@@ -37,7 +37,7 @@ export function Hero() {
         <div className="flex justify-center lg:justify-end">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/hero-porada.svg"
+            src="/assets/hero-porada.svg"
             alt=""
             className="w-full max-w-md lg:max-w-none"
           />

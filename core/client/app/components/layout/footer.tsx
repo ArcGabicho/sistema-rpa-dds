@@ -39,7 +39,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2.5">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-paper">
-                <Image src="/icon.png" alt="" width={28} height={28} className="h-7 w-7" />
+                <Image src="/assets/icon.png" alt="" width={28} height={28} className="h-7 w-7" />
               </span>
               <span className="font-display text-[15px] font-bold text-paper">
                 {SITE.name}

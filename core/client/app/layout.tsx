@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description:
     "Soluciones inteligentes en Analítica de Datos, Automatización RPA e Inteligencia Artificial para transformar tu empresa.",
   icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
+    icon: "/assets/icon.png",
+    apple: "/assets/apple-icon.png",
   },
 };
 

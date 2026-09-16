@@ -14,7 +14,7 @@ export function DashboardSidebar({ user }: { user: SessionUser | null }) {
   return (
     <aside className="flex w-64 shrink-0 flex-col bg-ink-950 px-5 py-6">
       <Link href="/" className="flex items-center gap-2.5 px-2">
-        <Image src="/icon.png" alt="" width={28} height={28} className="h-7 w-7" />
+        <Image src="/assets/icon.png" alt="" width={28} height={28} className="h-7 w-7" />
         <span className="font-display text-sm font-bold text-paper">{SITE.name}</span>
       </Link>
 

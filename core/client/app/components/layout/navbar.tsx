@@ -36,7 +36,7 @@ export function Navbar() {
 
       <Container className="flex h-18 items-center justify-between py-3">
         <Link href="/#top" className="flex items-center gap-2.5">
-          <Image src="/icon.png" alt="" width={32} height={32} className="h-8 w-8" />
+          <Image src="/assets/icon.png" alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-[15px] font-bold tracking-tight text-ink-950">
             {SITE.name}
           </span>
