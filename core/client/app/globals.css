@@ -1,26 +1,79 @@
 @import "tailwindcss";
+@import "sileo/styles.css";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0b1d4b;
+
+  /* Ink — DDS's deep navy: heading text on light pages, and the fill for
+     the dark accent bands/panels used sparingly for contrast */
+  --color-ink-950: #0b1d4b;
+  --color-ink-900: #0d2565;
+  --color-ink-800: #16327a;
+  --color-ink-700: #204ab0;
+
+  /* Paper — white surfaces, and reversed (light) text on the dark bands */
+  --color-paper: #ffffff;
+  --color-paper-dim: #cdd4ef;
+
+  /* Slate / line / mist — supporting neutrals for the light pages */
+  --color-slate: #57678a;
+  --color-line: #dbe0ec;
+  --color-mist: #f1f5fc;
+
+  /* Blue — DDS's primary accent */
+  --color-brass-300: #a8c3ff;
+  --color-brass-400: #6491ff;
+  --color-brass-500: #204ab0;
+  --color-brass-600: #16357f;
+
+  /* Mint — DDS's secondary accent, reserved for diagram strokes and
+     validated / success states */
+  --color-signal-300: #7be8c4;
+  --color-signal-400: #03e78b;
+  --color-signal-500: #04b872;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ink-950: var(--color-ink-950);
+  --color-ink-900: var(--color-ink-900);
+  --color-ink-800: var(--color-ink-800);
+  --color-ink-700: var(--color-ink-700);
+
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+
+  --color-slate: var(--color-slate);
+  --color-line: var(--color-line);
+  --color-mist: var(--color-mist);
+
+  --color-brass-300: var(--color-brass-300);
+  --color-brass-400: var(--color-brass-400);
+  --color-brass-500: var(--color-brass-500);
+  --color-brass-600: var(--color-brass-600);
+
+  --color-signal-300: var(--color-signal-300);
+  --color-signal-400: var(--color-signal-400);
+  --color-signal-500: var(--color-signal-500);
+
+  --font-sans: var(--font-instrument-sans);
+  --font-display: var(--font-instrument-sans);
+  --font-mono: var(--font-roboto-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--color-brass-400);
+  color: var(--color-paper);
 }
