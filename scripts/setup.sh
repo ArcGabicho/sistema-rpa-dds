@@ -7,9 +7,26 @@ set -euo pipefail
 #   curl -fsSL https://raw.githubusercontent.com/ArcGabicho/sistema-rpa-dds/master/scripts/setup.sh | bash
 # or, from an existing clone:
 #   scripts/setup.sh
+#
+# Idempotent: running it again (e.g. to pull the latest code) reuses the
+# existing .env untouched — it only fills in values that are still missing
+# or left at their .env.example placeholder, and never regenerates a secret
+# that's already in use by a running deployment. Pass --force to intentionally
+# rotate the admin credentials and every generated secret instead.
 
 REPO_URL="${REPO_URL:-https://github.com/ArcGabicho/sistema-rpa-dds.git}"
 TARGET_DIR="${TARGET_DIR:-$HOME/sistema-rpa-dds}"
+FORCE=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --force) FORCE=1 ;;
+    *)
+      echo "Uso: setup.sh [--force]" >&2
+      exit 1
+      ;;
+  esac
+done
 
 log()  { printf '\n==> %s\n' "$1"; }
 warn() { printf 'Advertencia: %s\n' "$1" >&2; }
@@ -39,6 +56,13 @@ prompt_secret() {
   echo "$reply"
 }
 
+get_env_var() {
+  # get_env_var FILE KEY — prints the current value, or nothing if unset.
+  local file="$1" key="$2"
+  [ -f "$file" ] || return 0
+  sed -n "s/^${key}=//p" "$file" | tail -n1
+}
+
 set_env_var() {
   # set_env_var FILE KEY VALUE — replaces KEY=... in FILE, or appends it.
   local file="$1" key="$2" value="$3"
@@ -49,6 +73,15 @@ set_env_var() {
   else
     printf '%s=%s\n' "$key" "$value" >> "$file"
   fi
+}
+
+# needs_value FILE KEY — true if KEY is unset, empty, or still equal to the
+# placeholder shipped in .env.example (i.e. nobody has customized it yet).
+needs_value() {
+  local file="$1" key="$2" current placeholder
+  current=$(get_env_var "$file" "$key")
+  placeholder=$(get_env_var .env.example "$key")
+  [ "$FORCE" = "1" ] || [ -z "$current" ] || [ "$current" = "$placeholder" ]
 }
 
 require git
@@ -67,6 +100,7 @@ cd "$TARGET_DIR"
 
 # 2. Install local dependencies (useful for development outside Docker;
 #    the Docker images install their own dependencies during the build).
+#    Safe to re-run: npm/dotnet only reconcile what changed.
 if command -v npm > /dev/null 2>&1; then
   log "Instalando dependencias de core/client..."
   (cd core/client && npm install)
@@ -81,37 +115,49 @@ else
   warn "dotnet no está instalado; omitiendo dependencias de core/server."
 fi
 
-# 3. Create .env from .env.example.
+# 3. Create .env from .env.example if it doesn't exist yet.
 if [ -f .env ]; then
-  warn ".env ya existe, se editará en el lugar."
+  log ".env ya existe, se conservan los valores ya configurados."
 else
   cp .env.example .env
 fi
 
-log "Configura el usuario administrador de la aplicación:"
-admin_email=$(prompt "Correo del administrador" "admin@dds.pe")
-while true; do
-  admin_password=$(prompt_secret "Contraseña del administrador (mín. 8 caracteres)")
-  admin_password_confirm=$(prompt_secret "Confirma la contraseña")
-  if [ "$admin_password" != "$admin_password_confirm" ]; then
-    echo "Las contraseñas no coinciden, intenta de nuevo." >&2
-    continue
+# 4. Admin credentials — only prompt if not already set (or --force).
+if needs_value .env ADMIN_EMAIL || needs_value .env ADMIN_PASSWORD; then
+  log "Configura el usuario administrador de la aplicación:"
+  admin_email=$(prompt "Correo del administrador" "admin@dds.pe")
+  while true; do
+    admin_password=$(prompt_secret "Contraseña del administrador (mín. 8 caracteres)")
+    admin_password_confirm=$(prompt_secret "Confirma la contraseña")
+    if [ "$admin_password" != "$admin_password_confirm" ]; then
+      echo "Las contraseñas no coinciden, intenta de nuevo." >&2
+      continue
+    fi
+    if [ "${#admin_password}" -lt 8 ]; then
+      echo "La contraseña debe tener al menos 8 caracteres." >&2
+      continue
+    fi
+    break
+  done
+  admin_name=$(prompt "Nombre completo del administrador" "Administrador")
+
+  set_env_var .env ADMIN_EMAIL "$admin_email"
+  set_env_var .env ADMIN_PASSWORD "$admin_password"
+  set_env_var .env ADMIN_FULL_NAME "$admin_name"
+else
+  log "Usuario administrador ya configurado ($(get_env_var .env ADMIN_EMAIL)), se conserva. Usa --force para cambiarlo."
+fi
+
+# 5. Generated secrets — only (re)generate the ones still at their
+#    .env.example placeholder, so re-running this never rotates a secret
+#    that a running deployment already depends on.
+for key in MSSQL_SA_PASSWORD APP_DB_PASSWORD JWT_SECRET; do
+  if needs_value .env "$key"; then
+    log "Generando $key..."
+    set_env_var .env "$key" "$(random_secret)"
+  else
+    log "$key ya está configurado, se conserva. Usa --force para rotarlo."
   fi
-  if [ "${#admin_password}" -lt 8 ]; then
-    echo "La contraseña debe tener al menos 8 caracteres." >&2
-    continue
-  fi
-  break
 done
-admin_name=$(prompt "Nombre completo del administrador" "Administrador")
-
-set_env_var .env ADMIN_EMAIL "$admin_email"
-set_env_var .env ADMIN_PASSWORD "$admin_password"
-set_env_var .env ADMIN_FULL_NAME "$admin_name"
-
-log "Generando secretos aleatorios para la base de datos y los tokens de sesión..."
-set_env_var .env MSSQL_SA_PASSWORD "$(random_secret)"
-set_env_var .env APP_DB_PASSWORD "$(random_secret)"
-set_env_var .env JWT_SECRET "$(random_secret)"
 
 log "Listo. Revisa $TARGET_DIR/.env y luego ejecuta scripts/run.sh para levantar el stack."
