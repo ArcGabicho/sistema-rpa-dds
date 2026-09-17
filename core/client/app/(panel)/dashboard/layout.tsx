@@ -1,4 +1,4 @@
-import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
+import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { getSessionUser } from "@/lib/session";
 
 export default async function DashboardLayout({
@@ -8,10 +8,5 @@ export default async function DashboardLayout({
 }) {
   const user = await getSessionUser();
 
-  return (
-    <div className="flex min-h-screen bg-mist">
-      <DashboardSidebar user={user} />
-      <main className="flex-1 overflow-y-auto p-8">{children}</main>
-    </div>
-  );
+  return <DashboardShell user={user}>{children}</DashboardShell>;
 }

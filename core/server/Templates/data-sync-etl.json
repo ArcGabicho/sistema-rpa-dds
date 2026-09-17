@@ -1,0 +1,190 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.47.16.16243",
+      "templateHash": "2479510536808258718"
+    }
+  },
+  "parameters": {
+    "serviceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Nombre lógico del servicio, usado como prefijo de los recursos."
+      }
+    },
+    "sourceConnectionString": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Cadena de conexión de origen."
+      }
+    },
+    "targetConnectionString": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Cadena de conexión de destino."
+      }
+    },
+    "scheduleCron": {
+      "type": "string",
+      "defaultValue": "0 0 * * * *",
+      "metadata": {
+        "description": "Expresión CRON (NCronTab) para el timer trigger."
+      }
+    },
+    "implementacionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id de la implementación en la base de datos de la plataforma, usado solo para etiquetar recursos."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    }
+  },
+  "variables": {
+    "namePrefix": "[toLower(replace(parameters('serviceName'), '-', ''))]",
+    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id, parameters('serviceName')), 0, 8)]",
+    "storageAccountName": "[take(format('st{0}{1}', variables('namePrefix'), variables('uniqueSuffix')), 24)]",
+    "hostingPlanName": "[format('plan-{0}-{1}', parameters('serviceName'), variables('uniqueSuffix'))]",
+    "functionAppName": "[format('func-{0}-{1}', parameters('serviceName'), variables('uniqueSuffix'))]",
+    "appInsightsName": "[format('appi-{0}-{1}', parameters('serviceName'), variables('uniqueSuffix'))]",
+    "commonTags": {
+      "dds-implementacion-id": "[parameters('implementacionId')]",
+      "dds-template-id": "data-sync-etl"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "tags": "[variables('commonTags')]",
+      "properties": {
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}', variables('storageAccountName'), 'default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('storageAccountName'), 'default', 'logs')]",
+      "properties": {
+        "publicAccess": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('appInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "tags": "[union(variables('commonTags'), createObject('dds-role', 'monitoring'))]",
+      "properties": {
+        "Application_Type": "web"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2023-12-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "[parameters('location')]",
+      "tags": "[variables('commonTags')]",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic"
+      },
+      "kind": "functionapp",
+      "properties": {
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-12-01",
+      "name": "[variables('functionAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "functionapp,linux",
+      "tags": "[union(variables('commonTags'), createObject('dds-role', 'compute'))]",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "linuxFxVersion": "DOTNET-ISOLATED|8.0",
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', variables('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-05-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet-isolated"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString]"
+            },
+            {
+              "name": "SOURCE_CONNECTION_STRING",
+              "value": "[parameters('sourceConnectionString')]"
+            },
+            {
+              "name": "TARGET_CONNECTION_STRING",
+              "value": "[parameters('targetConnectionString')]"
+            },
+            {
+              "name": "SCHEDULE_CRON",
+              "value": "[parameters('scheduleCron')]"
+            },
+            {
+              "name": "LOGS_CONTAINER",
+              "value": "logs"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "functionAppUrl": {
+      "type": "string",
+      "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-12-01').defaultHostName)]"
+    },
+    "functionAppName": {
+      "type": "string",
+      "value": "[variables('functionAppName')]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    }
+  }
+}

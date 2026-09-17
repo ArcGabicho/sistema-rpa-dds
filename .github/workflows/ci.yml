@@ -73,6 +73,23 @@ jobs:
       - name: Build main.bicep
         run: az bicep build --file infra/main.bicep --outfile /dev/null
 
+      - name: Build implementación templates
+        run: |
+          for f in infra/templates/*.bicep; do
+            echo "az bicep build --file $f"
+            az bicep build --file "$f" --outfile /dev/null
+          done
+
+      - name: Compiled templates are up to date
+        run: |
+          tmp=$(mktemp -d)
+          for f in infra/templates/*.bicep; do
+            name="$(basename "$f" .bicep)"
+            az bicep build --file "$f" --outfile "$tmp/$name.json"
+          done
+          diff -rq "$tmp" core/server/Templates \
+            || { echo "core/server/Templates/*.json is stale — run scripts/compile-templates.sh and commit the result."; exit 1; }
+
   docker:
     name: Docker images
     runs-on: ubuntu-latest

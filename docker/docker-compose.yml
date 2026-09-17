@@ -56,6 +56,11 @@ services:
       Admin__Password: ${ADMIN_PASSWORD}
       Admin__FullName: ${ADMIN_FULL_NAME:-Administrador}
       Cors__AllowedOrigins__0: ${CLIENT_ORIGIN:-http://localhost:3000}
+      Azure__SubscriptionId: ${AZURE_SUBSCRIPTION_ID:-}
+      Azure__ResourceGroupName: ${AZURE_RESOURCE_GROUP:-rg-dds}
+      Azure__Location: ${AZURE_LOCATION:-eastus}
+      Azure__KeyVaultName: ${AZURE_KEY_VAULT_NAME:-}
+      Azure__ContainerAppsEnvironmentName: ${AZURE_CONTAINER_APPS_ENV:-}
     ports:
       - "${SERVER_PORT:-8080}:8080"
     healthcheck:

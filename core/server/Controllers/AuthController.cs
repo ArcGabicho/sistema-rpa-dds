@@ -53,6 +53,7 @@ public class AuthController(
                 Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
+                Role = user.Role,
             },
         });
     }
@@ -71,6 +72,7 @@ public class AuthController(
             Id = user.Id,
             Email = user.Email,
             FullName = user.FullName,
+            Role = user.Role,
         });
     }
 }

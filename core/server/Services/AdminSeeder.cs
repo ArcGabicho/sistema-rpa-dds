@@ -31,6 +31,7 @@ public static class AdminSeeder
             Email = email,
             FullName = fullName,
             PasswordHash = string.Empty,
+            Role = AdminRole.Admin,
         };
         admin.PasswordHash = hasher.HashPassword(admin, password);
 

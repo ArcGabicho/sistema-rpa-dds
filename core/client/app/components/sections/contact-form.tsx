@@ -1,39 +1,17 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Send } from "lucide-react";
-import { sileo } from "sileo";
-import {
-  SERVICE_OPTIONS,
-  contactSchema,
-  type ContactFormValues,
-} from "@/lib/contact-schema";
+import { SERVICE_OPTIONS } from "@/lib/contact-schema";
+import { useContact } from "@/hooks/use-contact";
 
 const FIELD_BASE =
   "w-full rounded-xl border bg-paper px-4 py-3 text-sm text-ink-950 outline-none transition-colors placeholder:text-slate/60 focus:border-brass-400";
 
 export function ContactForm() {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ContactFormValues>({
-    resolver: zodResolver(contactSchema),
-  });
-
-  const onSubmit = async (data: ContactFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    sileo.success({
-      title: "Solicitud enviada",
-      description: `Gracias ${data.fullName}, te contactaremos en menos de 24 horas.`,
-    });
-    reset();
-  };
+  const { register, errors, isSubmitting, onSubmit } = useContact();
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <input

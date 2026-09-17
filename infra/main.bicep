@@ -73,6 +73,14 @@ var keyVaultSecretsUserRoleId = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   '4633458b-17de-408a-b874-0445c86b69e6'
 )
+var keyVaultSecretsOfficerRoleId = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+)
+var contributorRoleId = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  'b24988ac-6180-42a0-ab88-20f7382dd24c'
+)
 
 // ---------------------------------------------------------------------------
 // Identity used by both container apps to pull from ACR and read Key Vault.
@@ -128,6 +136,30 @@ resource keyVaultSecretsUserAssignment 'Microsoft.Authorization/roleAssignments@
   scope: keyVault
   properties: {
     roleDefinitionId: keyVaultSecretsUserRoleId
+    principalId: identity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Secrets Officer (not just User/read-only): the server writes a new Key
+// Vault secret for every implementación credential the user supplies.
+resource keyVaultSecretsOfficerAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, identity.id, 'KeyVaultSecretsOfficer')
+  scope: keyVault
+  properties: {
+    roleDefinitionId: keyVaultSecretsOfficerRoleId
+    principalId: identity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Contributor on this resource group: the server provisions and tears down
+// the actual Azure resources (storage, function apps, container apps) behind
+// each user-deployed implementación via ARM deployments at runtime.
+resource contributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, identity.id, 'Contributor')
+  properties: {
+    roleDefinitionId: contributorRoleId
     principalId: identity.properties.principalId
     principalType: 'ServicePrincipal'
   }
@@ -324,6 +356,12 @@ resource serverApp 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'Admin__Password', secretRef: 'admin-password' }
             { name: 'Admin__FullName', value: adminFullName }
             { name: 'Cors__AllowedOrigins__0', value: 'https://${clientAppName}.${containerAppsEnv.properties.defaultDomain}' }
+            { name: 'Azure__SubscriptionId', value: subscription().subscriptionId }
+            { name: 'Azure__ResourceGroupName', value: resourceGroup().name }
+            { name: 'Azure__Location', value: location }
+            { name: 'Azure__KeyVaultName', value: keyVault.name }
+            { name: 'Azure__ContainerAppsEnvironmentName', value: containerAppsEnv.name }
+            { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
           ]
         }
       ]
@@ -336,6 +374,8 @@ resource serverApp 'Microsoft.App/containerApps@2024-03-01' = {
   dependsOn: [
     acrPullAssignment
     keyVaultSecretsUserAssignment
+    keyVaultSecretsOfficerAssignment
+    contributorAssignment
     dbAppUserSetup
   ]
 }
