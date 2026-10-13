@@ -8,8 +8,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<ClientNote> ClientNotes => Set<ClientNote>();
-    public DbSet<Implementacion> Implementaciones => Set<Implementacion>();
-    public DbSet<ImplementacionLog> ImplementacionLogs => Set<ImplementacionLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,31 +47,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany()
                 .HasForeignKey(n => n.AuthorUserId)
                 .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Implementacion>(entity =>
-        {
-            entity.HasIndex(i => i.CreatedAtUtc);
-            entity.Property(i => i.TemplateId).HasMaxLength(100).IsRequired();
-            entity.Property(i => i.Name).HasMaxLength(100).IsRequired();
-            entity.Property(i => i.Status).HasMaxLength(20).IsRequired();
-            entity.Property(i => i.ResourceGroupName).HasMaxLength(100).IsRequired();
-            entity.Property(i => i.DeploymentName).HasMaxLength(100).IsRequired();
-            entity.HasOne(i => i.AdminUser)
-                .WithMany()
-                .HasForeignKey(i => i.AdminUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-            entity.HasMany(i => i.Logs)
-                .WithOne(l => l.Implementacion)
-                .HasForeignKey(l => l.ImplementacionId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<ImplementacionLog>(entity =>
-        {
-            entity.HasIndex(l => new { l.ImplementacionId, l.TimestampUtc });
-            entity.Property(l => l.Level).HasMaxLength(20).IsRequired();
-            entity.Property(l => l.Message).HasMaxLength(1000).IsRequired();
         });
     }
 }

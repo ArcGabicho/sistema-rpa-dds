@@ -147,98 +147,6 @@ namespace server.Data.Migrations
                     b.ToTable("ClientNotes");
                 });
 
-            modelBuilder.Entity("Server.Models.Implementacion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AdminUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConfigJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeploymentName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("OutputsJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResourceGroupName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("TemplateId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdminUserId");
-
-                    b.HasIndex("CreatedAtUtc");
-
-                    b.ToTable("Implementaciones");
-                });
-
-            modelBuilder.Entity("Server.Models.ImplementacionLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ImplementacionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("TimestampUtc")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ImplementacionId", "TimestampUtc");
-
-                    b.ToTable("ImplementacionLogs");
-                });
-
             modelBuilder.Entity("Server.Models.Client", b =>
                 {
                     b.HasOne("Server.Models.AdminUser", "AssignedToUser")
@@ -268,36 +176,9 @@ namespace server.Data.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("Server.Models.Implementacion", b =>
-                {
-                    b.HasOne("Server.Models.AdminUser", "AdminUser")
-                        .WithMany()
-                        .HasForeignKey("AdminUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AdminUser");
-                });
-
-            modelBuilder.Entity("Server.Models.ImplementacionLog", b =>
-                {
-                    b.HasOne("Server.Models.Implementacion", "Implementacion")
-                        .WithMany("Logs")
-                        .HasForeignKey("ImplementacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Implementacion");
-                });
-
             modelBuilder.Entity("Server.Models.Client", b =>
                 {
                     b.Navigation("Notes");
-                });
-
-            modelBuilder.Entity("Server.Models.Implementacion", b =>
-                {
-                    b.Navigation("Logs");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using Server.Data;
 namespace server.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260917021850_AddClients")]
-    partial class AddClients
+    [Migration("20261013044424_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,11 @@ namespace server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -68,6 +73,9 @@ namespace server.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AssignedToUserId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
@@ -97,11 +105,83 @@ namespace server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AssignedToUserId");
 
                     b.HasIndex("CreatedAtUtc");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("Server.Models.ClientNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AuthorUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorUserId");
+
+                    b.HasIndex("ClientId", "CreatedAtUtc");
+
+                    b.ToTable("ClientNotes");
+                });
+
+            modelBuilder.Entity("Server.Models.Client", b =>
+                {
+                    b.HasOne("Server.Models.AdminUser", "AssignedToUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AssignedToUser");
+                });
+
+            modelBuilder.Entity("Server.Models.ClientNote", b =>
+                {
+                    b.HasOne("Server.Models.AdminUser", "AuthorUser")
+                        .WithMany()
+                        .HasForeignKey("AuthorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.Client", "Client")
+                        .WithMany("Notes")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuthorUser");
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("Server.Models.Client", b =>
+                {
+                    b.Navigation("Notes");
                 });
 #pragma warning restore 612, 618
         }
