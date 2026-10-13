@@ -58,46 +58,9 @@ jobs:
       - name: Syntax check
         run: |
           status=0
-          for f in scripts/*.sh docker/database/init.sh; do
+          for f in scripts/*.sh; do
             echo "bash -n $f"
             bash -n "$f" || status=1
-          done
-          exit $status
-
-  infra:
-    name: Infra (Bicep)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build main.bicep
-        run: az bicep build --file infra/main.bicep --outfile /dev/null
-
-      - name: Build implementación templates
-        run: |
-          for f in infra/templates/*.bicep; do
-            echo "az bicep build --file $f"
-            az bicep build --file "$f" --outfile /dev/null
-          done
-
-      - name: Compiled templates are up to date
-        run: |
-          # Compare semantically, not byte-for-byte: the compiled JSON embeds
-          # metadata._generator.version/templateHash, which differs between
-          # bicep compiler versions (e.g. a dev machine's CLI vs. whatever
-          # az bicep ships on this runner) even when the source .bicep is
-          # byte-identical. Strip that stamp before diffing.
-          tmp=$(mktemp -d)
-          status=0
-          for f in infra/templates/*.bicep; do
-            name="$(basename "$f" .bicep)"
-            az bicep build --file "$f" --outfile "$tmp/$name.json"
-            jq 'del(.metadata._generator)' "$tmp/$name.json" > "$tmp/$name.fresh.json"
-            jq 'del(.metadata._generator)' "core/server/Templates/$name.json" > "$tmp/$name.committed.json"
-            if ! diff -u "$tmp/$name.committed.json" "$tmp/$name.fresh.json"; then
-              echo "core/server/Templates/$name.json is stale — run scripts/compile-templates.sh and commit the result."
-              status=1
-            fi
           done
           exit $status
 

@@ -2,20 +2,20 @@
 
 ![Wallpaper](core/client/public/portada.png)
 
-Sistema para implementar y gestionar soluciones de automatización RPA & IA para empresas y organizaciones públicas. Proyecto especializado en Azure como infraestructura.
+Sistema para implementar y gestionar soluciones de automatización RPA & IA para empresas y organizaciones públicas. El frontend (Next.js) se despliega en Vercel, la API (ASP.NET Core) en Dokploy y la base de datos en Azure SQL Database.
 
 ----
 
 #### Clona el proyecto en local:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ArcGabicho/sistema-rpa-dds/master/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ArcGabicho/sistema-rpa-dds/master/scripts/setup.sh | bash
 ```
 
-#### Deployar el proyecto en Azure:
+#### Levanta el proyecto en local:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ArcGabicho/sistema-rpa-dds/master/deploy.sh | bash
+scripts/run.sh
 ```
 
 ----

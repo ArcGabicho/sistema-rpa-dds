@@ -1,66 +1,24 @@
 name: sistema-rpa-dds
 
+# Local stack: the API and the website. There is no database container — the
+# API connects to the Azure SQL database in DB_CONNECTION_STRING. In
+# production the server is deployed by Dokploy (docker/Dockerfile.server) and
+# the client by Vercel; this file is only for running both together locally.
+
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-    volumes:
-      - mssql_data:/var/opt/mssql
-    ports:
-      - "${DB_PORT:-1433}:1433"
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1'",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-    networks:
-      - dds
-
-  db-init:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-    environment:
-      DB_HOST: sqlserver
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-      APP_DB_NAME: ${APP_DB_NAME}
-      APP_DB_USER: ${APP_DB_USER}
-      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
-    volumes:
-      - ./database:/scripts:ro
-    entrypoint: ["/bin/bash", "/scripts/init.sh"]
-    networks:
-      - dds
-
   server:
     build:
       context: ..
       dockerfile: docker/Dockerfile.server
-    depends_on:
-      db-init:
-        condition: service_completed_successfully
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
-      ConnectionStrings__Default: Server=sqlserver,1433;Database=${APP_DB_NAME};User Id=${APP_DB_USER};Password=${APP_DB_PASSWORD};TrustServerCertificate=True
+      ConnectionStrings__Default: ${DB_CONNECTION_STRING}
       Jwt__Secret: ${JWT_SECRET}
       Jwt__ExpiresInMinutes: ${JWT_EXPIRES_IN_MINUTES:-60}
       Admin__Email: ${ADMIN_EMAIL}
       Admin__Password: ${ADMIN_PASSWORD}
       Admin__FullName: ${ADMIN_FULL_NAME:-Administrador}
       Cors__AllowedOrigins__0: ${CLIENT_ORIGIN:-http://localhost:3000}
-      Azure__SubscriptionId: ${AZURE_SUBSCRIPTION_ID:-}
-      Azure__ResourceGroupName: ${AZURE_RESOURCE_GROUP:-rg-dds}
-      Azure__Location: ${AZURE_LOCATION:-eastus}
-      Azure__KeyVaultName: ${AZURE_KEY_VAULT_NAME:-}
-      Azure__ContainerAppsEnvironmentName: ${AZURE_CONTAINER_APPS_ENV:-}
     ports:
       - "${SERVER_PORT:-8080}:8080"
     healthcheck:
@@ -68,7 +26,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 15s
+      # Startup runs EF migrations against Azure SQL, which can take up to a
+      # minute when a serverless database is resuming from auto-pause.
+      start_period: 60s
     networks:
       - dds
 
@@ -90,6 +50,3 @@ services:
 
 networks:
   dds:
-
-volumes:
-  mssql_data:

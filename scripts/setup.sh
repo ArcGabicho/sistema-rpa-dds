@@ -148,16 +148,30 @@ else
   log "Usuario administrador ya configurado ($(get_env_var .env ADMIN_EMAIL)), se conserva. Usa --force para cambiarlo."
 fi
 
-# 5. Generated secrets — only (re)generate the ones still at their
-#    .env.example placeholder, so re-running this never rotates a secret
-#    that a running deployment already depends on.
-for key in MSSQL_SA_PASSWORD APP_DB_PASSWORD JWT_SECRET; do
-  if needs_value .env "$key"; then
-    log "Generando $key..."
-    set_env_var .env "$key" "$(random_secret)"
+# 5. JWT secret — only (re)generated while still at its .env.example
+#    placeholder, so re-running this never rotates it under a running
+#    deployment (that would invalidate every active session).
+if needs_value .env JWT_SECRET; then
+  log "Generando JWT_SECRET..."
+  set_env_var .env JWT_SECRET "$(random_secret)"
+else
+  log "JWT_SECRET ya está configurado, se conserva. Usa --force para rotarlo."
+fi
+
+# 6. Azure SQL connection string — the database is created outside this
+#    repo (Azure portal), so it's asked for, never generated. Not affected
+#    by --force: an existing value is always kept.
+if [ -z "$(get_env_var .env DB_CONNECTION_STRING)" ]; then
+  log "Configura la base de datos (Azure SQL Database):"
+  db_connection_string=$(prompt_secret "Cadena de conexión de Azure SQL (Enter para completarla luego)")
+  if [ -n "$db_connection_string" ]; then
+    # Single quotes: Docker Compose then reads $ or # in the password literally.
+    set_env_var .env DB_CONNECTION_STRING "'$db_connection_string'"
   else
-    log "$key ya está configurado, se conserva. Usa --force para rotarlo."
+    warn "DB_CONNECTION_STRING quedó vacío; complétalo en .env antes de levantar el stack."
   fi
-done
+else
+  log "DB_CONNECTION_STRING ya está configurado, se conserva."
+fi
 
 log "Listo. Revisa $TARGET_DIR/.env y luego ejecuta scripts/run.sh para levantar el stack."
