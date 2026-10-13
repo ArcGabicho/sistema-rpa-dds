@@ -18,8 +18,12 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Falta la cadena de conexión 'ConnectionStrings:Default'.");
 
+// Retry transient failures: the Azure SQL database is serverless and
+// auto-pauses, so the first connection after a pause gets error 40613
+// ("not currently available") for up to about a minute while it resumes.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql =>
+        sql.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)));
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.AddSingleton<TokenService>();
