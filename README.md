@@ -12,12 +12,6 @@ Sistema para implementar y gestionar soluciones de automatización RPA & IA para
 curl -fsSL https://raw.githubusercontent.com/ArcGabicho/sistema-rpa-dds/master/scripts/setup.sh | bash
 ```
 
-#### Levanta el proyecto en local:
-
-```bash
-scripts/run.sh
-```
-
 ----
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE.md](LICENSE.md) para más detalles.
