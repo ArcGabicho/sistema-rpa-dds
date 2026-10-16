@@ -12,7 +12,8 @@ set -euo pipefail
 # existing .env untouched — it only fills in values that are still missing
 # or left at their .env.example placeholder, and never regenerates a secret
 # that's already in use by a running deployment. Pass --force to intentionally
-# rotate the admin credentials and every generated secret instead.
+# rotate the admin credentials and every generated secret instead — except
+# the vault's master key, which is never rotated here (see step 7).
 
 REPO_URL="${REPO_URL:-https://github.com/ArcGabicho/sistema-rpa-dds.git}"
 TARGET_DIR="${TARGET_DIR:-$HOME/sistema-rpa-dds}"
@@ -170,6 +171,17 @@ if needs_value .env MSSQL_SA_PASSWORD; then
   fi
 else
   log "MSSQL_SA_PASSWORD ya está configurado, se conserva. Usa --force para rotarlo."
+fi
+
+# 7. Vault master key (Bóveda) — 32 random bytes in base64. Generated only
+#    when empty, never by --force: a new key can't read the secrets the old
+#    one encrypted, so replacing it would lose them all.
+if [ -z "$(get_env_var .env BOVEDA_CLAVE_MAESTRA)" ]; then
+  log "Generando BOVEDA_CLAVE_MAESTRA (clave de cifrado de la bóveda)..."
+  set_env_var .env BOVEDA_CLAVE_MAESTRA "$(openssl rand -base64 32 2>/dev/null | tr -d '\n' || head -c 32 /dev/urandom | base64 | tr -d '\n')"
+  warn "Guarda una copia de BOVEDA_CLAVE_MAESTRA fuera del servidor (p. ej. en un gestor de contraseñas): sin ella no se pueden recuperar los secretos."
+else
+  log "BOVEDA_CLAVE_MAESTRA ya está configurada, se conserva (nunca se rota automáticamente)."
 fi
 
 log "Listo. Revisa $TARGET_DIR/.env y luego ejecuta scripts/run.sh para levantar el stack."

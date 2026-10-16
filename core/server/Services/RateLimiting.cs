@@ -9,12 +9,15 @@ namespace Server.Services;
 // - every request: 300 a minute per user, 120 a minute per anonymous IP;
 // - "login": 10 attempts per IP in any 5 minutes (plus LoginThrottle's
 //   per-account lockout);
-// - "contact": 5 contact-form submissions per IP every 10 minutes.
+// - "contact": 5 contact-form submissions per IP every 10 minutes;
+// - "boveda": 30 secrets revealed per user in any 5 minutes, so an account
+//   in the wrong hands can't dump the vault in one go.
 // A rejected request gets a 429 with Retry-After and a { message } to show.
 public static class RateLimiting
 {
     public const string Login = "login";
     public const string Contact = "contact";
+    public const string Boveda = "boveda";
 
     public static IServiceCollection AddRateLimits(this IServiceCollection services)
     {
@@ -47,6 +50,17 @@ public static class RateLimiting
                     SegmentsPerWindow = 5,
                     QueueLimit = 0,
                 }));
+
+            options.AddPolicy(Boveda, context =>
+                RateLimitPartition.GetSlidingWindowLimiter(
+                    context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ClientIp.Resolve(context),
+                    _ => new SlidingWindowRateLimiterOptions
+                    {
+                        PermitLimit = 30,
+                        Window = TimeSpan.FromMinutes(5),
+                        SegmentsPerWindow = 5,
+                        QueueLimit = 0,
+                    }));
 
             options.AddPolicy(Contact, context =>
                 RateLimitPartition.GetFixedWindowLimiter(ClientIp.Resolve(context), _ => new FixedWindowRateLimiterOptions

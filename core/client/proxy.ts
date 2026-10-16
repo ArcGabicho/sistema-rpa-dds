@@ -29,7 +29,8 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  if (pathname.startsWith("/dashboard/usuarios") && role !== "Admin") {
+  const adminOnly = pathname.startsWith("/dashboard/usuarios") || pathname.startsWith("/dashboard/boveda/registro");
+  if (adminOnly && role !== "Admin") {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";

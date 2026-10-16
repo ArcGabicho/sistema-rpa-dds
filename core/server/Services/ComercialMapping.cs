@@ -30,7 +30,7 @@ public static class ComercialMapping
         Id = a.Id,
         Tipo = a.Tipo,
         Descripcion = a.Descripcion,
-        AutorNombre = a.Autor != null ? a.Autor.FullName : "—",
+        AutorNombre = a.Autor != null ? a.Autor.FullName : "Usuario eliminado",
         OportunidadId = a.OportunidadId,
         OportunidadTitulo = a.Oportunidad != null ? a.Oportunidad.Titulo : null,
         CreatedAtUtc = a.CreatedAtUtc,

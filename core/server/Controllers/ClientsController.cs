@@ -120,7 +120,7 @@ public class ClientsController(AppDbContext db, ILogger<ClientsController> logge
         {
             Id = n.Id,
             Message = n.Message,
-            AuthorName = n.AuthorUser?.FullName ?? "—",
+            AuthorName = n.AuthorUser?.FullName ?? "Usuario eliminado",
             CreatedAtUtc = n.CreatedAtUtc,
         }));
     }

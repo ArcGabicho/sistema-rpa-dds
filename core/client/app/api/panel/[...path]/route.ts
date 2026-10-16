@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { getApiUrl } from "@/lib/auth";
+import { clientIpHeaders } from "@/lib/client-ip";
 import { getSessionToken } from "@/lib/session";
 
 // Authenticated pass-through to the API for the panel's client components:
 // /api/panel/empresas/12/contactos -> {API_URL}/api/empresas/12/contactos,
 // with the session's JWT attached. Only the modules listed here go through.
-const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients"]);
+const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda"]);
+
+// Nothing from the panel's API (vault values least of all) may be cached.
+const NO_STORE = { "Cache-Control": "no-store" };
 
 type Context = { params: Promise<{ path: string[] }> };
 
@@ -37,6 +41,8 @@ async function forward(request: Request, { params }: Context) {
       headers: {
         Authorization: `Bearer ${token}`,
         ...(hasBody && { "Content-Type": "application/json" }),
+        // For the vault's access log, which records where each reveal came from.
+        ...clientIpHeaders(request),
       },
       body: hasBody ? await request.text() : undefined,
       cache: "no-store",
@@ -45,7 +51,7 @@ async function forward(request: Request, { params }: Context) {
     return NextResponse.json({ message: "No se pudo conectar con el servidor." }, { status: 502 });
   }
 
-  if (backendResponse.status === 204) return new NextResponse(null, { status: 204 });
+  if (backendResponse.status === 204) return new NextResponse(null, { status: 204, headers: NO_STORE });
 
   const data = await backendResponse.json().catch(() => null);
   if (!backendResponse.ok) {
@@ -53,11 +59,11 @@ async function forward(request: Request, { params }: Context) {
       backendResponse.status === 403 ? "No tienes permiso para esta acción." : "No se pudo completar la acción.";
     return NextResponse.json(
       { ...(data && typeof data === "object" ? data : {}), message: errorMessage(data) ?? fallback },
-      { status: backendResponse.status },
+      { status: backendResponse.status, headers: NO_STORE },
     );
   }
 
-  return NextResponse.json(data, { status: backendResponse.status });
+  return NextResponse.json(data, { status: backendResponse.status, headers: NO_STORE });
 }
 
 export { forward as GET, forward as POST, forward as PUT, forward as PATCH, forward as DELETE };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Pencil, Plus } from "lucide-react";
+import { EmpresaCredenciales } from "@/components/boveda/empresa-credenciales";
 import { ActividadTimeline } from "@/components/comercial/actividad-timeline";
 import { ContactosPanel } from "@/components/comercial/contactos-panel";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
@@ -9,7 +10,8 @@ import { EmpresaEstadoBadge, EtapaBadge } from "@/components/ui/comercial-badges
 import { PageHeader } from "@/components/ui/page-header";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
-import { ETAPAS_ABIERTAS, formatSoles, type Empresa } from "@/lib/comercial";
+import type { SecretoItem } from "@/lib/boveda";
+import { ETAPAS_ABIERTAS, formatSoles, type Empresa, type Paged } from "@/lib/comercial";
 import { formatDate, formatDateTime, todayInLima } from "@/lib/format-date";
 import { getSessionUser, isAdmin } from "@/lib/session";
 
@@ -19,7 +21,11 @@ function website(url: string) {
 
 export default async function EmpresaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [empresa, user] = await Promise.all([apiGet<Empresa>(`empresas/${id}`), getSessionUser()]);
+  const [empresa, user, credenciales] = await Promise.all([
+    apiGet<Empresa>(`empresas/${id}`),
+    getSessionUser(),
+    /^\d+$/.test(id) ? apiGet<Paged<SecretoItem>>(`boveda?empresaId=${id}&pageSize=50`) : null,
+  ]);
   if (!empresa) notFound();
 
   const today = todayInLima();
@@ -135,6 +141,13 @@ export default async function EmpresaPage({ params }: { params: Promise<{ id: st
           </section>
 
           <ContactosPanel empresaId={empresa.id} contactos={empresa.contactos} />
+
+          <EmpresaCredenciales
+            empresaId={empresa.id}
+            secretos={credenciales?.items ?? null}
+            today={today}
+            esAdmin={isAdmin(user)}
+          />
         </div>
       </div>
     </div>

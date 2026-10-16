@@ -42,6 +42,7 @@ services:
       ConnectionStrings__Default: Server=sqlserver,1433;Database=${DEV_DB_NAME:-db-rpa-dds};User Id=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True
       Jwt__Secret: ${JWT_SECRET}
       Jwt__ExpiresInMinutes: ${JWT_EXPIRES_IN_MINUTES:-60}
+      Boveda__ClaveMaestra: ${BOVEDA_CLAVE_MAESTRA:-}
       Admin__Email: ${ADMIN_EMAIL}
       Admin__Password: ${ADMIN_PASSWORD}
       Admin__FullName: ${ADMIN_FULL_NAME:-Administrador}

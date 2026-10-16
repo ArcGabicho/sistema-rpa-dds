@@ -22,6 +22,53 @@ namespace server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Server.Models.AccesoSecreto", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ip")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int?>("SecretoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SecretoNombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsuarioNombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAtUtc");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("SecretoId", "CreatedAtUtc");
+
+                    b.ToTable("AccesosSecreto");
+                });
+
             modelBuilder.Entity("Server.Models.Actividad", b =>
                 {
                     b.Property<int>("Id")
@@ -30,7 +77,7 @@ namespace server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AutorId")
+                    b.Property<int?>("AutorId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
@@ -165,7 +212,7 @@ namespace server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AuthorUserId")
+                    b.Property<int?>("AuthorUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("ClientId")
@@ -385,13 +432,98 @@ namespace server.Data.Migrations
                     b.ToTable("Oportunidades");
                 });
 
+            modelBuilder.Entity("Server.Models.Secreto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Notas")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("Restringido")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("RotadoAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("Uid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Usuario")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<byte[]>("ValorCifrado")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime?>("VenceEl")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("Nombre");
+
+                    b.HasIndex("Uid")
+                        .IsUnique();
+
+                    b.HasIndex("VenceEl");
+
+                    b.ToTable("Secretos");
+                });
+
+            modelBuilder.Entity("Server.Models.AccesoSecreto", b =>
+                {
+                    b.HasOne("Server.Models.Secreto", "Secreto")
+                        .WithMany("Accesos")
+                        .HasForeignKey("SecretoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Server.Models.AdminUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Secreto");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("Server.Models.Actividad", b =>
                 {
                     b.HasOne("Server.Models.AdminUser", "Autor")
                         .WithMany()
                         .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Server.Models.Empresa", "Empresa")
                         .WithMany()
@@ -426,8 +558,7 @@ namespace server.Data.Migrations
                     b.HasOne("Server.Models.AdminUser", "AuthorUser")
                         .WithMany()
                         .HasForeignKey("AuthorUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Server.Models.Client", "Client")
                         .WithMany("Notes")
@@ -492,6 +623,16 @@ namespace server.Data.Migrations
                     b.Navigation("Solicitud");
                 });
 
+            modelBuilder.Entity("Server.Models.Secreto", b =>
+                {
+                    b.HasOne("Server.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Empresa");
+                });
+
             modelBuilder.Entity("Server.Models.Client", b =>
                 {
                     b.Navigation("Notes");
@@ -507,6 +648,11 @@ namespace server.Data.Migrations
             modelBuilder.Entity("Server.Models.Oportunidad", b =>
                 {
                     b.Navigation("Actividades");
+                });
+
+            modelBuilder.Entity("Server.Models.Secreto", b =>
+                {
+                    b.Navigation("Accesos");
                 });
 #pragma warning restore 612, 618
         }

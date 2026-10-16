@@ -46,6 +46,18 @@ public static class EmpresaSeeder
             empresas.Sum(e => e.Oportunidades.Count));
     }
 
+    // "Logística Ñan & Cóndor" -> "logisticanancondor"
+    internal static string Slug(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (var ch in s.Normalize(NormalizationForm.FormD))
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(ch) == UnicodeCategory.NonSpacingMark) continue;
+            if (char.IsAsciiLetterOrDigit(ch)) sb.Append(char.ToLowerInvariant(ch));
+        }
+        return sb.ToString();
+    }
+
     private sealed class Generador(Random rnd, DateTime ahora, DateTime hoy, int? autorId)
     {
         private readonly HashSet<string> nombres = [];
@@ -260,18 +272,6 @@ public static class EmpresaSeeder
 
         private static DateTime Max(DateTime a, DateTime b) => a > b ? a : b;
         private static DateTime Min(DateTime a, DateTime b) => a < b ? a : b;
-
-        // "Logística Ñan & Cóndor" -> "logisticanancondor"
-        private static string Slug(string s)
-        {
-            var sb = new StringBuilder();
-            foreach (var ch in s.Normalize(NormalizationForm.FormD))
-            {
-                if (CharUnicodeInfo.GetUnicodeCategory(ch) == UnicodeCategory.NonSpacingMark) continue;
-                if (char.IsAsciiLetterOrDigit(ch)) sb.Append(char.ToLowerInvariant(ch));
-            }
-            return sb.ToString();
-        }
     }
 
     // --- Fictitious catalogs ---------------------------------------------------

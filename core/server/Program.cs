@@ -25,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.AddSingleton<TokenService>();
+builder.Services.AddSingleton<BovedaCifrado>();
 builder.Services.AddSingleton<PasswordHasher<AdminUser>>();
 
 var jwtSecret = builder.Configuration[$"{JwtOptions.SectionName}:Secret"]
@@ -77,6 +78,9 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
     await AdminSeeder.SeedAsync(db, app.Configuration, logger);
     await EmpresaSeeder.SeedAsync(db, app.Configuration, logger);
+    // Resolved here so a malformed vault key stops the API at startup.
+    var cifrado = scope.ServiceProvider.GetRequiredService<BovedaCifrado>();
+    await BovedaSeeder.SeedAsync(db, app.Configuration, cifrado, logger);
 }
 
 // Configure the HTTP request pipeline.

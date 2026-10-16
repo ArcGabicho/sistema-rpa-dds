@@ -25,7 +25,8 @@ public class Actividad
     public required string Tipo { get; set; }
     public required string Descripcion { get; set; }
 
-    public int AutorId { get; set; }
+    // Null once the author's user is deleted; the history stays.
+    public int? AutorId { get; set; }
     public AdminUser? Autor { get; set; }
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

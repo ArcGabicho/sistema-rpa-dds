@@ -8,6 +8,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<ClientNote> ClientNotes => Set<ClientNote>();
+    public DbSet<Secreto> Secretos => Set<Secreto>();
+    public DbSet<AccesoSecreto> AccesosSecreto => Set<AccesoSecreto>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Contacto> Contactos => Set<Contacto>();
     public DbSet<Oportunidad> Oportunidades => Set<Oportunidad>();
@@ -50,7 +52,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(n => n.AuthorUser)
                 .WithMany()
                 .HasForeignKey(n => n.AuthorUserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Comercial. Deleting a company cascades to its contacts, opportunities
@@ -137,7 +139,44 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(a => a.Autor)
                 .WithMany()
                 .HasForeignKey(a => a.AutorId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Bóveda. A company's secrets go with it; the audit trail outlives
+        // both the secret and the user (SetNull, with names copied in).
+        modelBuilder.Entity<Secreto>(entity =>
+        {
+            entity.HasIndex(s => s.Uid).IsUnique();
+            entity.HasIndex(s => s.Nombre);
+            entity.HasIndex(s => s.VenceEl);
+            entity.Property(s => s.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(s => s.Tipo).HasMaxLength(20).IsRequired();
+            entity.Property(s => s.Usuario).HasMaxLength(256);
+            entity.Property(s => s.Url).HasMaxLength(500);
+            entity.Property(s => s.Notas).HasMaxLength(1000);
+            entity.Property(s => s.ValorCifrado).IsRequired();
+            entity.HasOne(s => s.Empresa)
+                .WithMany()
+                .HasForeignKey(s => s.EmpresaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AccesoSecreto>(entity =>
+        {
+            entity.HasIndex(a => new { a.SecretoId, a.CreatedAtUtc });
+            entity.HasIndex(a => a.CreatedAtUtc);
+            entity.Property(a => a.SecretoNombre).HasMaxLength(200).IsRequired();
+            entity.Property(a => a.UsuarioNombre).HasMaxLength(200).IsRequired();
+            entity.Property(a => a.Accion).HasMaxLength(20).IsRequired();
+            entity.Property(a => a.Ip).HasMaxLength(64);
+            entity.HasOne(a => a.Secreto)
+                .WithMany(s => s.Accesos)
+                .HasForeignKey(a => a.SecretoId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(a => a.Usuario)
+                .WithMany()
+                .HasForeignKey(a => a.UsuarioId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

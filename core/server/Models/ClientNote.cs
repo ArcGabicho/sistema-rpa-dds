@@ -6,7 +6,8 @@ public class ClientNote
     public int ClientId { get; set; }
     public Client? Client { get; set; }
 
-    public int AuthorUserId { get; set; }
+    // Null once the author's user is deleted; the note stays.
+    public int? AuthorUserId { get; set; }
     public AdminUser? AuthorUser { get; set; }
 
     public required string Message { get; set; }
