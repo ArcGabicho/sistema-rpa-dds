@@ -13,7 +13,7 @@ export function PageHero({
   const breadcrumbLabel = heading.replace(/\.$/, "");
 
   return (
-    <section className="relative overflow-hidden pt-32 pb-16 sm:pt-40 lg:pb-24">
+    <section className="relative overflow-hidden pt-14 pb-16 lg:pt-20 lg:pb-24">
       <FacadeBackdrop tone="light" />
       <Container className="relative">
         <nav className="flex items-center gap-1.5 text-xs text-ink-500">

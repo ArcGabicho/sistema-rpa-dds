@@ -1,18 +1,17 @@
-import { ArrowUpRight } from "lucide-react";
+import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { CASE_STUDIES } from "@/lib/case-studies";
 import { SITE } from "@/lib/site-config";
 
 export function CaseStudies() {
   return (
-    <section className="bg-brand-50 py-24">
+    <section id="casos" className="scroll-mt-24 bg-brand-50 py-24">
       <Container>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
-            <p className="text-sm font-medium text-brand-700">
-              Nuestros proyectos destacados
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
+            <Eyebrow>Proyectos destacados</Eyebrow>
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
               Casos reales de transformación digital
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-ink-700">
@@ -21,54 +20,39 @@ export function CaseStudies() {
               tiempo real.
             </p>
           </div>
-          <a
-            href={SITE.portfolioUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 text-sm font-medium text-ink-950 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
-          >
+          <ActionLink href={SITE.portfolioUrl} external className="shrink-0">
             Ver todos los casos de éxito
-          </a>
+          </ActionLink>
         </div>
 
-        <ol className="mt-12 divide-y divide-line border-y border-line">
-          {CASE_STUDIES.map((study, index) => (
-            <li key={study.title}>
-              <a
-                href={SITE.portfolioUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group grid grid-cols-[2.5rem_1fr_auto] items-start gap-x-4 gap-y-3 py-6 sm:grid-cols-[3rem_1fr_auto_auto] sm:items-center"
-              >
-                <span className="pt-1 font-mono text-sm text-ink-400 sm:pt-0">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="font-display text-lg font-semibold text-ink-950 group-hover:underline sm:text-xl">
-                    {study.title}
-                  </h3>
-                  {study.teaser && (
-                    <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-ink-700">
-                      {study.teaser}
-                    </p>
-                  )}
-                </div>
-                <div className="col-start-2 row-start-2 flex flex-wrap gap-2 sm:col-start-auto sm:row-start-auto">
-                  {study.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-line bg-white px-2.5 py-1 text-xs font-medium text-ink-700"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <ArrowUpRight className="h-4 w-4 text-ink-400" aria-hidden="true" />
-                <span className="sr-only">(se abre en una pestaña nueva)</span>
-              </a>
+        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {CASE_STUDIES.map((study) => (
+            <li
+              key={study.title}
+              className="flex flex-col rounded-lg bg-white p-6 shadow-card transition-shadow hover:shadow-card-hover"
+            >
+              <div className="flex flex-wrap gap-2">
+                {study.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <h3 className="mt-4 font-display text-lg font-semibold leading-snug text-ink-950">
+                {study.title}
+              </h3>
+              {study.teaser && (
+                <p className="mt-2 text-sm leading-relaxed text-ink-700">{study.teaser}</p>
+              )}
+              <ActionLink href={SITE.portfolioUrl} external className="mt-auto pt-6">
+                Revisar caso
+              </ActionLink>
             </li>
           ))}
-        </ol>
+        </ul>
       </Container>
     </section>
   );

@@ -11,7 +11,7 @@ const STATUS_OPTIONS = [
 ];
 
 const FIELD_BASE =
-  "h-11 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink-950 outline-none transition-colors focus:border-brand-500 disabled:opacity-60";
+  "h-11 w-full rounded-md border border-line bg-white px-3 text-sm text-ink-950 outline-none transition-colors focus:border-brand-500 disabled:opacity-60";
 
 export function ClientAssignmentPanel({
   clientId,
@@ -52,7 +52,7 @@ export function ClientAssignmentPanel({
   }
 
   return (
-    <aside className="h-fit rounded-xl bg-brand-50 p-5">
+    <aside className="h-fit rounded-lg bg-white shadow-card p-6">
       <h2 className="text-base font-semibold text-ink-950">Seguimiento</h2>
       <div className="mt-4 flex flex-col gap-4">
         <div>

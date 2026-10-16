@@ -6,7 +6,7 @@ import { ROLE_OPTIONS } from "@/lib/users-schema";
 import { useCreateUser } from "@/hooks/use-create-user";
 
 const FIELD_BASE =
-  "mt-1.5 h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
+  "mt-1.5 h-11 w-full rounded-md border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
 
 function fieldState(hasError: boolean) {
   return hasError
@@ -18,7 +18,7 @@ export function CreateUserForm() {
   const { register, errors, isSubmitting, onSubmit } = useCreateUser();
 
   return (
-    <form onSubmit={onSubmit} noValidate className="max-w-lg">
+    <form onSubmit={onSubmit} noValidate className="max-w-lg rounded-lg bg-white shadow-card p-6 sm:p-8">
       <div className="flex flex-col gap-5">
         <div>
           <label htmlFor="user-full-name" className="text-sm font-medium text-ink-950">
@@ -109,14 +109,14 @@ export function CreateUserForm() {
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link
           href="/dashboard/usuarios"
-          className="inline-flex h-11 items-center justify-center rounded-full border border-line px-6 text-sm font-medium text-ink-950 transition-colors hover:bg-brand-50"
+          className="inline-flex h-11 items-center justify-center rounded-md border border-line px-6 text-sm font-semibold text-ink-950 transition-colors hover:bg-brand-50"
         >
           Cancelar
         </Link>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-brand-700 px-6 text-sm font-medium text-white transition-colors hover:bg-ink-900 disabled:opacity-60"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-700 px-6 text-sm font-semibold text-white transition-colors hover:bg-ink-900 disabled:opacity-60"
         >
           {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSubmitting ? "Creando..." : "Crear usuario"}

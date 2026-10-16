@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { StatCounter } from "@/components/ui/stat-counter";
+import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE } from "@/lib/site-config";
 
 export function About() {
@@ -17,7 +18,8 @@ export function About() {
         </div>
 
         <div>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
+          <Eyebrow>Nosotros</Eyebrow>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
             Haz crecer tu empresa con soluciones inteligentes en datos,
             automatización e IA
           </h2>
@@ -44,12 +46,9 @@ export function About() {
             </p>
           </div>
 
-          <Link
-            href={SITE.aboutUrl}
-            className="mt-6 inline-flex items-center text-sm font-medium text-ink-950 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
-          >
+          <ActionLink href={SITE.aboutUrl} className="mt-8">
             Más sobre nosotros
-          </Link>
+          </ActionLink>
         </div>
       </Container>
     </section>

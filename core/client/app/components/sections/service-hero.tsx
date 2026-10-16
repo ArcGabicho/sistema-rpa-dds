@@ -12,7 +12,7 @@ export function ServiceHero({
   intro: string;
 }) {
   return (
-    <section className="relative overflow-hidden pt-32 pb-16 sm:pt-40 lg:pb-24">
+    <section className="relative overflow-hidden pt-14 pb-16 lg:pt-20 lg:pb-24">
       <FacadeBackdrop tone="light" />
       <Container className="relative grid gap-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
         <div>
@@ -32,7 +32,7 @@ export function ServiceHero({
           </p>
         </div>
 
-        <div className="rounded-[20px] border border-line bg-white p-6 shadow-[0_20px_50px_-24px_rgb(23_39_58/0.35)]">
+        <div className="rounded-lg bg-white p-6 shadow-card-hover">
           <p className="font-display text-base font-semibold text-ink-950">
             Agenda una sesión de exploración
           </p>
@@ -45,7 +45,7 @@ export function ServiceHero({
           </a>
           <Link
             href={SITE.contactUrl}
-            className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-full bg-brand-700 px-5 text-sm font-medium text-white transition-colors hover:bg-ink-900"
+            className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-md bg-brand-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-ink-900"
           >
             Solicita una demo gratuita
           </Link>

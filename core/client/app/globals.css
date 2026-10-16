@@ -65,6 +65,12 @@
 
   --color-line: var(--color-line);
 
+  /* Fluent depth shadows (Microsoft's design system, as on azure.com):
+     cards rest at depth 4, lift to depth 16 on hover; menus use depth 64. */
+  --shadow-card: 0 1.6px 3.6px 0 rgb(23 39 58 / 0.13), 0 0.3px 0.9px 0 rgb(23 39 58 / 0.11);
+  --shadow-card-hover: 0 6.4px 14.4px 0 rgb(23 39 58 / 0.13), 0 1.2px 3.6px 0 rgb(23 39 58 / 0.11);
+  --shadow-flyout: 0 25.6px 57.6px 0 rgb(23 39 58 / 0.22), 0 4.8px 14.4px 0 rgb(23 39 58 / 0.18);
+
   --font-sans: var(--font-instrument-sans);
   --font-display: var(--font-instrument-sans);
   --font-mono: var(--font-roboto-mono);

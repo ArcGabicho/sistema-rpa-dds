@@ -8,7 +8,7 @@ import { ROLE_OPTIONS, type User } from "@/lib/users-schema";
 import { formatDate } from "@/lib/format-date";
 
 const ROLE_SELECT =
-  "h-9 rounded-lg border border-line bg-white px-2.5 text-sm text-ink-950 outline-none transition-colors focus:border-brand-500 disabled:opacity-60";
+  "h-9 rounded-md border border-line bg-white px-2.5 text-sm text-ink-950 outline-none transition-colors focus:border-brand-500 disabled:opacity-60";
 const DELETE_BUTTON =
   "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60";
 
@@ -66,7 +66,7 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line">
+    <div className="overflow-hidden rounded-lg bg-white shadow-card">
       {/* Mobile: stacked rows */}
       <ul className="divide-y divide-line sm:hidden">
         {users.map((user) => (

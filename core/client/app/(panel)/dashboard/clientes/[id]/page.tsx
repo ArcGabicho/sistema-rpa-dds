@@ -104,9 +104,9 @@ export default async function ClienteDetailsPage({
         {SERVICE_LABELS[client.service] ?? client.service} · {formatDateTime(client.createdAtUtc)}
       </p>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="flex min-w-0 flex-col gap-10">
-          <section>
+      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <section className="rounded-lg bg-white shadow-card p-6">
             <h2 className="text-base font-semibold text-ink-950">Datos de contacto</h2>
             <dl className="mt-3 divide-y divide-line border-y border-line text-sm">
               <div className="flex justify-between gap-4 py-3">

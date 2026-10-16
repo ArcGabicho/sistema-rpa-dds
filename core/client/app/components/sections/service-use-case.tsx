@@ -41,10 +41,10 @@ export function ServiceUseCase({
                 type="button"
                 onClick={() => setActiveIndex(index)}
                 aria-pressed={isActive}
-                className={`rounded-full px-4 py-2 text-xs font-medium transition-colors ${
+                className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
                   isActive
-                    ? "bg-brand-700 text-white"
-                    : "bg-brand-50 text-ink-700 hover:bg-brand-200"
+                    ? "bg-ink-950 text-white"
+                    : "bg-brand-100 text-ink-700 hover:bg-brand-200"
                 }`}
               >
                 {useCase.title}
@@ -60,10 +60,10 @@ export function ServiceUseCase({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="mt-8 rounded-2xl border border-line p-8 sm:p-10"
+            className="mt-8 rounded-lg bg-white p-8 shadow-card sm:p-10"
           >
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-white">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-700 text-white">
                 {active.icon}
               </span>
               <div>

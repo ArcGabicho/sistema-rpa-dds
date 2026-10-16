@@ -1,18 +1,17 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { FacadeBackdrop } from "@/components/layout/facade-backdrop";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { SITE } from "@/lib/site-config";
 
 export function Hero() {
   return (
-    <section id="top" className="relative scroll-mt-24 overflow-hidden pt-32 pb-20 sm:pt-36 lg:pb-28">
+    <section id="top" className="relative scroll-mt-24 overflow-hidden pt-14 pb-20 lg:pt-20 lg:pb-24">
       <FacadeBackdrop tone="light" />
 
       <Container className="relative grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div className="max-w-2xl">
-          <p className="text-sm font-medium text-brand-700">
-            Automatiza. Analiza. Transforma.
-          </p>
+          <Eyebrow>Automatiza. Analiza. Transforma.</Eyebrow>
           <h1 className="mt-5 text-balance font-display text-[2.75rem] font-semibold leading-[1.05] tracking-tight text-ink-950 sm:text-6xl">
             Soluciones inteligentes en Analítica, RPA e IA
           </h1>
@@ -21,16 +20,16 @@ export function Hero() {
             sus operaciones y potenciar su crecimiento.
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+          <div className="mt-10 flex flex-wrap items-center gap-3">
             <a
               href="#servicios"
-              className="inline-flex h-11 items-center rounded-full bg-brand-700 px-6 text-sm font-medium text-white transition-colors hover:bg-ink-900"
+              className="inline-flex h-11 items-center rounded-md bg-brand-700 px-6 text-sm font-semibold text-white transition-colors hover:bg-ink-900"
             >
               Explorar servicios
             </a>
             <Link
               href={SITE.contactUrl}
-              className="text-sm font-medium text-ink-950 underline decoration-brand-300 underline-offset-4 transition-colors hover:decoration-brand-700"
+              className="inline-flex h-11 items-center rounded-md border border-ink-950 bg-white px-6 text-sm font-semibold text-ink-950 transition-colors hover:bg-brand-50"
             >
               Solicitar diagnóstico
             </Link>

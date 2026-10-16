@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { PROCESS_STEPS } from "@/lib/process-steps";
 import { SITE } from "@/lib/site-config";
 
@@ -11,10 +13,14 @@ export function Process() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="proceso" className="bg-ink-950 scroll-mt-24 py-24">
+    <section
+      id="proceso"
+      className="scroll-mt-24 bg-[linear-gradient(135deg,var(--color-ink-950)_0%,var(--color-ink-900)_60%,var(--color-brand-700)_140%)] py-24"
+    >
       <Container className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
         <div>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <Eyebrow tone="dark">Nuestro proceso</Eyebrow>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Guiamos a líderes de negocio y tecnología hacia las mejores
             soluciones en datos, RPA e IA
           </h2>
@@ -23,14 +29,9 @@ export function Process() {
             inteligencia artificial para que tu transformación digital sea
             clara, rápida y sin complicaciones.
           </p>
-          <a
-            href={SITE.processUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center text-sm font-medium text-white underline decoration-white/30 underline-offset-4 hover:decoration-white"
-          >
+          <ActionLink href={SITE.processUrl} external tone="dark" className="mt-6">
             Conoce nuestro proceso de trabajo
-          </a>
+          </ActionLink>
         </div>
 
         <div className="flex flex-col divide-y divide-white/10 border-t border-b border-white/10">

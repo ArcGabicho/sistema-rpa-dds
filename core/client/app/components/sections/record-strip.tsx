@@ -27,7 +27,7 @@ export function RecordStrip() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="grid grid-cols-1 items-stretch overflow-hidden rounded-[20px] border border-line sm:grid-cols-[1fr_auto_1fr]"
+      className="grid grid-cols-1 items-stretch overflow-hidden rounded-lg bg-white shadow-card sm:grid-cols-[1fr_auto_1fr]"
     >
       <div className="bg-brand-50 px-6 py-6 sm:px-7">
         <p className="text-xs text-ink-500">Como llega hoy</p>

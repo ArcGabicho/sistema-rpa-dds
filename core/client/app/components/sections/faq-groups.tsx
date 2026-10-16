@@ -67,7 +67,7 @@ export function FaqGroups() {
         </div>
 
         <div className="lg:sticky lg:top-28">
-          <div className="rounded-2xl bg-ink-950 p-8">
+          <div className="rounded-lg bg-ink-950 p-8">
             <h3 className="font-display text-xl font-semibold text-white">
               ¿Aún tienes dudas?
             </h3>
@@ -116,7 +116,7 @@ export function FaqGroups() {
 
             <Link
               href={SITE.contactUrl}
-              className="mt-7 inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-ink-950 transition-colors hover:bg-white/85"
+              className="mt-7 inline-flex w-full items-center justify-center rounded-md bg-white px-5 py-3 text-sm font-medium text-ink-950 transition-colors hover:bg-white/85"
             >
               Contáctanos ahora
             </Link>

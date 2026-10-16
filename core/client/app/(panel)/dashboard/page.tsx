@@ -38,12 +38,12 @@ export default async function DashboardPage() {
       <p className="mt-1.5 text-sm text-ink-500">Este es el resumen general de tu panel.</p>
 
       {error || !data ? (
-        <p className="mt-8 rounded-xl bg-brand-50 p-6 text-sm text-ink-500">
+        <p className="mt-8 rounded-lg bg-white shadow-card p-6 text-sm text-ink-500">
           No se pudo cargar el resumen. Intenta de nuevo más tarde.
         </p>
       ) : (
         <>
-          <dl className="mt-8 grid grid-cols-2 divide-x divide-line rounded-xl border border-line">
+          <dl className="mt-8 grid grid-cols-2 divide-x divide-line rounded-lg bg-white shadow-card">
             <div className="p-5 sm:p-6">
               <dt className="text-sm text-ink-500">Leads nuevos</dt>
               <dd className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink-950">
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
             </div>
           </dl>
 
-          <section className="mt-10">
+          <section className="mt-6 rounded-lg bg-white shadow-card p-6">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-base font-semibold text-ink-950">Leads recientes</h2>
               <Link
@@ -72,11 +72,11 @@ export default async function DashboardPage() {
             </div>
 
             {data.recentClients.length === 0 ? (
-              <p className="mt-3 border-y border-line py-4 text-sm text-ink-500">
+              <p className="mt-3 border-t border-line pt-4 text-sm text-ink-500">
                 Aún no hay leads registrados.
               </p>
             ) : (
-              <ul className="mt-3 divide-y divide-line border-y border-line text-sm">
+              <ul className="mt-3 divide-y divide-line border-t border-line text-sm">
                 {data.recentClients.map((client) => (
                   <li key={client.id}>
                     <Link

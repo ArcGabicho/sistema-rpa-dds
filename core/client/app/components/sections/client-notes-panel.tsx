@@ -46,7 +46,7 @@ export function ClientNotesPanel({ clientId, notes }: { clientId: number; notes:
   }
 
   return (
-    <section>
+    <section className="rounded-lg bg-white shadow-card p-6">
       <h2 className="text-base font-semibold text-ink-950">Notas del equipo</h2>
 
       <ul className="mt-3 flex max-h-80 flex-col divide-y divide-line overflow-y-auto border-y border-line">
@@ -73,13 +73,13 @@ export function ClientNotesPanel({ clientId, notes }: { clientId: number; notes:
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Escribe una nota interna..."
-          className="h-11 w-full rounded-lg border border-line bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400 focus:border-brand-500"
+          className="h-11 w-full rounded-md border border-line bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400 focus:border-brand-500"
         />
         <button
           type="submit"
           disabled={submitting || !message.trim()}
           aria-label="Agregar nota"
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white transition-colors hover:bg-ink-900 disabled:opacity-40"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-brand-700 text-white transition-colors hover:bg-ink-900 disabled:opacity-40"
         >
           <Send className="h-4 w-4" />
         </button>

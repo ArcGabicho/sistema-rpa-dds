@@ -4,7 +4,7 @@ export function AboutWelcome() {
   return (
     <section className="bg-white py-24">
       <Container className="grid gap-8 lg:grid-cols-2 lg:items-stretch lg:gap-10">
-        <div className="rounded-[20px] bg-ink-950 p-8 sm:p-10">
+        <div className="rounded-lg bg-ink-950 p-8 sm:p-10">
           <p className="text-xs font-medium text-glow-300">Bienvenido a DDS</p>
           <p className="mt-4 font-display text-2xl font-semibold leading-snug text-white/80 sm:text-[1.75rem]">
             Somos DDS:{" "}

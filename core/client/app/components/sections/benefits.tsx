@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { BENEFITS } from "@/lib/benefits";
 
 export function Benefits() {
@@ -6,7 +7,8 @@ export function Benefits() {
     <section id="beneficios" className="scroll-mt-24 bg-white py-24">
       <Container>
         <div className="max-w-2xl">
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
+          <Eyebrow>Beneficios</Eyebrow>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
             ¿Por qué elegir Data Discovery Solutions?
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-ink-700">

@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site-config";
 
 export function ContactPanel() {
   return (
-    <section className="py-16 sm:py-20">
+    <section className="bg-brand-50 py-16 sm:py-20">
       <Container className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
         <div>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
@@ -58,7 +58,7 @@ export function ContactPanel() {
           </div>
         </div>
 
-        <div className="rounded-[20px] border border-line p-6 sm:p-10">
+        <div className="rounded-lg bg-white p-6 shadow-card sm:p-10">
           <ContactForm />
         </div>
       </Container>

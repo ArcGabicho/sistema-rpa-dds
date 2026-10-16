@@ -40,7 +40,7 @@ export default async function UsuariosPage() {
         </div>
         <Link
           href="/dashboard/usuarios/nuevo"
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-brand-700 px-5 text-sm font-medium text-white transition-colors hover:bg-ink-900"
+          className="inline-flex h-10 items-center gap-2 rounded-md bg-brand-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-ink-900"
         >
           <UserPlus className="h-4 w-4" />
           Nuevo usuario
@@ -49,7 +49,7 @@ export default async function UsuariosPage() {
 
       <div className="mt-8">
         {error ? (
-          <p className="rounded-xl bg-brand-50 p-6 text-sm text-ink-500">
+          <p className="rounded-lg bg-white shadow-card p-6 text-sm text-ink-500">
             No se pudieron cargar los usuarios. Intenta de nuevo más tarde.
           </p>
         ) : (

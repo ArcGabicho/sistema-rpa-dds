@@ -9,31 +9,31 @@ import { useAuth } from "@/hooks/use-auth";
 import { SITE } from "@/lib/site-config";
 
 const FIELD_BASE =
-  "h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
+  "h-11 w-full rounded-md border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
 
 export default function IngresarPage() {
   const { register, errors, isSubmitting, onSubmit } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-ink-950">
-      <FacadeBackdrop />
+    <div className="relative min-h-screen overflow-hidden bg-brand-50">
+      <FacadeBackdrop tone="light" />
 
       <div className="relative flex min-h-screen flex-col gap-3 p-3 sm:p-4 lg:flex-row lg:gap-4">
         <div className="flex flex-col justify-between px-3 py-3 sm:px-5 lg:flex-1 lg:px-10 lg:py-8">
           <div className="flex items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white">
+              <span className="flex h-9 w-9 items-center justify-center rounded-md bg-white shadow-card">
                 <Image src="/assets/icon.png" alt="" width={24} height={24} className="h-6 w-6" />
               </span>
-              <span className="whitespace-nowrap font-display text-[15px] font-semibold text-white">
+              <span className="whitespace-nowrap font-display text-[15px] font-semibold text-ink-950">
                 <span className="sm:hidden">{SITE.shortName}</span>
                 <span className="hidden sm:inline">{SITE.name}</span>
               </span>
             </Link>
             <Link
               href="/"
-              className="flex items-center gap-1.5 whitespace-nowrap text-sm text-white/75 transition-colors hover:text-white"
+              className="flex items-center gap-1.5 whitespace-nowrap text-sm text-ink-700 transition-colors hover:text-ink-950"
             >
               <ArrowLeft className="h-4 w-4" />
               Volver al sitio
@@ -41,17 +41,17 @@ export default function IngresarPage() {
           </div>
 
           <div className="hidden max-w-lg lg:block">
-            <h1 className="font-display text-5xl font-semibold leading-[1.1] tracking-tight text-white">
+            <h1 className="font-display text-5xl font-semibold leading-[1.1] tracking-tight text-ink-950">
               {SITE.tagline}
             </h1>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/75">
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink-700">
               Gestiona los leads del sitio, el seguimiento de clientes y los
               accesos de tu equipo desde un solo panel.
             </p>
           </div>
         </div>
 
-        <main className="flex flex-1 items-center justify-center rounded-[20px] bg-white px-6 py-12 sm:px-12 lg:flex-none lg:basis-[44%] lg:px-16">
+        <main className="flex flex-1 items-center justify-center rounded-lg bg-white shadow-card-hover px-6 py-12 sm:px-12 lg:flex-none lg:basis-[44%] lg:px-16">
           <div className="w-full max-w-[26rem]">
             <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950">
               Bienvenido de nuevo
@@ -143,7 +143,7 @@ export default function IngresarPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-700 text-sm font-medium text-white transition-colors hover:bg-ink-900 disabled:opacity-60"
+                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-brand-700 text-sm font-semibold text-white transition-colors hover:bg-ink-900 disabled:opacity-60"
               >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isSubmitting ? "Ingresando..." : "Ingresar"}

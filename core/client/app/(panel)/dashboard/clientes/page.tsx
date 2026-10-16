@@ -75,7 +75,7 @@ export default async function ClientesPage({
         Solicitudes recibidas desde el formulario de contacto del sitio público.
       </p>
 
-      <div className="mt-8 overflow-hidden rounded-xl border border-line">
+      <div className="mt-8 overflow-hidden rounded-lg bg-white shadow-card">
         {error || !data ? (
           <p className="p-6 text-sm text-ink-500">
             No se pudo cargar la lista de clientes. Intenta de nuevo más tarde.

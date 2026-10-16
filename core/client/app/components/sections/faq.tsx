@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { FAQ_ITEMS } from "@/lib/faq-data";
 import { SITE } from "@/lib/site-config";
 
@@ -14,7 +15,8 @@ export function Faq() {
   return (
     <section id="faq" className="scroll-mt-24 bg-white py-24">
       <Container className="max-w-3xl">
-        <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
+        <Eyebrow>Ayuda</Eyebrow>
+        <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
           Preguntas frecuentes
         </h2>
 
@@ -58,12 +60,9 @@ export function Faq() {
           })}
         </div>
 
-        <Link
-          href={SITE.faqUrl}
-          className="mt-8 inline-flex items-center text-sm font-medium text-ink-950 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
-        >
+        <ActionLink href={SITE.faqUrl} className="mt-8">
           Ver todas las preguntas
-        </Link>
+        </ActionLink>
       </Container>
     </section>
   );

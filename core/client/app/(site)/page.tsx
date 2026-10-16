@@ -1,4 +1,5 @@
 import { Hero } from "@/components/sections/hero";
+import { HomeSubnav } from "@/components/sections/home-subnav";
 import { LogoCloud } from "@/components/sections/logo-cloud";
 import { ServicesOverview } from "@/components/sections/services-overview";
 import { About } from "@/components/sections/about";
@@ -13,6 +14,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <HomeSubnav />
       <LogoCloud />
       <ServicesOverview />
       <About />

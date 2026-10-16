@@ -1,6 +1,6 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { RecordStrip } from "@/components/sections/record-strip";
 import { SERVICES } from "@/lib/services-data";
 
@@ -9,7 +9,8 @@ export function ServicesOverview() {
     <section id="servicios" className="scroll-mt-24 bg-white py-24">
       <Container>
         <div className="max-w-2xl">
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
+          <Eyebrow>Servicios</Eyebrow>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
             Automatiza, analiza y decide mejor con soluciones hechas a tu
             medida
           </h2>
@@ -37,13 +38,9 @@ export function ServicesOverview() {
                     <p className="mt-2 text-sm leading-relaxed text-ink-700">
                       {service.description}
                     </p>
-                    <Link
-                      href={`/${service.slug}`}
-                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700"
-                    >
+                    <ActionLink href={`/${service.slug}`} className="mt-4">
                       Ver detalle
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                    </ActionLink>
                   </div>
                 </div>
 
