@@ -88,42 +88,42 @@ export default async function ClienteDetailsPage({
     <div>
       <Link
         href="/dashboard/clientes"
-        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-950"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors hover:text-ink-950"
       >
         <ArrowLeft className="h-4 w-4" />
         Clientes
       </Link>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
           {client.fullName}
         </h1>
         <ClientStatusBadge status={client.status} />
       </div>
-      <p className="mt-1.5 text-sm text-neutral-500">
+      <p className="mt-1.5 text-sm text-ink-500">
         {SERVICE_LABELS[client.service] ?? client.service} · {formatDateTime(client.createdAtUtc)}
       </p>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="flex min-w-0 flex-col gap-10">
           <section>
-            <h2 className="text-base font-semibold text-neutral-950">Datos de contacto</h2>
-            <dl className="mt-3 divide-y divide-neutral-200 border-y border-neutral-200 text-sm">
+            <h2 className="text-base font-semibold text-ink-950">Datos de contacto</h2>
+            <dl className="mt-3 divide-y divide-line border-y border-line text-sm">
               <div className="flex justify-between gap-4 py-3">
-                <dt className="text-neutral-500">Correo</dt>
-                <dd className="min-w-0 truncate font-medium text-neutral-950">
+                <dt className="text-ink-500">Correo</dt>
+                <dd className="min-w-0 truncate font-medium text-ink-950">
                   <a href={`mailto:${client.email}`} className="hover:underline">
                     {client.email}
                   </a>
                 </dd>
               </div>
               <div className="flex justify-between gap-4 py-3">
-                <dt className="text-neutral-500">Teléfono</dt>
-                <dd className="font-medium text-neutral-950">{client.phone}</dd>
+                <dt className="text-ink-500">Teléfono</dt>
+                <dd className="font-medium text-ink-950">{client.phone}</dd>
               </div>
             </dl>
-            <h3 className="mt-6 text-sm font-medium text-neutral-950">Mensaje</h3>
-            <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+            <h3 className="mt-6 text-sm font-medium text-ink-950">Mensaje</h3>
+            <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-ink-700">
               {client.message}
             </p>
           </section>

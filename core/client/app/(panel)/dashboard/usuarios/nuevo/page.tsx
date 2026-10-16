@@ -7,16 +7,16 @@ export default function NuevoUsuarioPage() {
     <div>
       <Link
         href="/dashboard/usuarios"
-        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-950"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors hover:text-ink-950"
       >
         <ArrowLeft className="h-4 w-4" />
         Usuarios
       </Link>
 
-      <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">
+      <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
         Nuevo usuario
       </h1>
-      <p className="mt-1.5 text-sm text-neutral-500">
+      <p className="mt-1.5 text-sm text-ink-500">
         Crea un acceso para un trabajador con la contraseña temporal que definas aquí.
       </p>
 

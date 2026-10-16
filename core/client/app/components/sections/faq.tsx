@@ -12,9 +12,9 @@ export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="scroll-mt-20 bg-paper py-24 lg:scroll-mt-28">
+    <section id="faq" className="scroll-mt-24 bg-white py-24">
       <Container className="max-w-3xl">
-        <h2 className="font-display text-3xl font-bold tracking-tight text-ink-950 sm:text-4xl">
+        <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
           Preguntas frecuentes
         </h2>
 
@@ -33,7 +33,7 @@ export function Faq() {
                     {item.question}
                   </span>
                   <ChevronDown
-                    className={`h-5 w-5 shrink-0 text-slate transition-transform ${
+                    className={`h-5 w-5 shrink-0 text-ink-700 transition-transform ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -47,7 +47,7 @@ export function Faq() {
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-6 text-sm leading-relaxed text-slate">
+                      <p className="pb-6 text-sm leading-relaxed text-ink-700">
                         {item.answer}
                       </p>
                     </motion.div>
@@ -60,7 +60,7 @@ export function Faq() {
 
         <Link
           href={SITE.faqUrl}
-          className="mt-8 inline-flex items-center text-sm font-medium text-brass-500 underline decoration-brass-300 underline-offset-4 hover:decoration-brass-500"
+          className="mt-8 inline-flex items-center text-sm font-medium text-ink-950 underline decoration-brand-300 underline-offset-4 hover:decoration-brand-700"
         >
           Ver todas las preguntas
         </Link>

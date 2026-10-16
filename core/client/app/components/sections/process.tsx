@@ -11,14 +11,14 @@ export function Process() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="proceso" className="scroll-mt-20 bg-ink-950 py-24 lg:scroll-mt-28">
+    <section id="proceso" className="bg-ink-950 scroll-mt-24 py-24">
       <Container className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
         <div>
-          <h2 className="font-display text-3xl font-bold tracking-tight text-paper sm:text-4xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Guiamos a líderes de negocio y tecnología hacia las mejores
             soluciones en datos, RPA e IA
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-paper-dim">
+          <p className="mt-4 text-lg leading-relaxed text-white/70">
             Nuestros expertos combinan automatización, analítica e
             inteligencia artificial para que tu transformación digital sea
             clara, rápida y sin complicaciones.
@@ -27,13 +27,13 @@ export function Process() {
             href={SITE.processUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center text-sm font-medium text-signal-400 underline decoration-signal-500/40 underline-offset-4 hover:decoration-signal-400"
+            className="mt-6 inline-flex items-center text-sm font-medium text-white underline decoration-white/30 underline-offset-4 hover:decoration-white"
           >
             Conoce nuestro proceso de trabajo
           </a>
         </div>
 
-        <div className="flex flex-col divide-y divide-ink-800 border-t border-b border-ink-800">
+        <div className="flex flex-col divide-y divide-white/10 border-t border-b border-white/10">
           {PROCESS_STEPS.map((step, index) => {
             const isOpen = index === openIndex;
             return (
@@ -44,14 +44,14 @@ export function Process() {
                   aria-expanded={isOpen}
                   className="flex w-full items-center gap-5 py-5 text-left"
                 >
-                  <span className="font-display text-sm font-bold text-signal-400">
+                  <span className="font-display text-sm font-semibold text-glow-300">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="flex-1 font-display text-base font-semibold text-paper">
+                  <span className="flex-1 font-display text-base font-semibold text-white">
                     {step.title}
                   </span>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-paper-dim transition-transform ${
+                    className={`h-4 w-4 shrink-0 text-white/70 transition-transform ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -65,7 +65,7 @@ export function Process() {
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-6 pl-9 text-sm leading-relaxed text-paper-dim">
+                      <p className="pb-6 pl-9 text-sm leading-relaxed text-white/70">
                         {step.description}
                       </p>
                     </motion.div>

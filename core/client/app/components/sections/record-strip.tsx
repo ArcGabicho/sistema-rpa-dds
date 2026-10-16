@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 const MESSY_ROWS = [
@@ -17,6 +17,7 @@ const CLEAN_ROWS = [
   { label: "estado", value: "Validado" },
 ];
 
+// One record before and after going through a DDS automation.
 export function RecordStrip() {
   const reduceMotion = useReducedMotion();
 
@@ -26,34 +27,37 @@ export function RecordStrip() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="grid grid-cols-1 items-stretch gap-0 overflow-hidden rounded-2xl border border-line sm:grid-cols-[1fr_auto_1fr]"
+      className="grid grid-cols-1 items-stretch overflow-hidden rounded-[20px] border border-line sm:grid-cols-[1fr_auto_1fr]"
     >
-      <div className="bg-mist px-6 py-6 sm:px-7">
-        <p className="text-xs text-slate">Como llega hoy</p>
+      <div className="bg-brand-50 px-6 py-6 sm:px-7">
+        <p className="text-xs text-ink-500">Como llega hoy</p>
         <dl className="mt-3 flex flex-col gap-2">
           {MESSY_ROWS.map((row) => (
             <div key={row.label} className="flex items-baseline justify-between gap-4">
-              <dt className="text-[11px] uppercase text-slate/70">{row.label}</dt>
-              <dd className="font-mono text-sm text-ink-800">{row.value}</dd>
+              <dt className="text-[11px] uppercase text-ink-400">{row.label}</dt>
+              <dd className="font-mono text-sm text-ink-700">{row.value}</dd>
             </div>
           ))}
         </dl>
       </div>
 
-      <div className="flex items-center justify-center border-y border-line bg-paper px-4 py-4 sm:border-x sm:border-y-0">
-        <span className="h-px w-8 bg-line sm:h-8 sm:w-px" />
+      <div
+        className="flex items-center justify-center border-y border-line bg-white px-4 py-3 sm:border-x sm:border-y-0"
+        aria-hidden="true"
+      >
+        <ArrowRight className="h-4 w-4 rotate-90 text-brand-500 sm:rotate-0" />
       </div>
 
       <div className="bg-ink-950 px-6 py-6 sm:px-7">
-        <p className="text-xs text-signal-400">Como queda validado</p>
+        <p className="text-xs text-glow-300">Como queda validado</p>
         <dl className="mt-3 flex flex-col gap-2">
           {CLEAN_ROWS.map((row) => (
             <div key={row.label} className="flex items-baseline justify-between gap-4">
-              <dt className="text-[11px] uppercase text-paper-dim/70">{row.label}</dt>
-              <dd className="flex items-center gap-1.5 font-mono text-sm text-paper">
+              <dt className="text-[11px] uppercase text-white/50">{row.label}</dt>
+              <dd className="flex items-center gap-1.5 font-mono text-sm text-white">
                 {row.value}
                 {row.label === "estado" && (
-                  <Check className="h-3.5 w-3.5 text-signal-400" strokeWidth={2.5} />
+                  <Check className="h-3.5 w-3.5 text-glow-300" strokeWidth={2.5} />
                 )}
               </dd>
             </div>

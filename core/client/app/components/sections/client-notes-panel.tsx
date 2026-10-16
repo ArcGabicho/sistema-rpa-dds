@@ -47,16 +47,16 @@ export function ClientNotesPanel({ clientId, notes }: { clientId: number; notes:
 
   return (
     <section>
-      <h2 className="text-base font-semibold text-neutral-950">Notas del equipo</h2>
+      <h2 className="text-base font-semibold text-ink-950">Notas del equipo</h2>
 
-      <ul className="mt-3 flex max-h-80 flex-col divide-y divide-neutral-200 overflow-y-auto border-y border-neutral-200">
+      <ul className="mt-3 flex max-h-80 flex-col divide-y divide-line overflow-y-auto border-y border-line">
         {notes.length === 0 && (
-          <li className="py-4 text-sm text-neutral-500">Aún no hay notas para este lead.</li>
+          <li className="py-4 text-sm text-ink-500">Aún no hay notas para este lead.</li>
         )}
         {notes.map((note) => (
           <li key={note.id} className="py-3.5 text-sm">
-            <p className="whitespace-pre-line text-neutral-800">{note.message}</p>
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="whitespace-pre-line text-ink-700">{note.message}</p>
+            <p className="mt-1 text-xs text-ink-400">
               {note.authorName} · {note.createdAtLabel}
             </p>
           </li>
@@ -73,13 +73,13 @@ export function ClientNotesPanel({ clientId, notes }: { clientId: number; notes:
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Escribe una nota interna..."
-          className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3.5 text-sm text-neutral-950 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-950"
+          className="h-11 w-full rounded-lg border border-line bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400 focus:border-brand-500"
         />
         <button
           type="submit"
           disabled={submitting || !message.trim()}
           aria-label="Agregar nota"
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-neutral-950 text-white transition-colors hover:bg-neutral-800 disabled:opacity-40"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white transition-colors hover:bg-ink-900 disabled:opacity-40"
         >
           <Send className="h-4 w-4" />
         </button>

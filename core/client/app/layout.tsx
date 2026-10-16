@@ -35,7 +35,7 @@ export default function RootLayout({
       lang="es"
       className={`${instrumentSans.variable} ${robotoMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-paper font-sans text-ink-950">
+      <body className="min-h-full flex flex-col bg-white font-sans text-ink-950">
         {children}
         <Toaster position="top-right" theme="light" options={{ roundness: 16 }} />
       </body>

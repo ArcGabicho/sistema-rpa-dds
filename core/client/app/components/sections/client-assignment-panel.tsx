@@ -11,7 +11,7 @@ const STATUS_OPTIONS = [
 ];
 
 const FIELD_BASE =
-  "h-11 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm text-neutral-950 outline-none transition-colors focus:border-neutral-950 disabled:opacity-60";
+  "h-11 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink-950 outline-none transition-colors focus:border-brand-500 disabled:opacity-60";
 
 export function ClientAssignmentPanel({
   clientId,
@@ -52,11 +52,11 @@ export function ClientAssignmentPanel({
   }
 
   return (
-    <aside className="h-fit rounded-xl bg-neutral-50 p-5">
-      <h2 className="text-base font-semibold text-neutral-950">Seguimiento</h2>
+    <aside className="h-fit rounded-xl bg-brand-50 p-5">
+      <h2 className="text-base font-semibold text-ink-950">Seguimiento</h2>
       <div className="mt-4 flex flex-col gap-4">
         <div>
-          <label htmlFor="client-status" className="mb-1.5 block text-sm font-medium text-neutral-950">
+          <label htmlFor="client-status" className="mb-1.5 block text-sm font-medium text-ink-950">
             Estado
           </label>
           <select
@@ -75,7 +75,7 @@ export function ClientAssignmentPanel({
         </div>
 
         <div>
-          <label htmlFor="client-assignee" className="mb-1.5 block text-sm font-medium text-neutral-950">
+          <label htmlFor="client-assignee" className="mb-1.5 block text-sm font-medium text-ink-950">
             Asignado a
           </label>
           <select

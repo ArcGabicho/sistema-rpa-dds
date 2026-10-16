@@ -22,7 +22,7 @@ export function DashboardShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="relative flex h-dvh overflow-hidden bg-[#0d1722]">
+    <div className="relative flex h-dvh overflow-hidden bg-ink-950">
       <FacadeBackdrop />
 
       <div className="relative hidden lg:flex">
@@ -36,7 +36,7 @@ export function DashboardShell({
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute inset-y-0 left-0 bg-[#0d1722]">
+          <div className="absolute inset-y-0 left-0 bg-ink-950">
             <DashboardSidebar
               user={user}
               onClose={() => setMobileOpen(false)}

@@ -68,20 +68,20 @@ export default async function ClientesPage({
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
         Clientes
       </h1>
-      <p className="mt-1.5 text-sm text-neutral-500">
+      <p className="mt-1.5 text-sm text-ink-500">
         Solicitudes recibidas desde el formulario de contacto del sitio público.
       </p>
 
-      <div className="mt-8 overflow-hidden rounded-xl border border-neutral-200">
+      <div className="mt-8 overflow-hidden rounded-xl border border-line">
         {error || !data ? (
-          <p className="p-6 text-sm text-neutral-500">
+          <p className="p-6 text-sm text-ink-500">
             No se pudo cargar la lista de clientes. Intenta de nuevo más tarde.
           </p>
         ) : data.items.length === 0 ? (
-          <p className="p-6 text-sm text-neutral-500">
+          <p className="p-6 text-sm text-ink-500">
             {page > 1
               ? "No hay resultados en esta página."
               : "Aún no se han recibido solicitudes de contacto."}
@@ -89,20 +89,20 @@ export default async function ClientesPage({
         ) : (
           <>
             {/* Mobile: one link per lead */}
-            <ul className="divide-y divide-neutral-200 sm:hidden">
+            <ul className="divide-y divide-line sm:hidden">
               {data.items.map((client) => (
                 <li key={client.id}>
                   <Link
                     href={`/dashboard/clientes/${client.id}`}
-                    className="flex flex-col gap-1.5 p-4 transition-colors active:bg-neutral-50"
+                    className="flex flex-col gap-1.5 p-4 transition-colors active:bg-brand-50"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="font-medium text-neutral-950">{client.fullName}</p>
+                      <p className="font-medium text-ink-950">{client.fullName}</p>
                       <ClientStatusBadge status={client.status} />
                     </div>
-                    <p className="text-sm text-neutral-500">{client.email}</p>
-                    <p className="text-sm text-neutral-500">{client.phone}</p>
-                    <p className="mt-1 text-xs text-neutral-400">
+                    <p className="text-sm text-ink-500">{client.email}</p>
+                    <p className="text-sm text-ink-500">{client.phone}</p>
+                    <p className="mt-1 text-xs text-ink-400">
                       {SERVICE_LABELS[client.service] ?? client.service}
                       {client.assignedToName && ` · Asignado a ${client.assignedToName}`}
                       {` · ${formatDate(client.createdAtUtc)}`}
@@ -115,7 +115,7 @@ export default async function ClientesPage({
             {/* Desktop: table */}
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-neutral-200 bg-neutral-50 text-xs text-neutral-500">
+                <thead className="border-b border-line bg-brand-50 text-xs text-ink-500">
                   <tr>
                     <th className="px-5 py-3 font-medium">Nombre</th>
                     <th className="px-5 py-3 font-medium">Contacto</th>
@@ -125,29 +125,29 @@ export default async function ClientesPage({
                     <th className="px-5 py-3 font-medium">Fecha</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-200">
+                <tbody className="divide-y divide-line">
                   {data.items.map((client) => (
-                    <tr key={client.id} className="transition-colors hover:bg-neutral-50">
+                    <tr key={client.id} className="transition-colors hover:bg-brand-50">
                       <td className="px-5 py-4">
                         <Link
                           href={`/dashboard/clientes/${client.id}`}
-                          className="font-medium text-neutral-950 hover:underline"
+                          className="font-medium text-ink-950 hover:underline"
                         >
                           {client.fullName}
                         </Link>
                       </td>
-                      <td className="px-5 py-4 text-neutral-500">
+                      <td className="px-5 py-4 text-ink-500">
                         <div>{client.email}</div>
-                        <div className="text-xs text-neutral-400">{client.phone}</div>
+                        <div className="text-xs text-ink-400">{client.phone}</div>
                       </td>
-                      <td className="px-5 py-4 text-neutral-500">
+                      <td className="px-5 py-4 text-ink-500">
                         {SERVICE_LABELS[client.service] ?? client.service}
                       </td>
                       <td className="px-5 py-4">
                         <ClientStatusBadge status={client.status} />
                       </td>
-                      <td className="px-5 py-4 text-neutral-500">{client.assignedToName ?? "—"}</td>
-                      <td className="px-5 py-4 whitespace-nowrap text-neutral-500">
+                      <td className="px-5 py-4 text-ink-500">{client.assignedToName ?? "—"}</td>
+                      <td className="px-5 py-4 whitespace-nowrap text-ink-500">
                         {formatDate(client.createdAtUtc)}
                       </td>
                     </tr>

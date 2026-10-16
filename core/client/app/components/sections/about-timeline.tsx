@@ -19,7 +19,7 @@ export function AboutTimeline() {
     <section className="bg-ink-950 py-24">
       <Container>
         <div className="flex items-end justify-between gap-6">
-          <h2 className="font-display text-2xl font-bold tracking-tight text-paper sm:text-3xl">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             Nuestra historia
           </h2>
           <div className="hidden shrink-0 gap-2 sm:flex">
@@ -27,7 +27,7 @@ export function AboutTimeline() {
               type="button"
               onClick={() => scrollBy(-1)}
               aria-label="Anterior"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-800 text-paper-dim transition-colors hover:border-signal-400 hover:text-paper"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:border-white/40 hover:text-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -35,7 +35,7 @@ export function AboutTimeline() {
               type="button"
               onClick={() => scrollBy(1)}
               aria-label="Siguiente"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-800 text-paper-dim transition-colors hover:border-signal-400 hover:text-paper"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:border-white/40 hover:text-white"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -49,15 +49,15 @@ export function AboutTimeline() {
           {TIMELINE.map((milestone) => (
             <div
               key={milestone.title}
-              className="w-72 shrink-0 snap-start border-t border-ink-800 pt-6"
+              className="w-72 shrink-0 snap-start border-t border-white/10 pt-6"
             >
-              <p className="text-xs font-medium text-signal-400">
+              <p className="text-xs font-medium text-glow-300">
                 {milestone.years}
               </p>
-              <h3 className="mt-2 font-display text-lg font-bold text-paper">
+              <h3 className="mt-2 font-display text-lg font-semibold text-white">
                 {milestone.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-paper-dim">
+              <p className="mt-2 text-sm leading-relaxed text-white/70">
                 {milestone.description}
               </p>
             </div>

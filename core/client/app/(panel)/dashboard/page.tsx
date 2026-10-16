@@ -32,63 +32,63 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
         Bienvenido{user?.name ? `, ${user.name}` : ""}
       </h1>
-      <p className="mt-1.5 text-sm text-neutral-500">Este es el resumen general de tu panel.</p>
+      <p className="mt-1.5 text-sm text-ink-500">Este es el resumen general de tu panel.</p>
 
       {error || !data ? (
-        <p className="mt-8 rounded-xl bg-neutral-50 p-6 text-sm text-neutral-500">
+        <p className="mt-8 rounded-xl bg-brand-50 p-6 text-sm text-ink-500">
           No se pudo cargar el resumen. Intenta de nuevo más tarde.
         </p>
       ) : (
         <>
-          <dl className="mt-8 grid grid-cols-2 divide-x divide-neutral-200 rounded-xl border border-neutral-200">
+          <dl className="mt-8 grid grid-cols-2 divide-x divide-line rounded-xl border border-line">
             <div className="p-5 sm:p-6">
-              <dt className="text-sm text-neutral-500">Leads nuevos</dt>
-              <dd className="mt-2 font-display text-4xl font-semibold tracking-tight text-neutral-950">
+              <dt className="text-sm text-ink-500">Leads nuevos</dt>
+              <dd className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink-950">
                 {data.clientsNew}
               </dd>
-              <dd className="mt-1 text-xs text-neutral-400">Sin contactar todavía</dd>
+              <dd className="mt-1 text-xs text-ink-400">Sin contactar todavía</dd>
             </div>
             <div className="p-5 sm:p-6">
-              <dt className="text-sm text-neutral-500">Clientes totales</dt>
-              <dd className="mt-2 font-display text-4xl font-semibold tracking-tight text-neutral-950">
+              <dt className="text-sm text-ink-500">Clientes totales</dt>
+              <dd className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink-950">
                 {data.clientsTotal}
               </dd>
-              <dd className="mt-1 text-xs text-neutral-400">Desde el formulario del sitio</dd>
+              <dd className="mt-1 text-xs text-ink-400">Desde el formulario del sitio</dd>
             </div>
           </dl>
 
           <section className="mt-10">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-base font-semibold text-neutral-950">Leads recientes</h2>
+              <h2 className="text-base font-semibold text-ink-950">Leads recientes</h2>
               <Link
                 href="/dashboard/clientes"
-                className="text-sm text-neutral-500 transition-colors hover:text-neutral-950"
+                className="text-sm text-ink-500 transition-colors hover:text-ink-950"
               >
                 Ver todos
               </Link>
             </div>
 
             {data.recentClients.length === 0 ? (
-              <p className="mt-3 border-y border-neutral-200 py-4 text-sm text-neutral-500">
+              <p className="mt-3 border-y border-line py-4 text-sm text-ink-500">
                 Aún no hay leads registrados.
               </p>
             ) : (
-              <ul className="mt-3 divide-y divide-neutral-200 border-y border-neutral-200 text-sm">
+              <ul className="mt-3 divide-y divide-line border-y border-line text-sm">
                 {data.recentClients.map((client) => (
                   <li key={client.id}>
                     <Link
                       href={`/dashboard/clientes/${client.id}`}
                       className="group flex items-center justify-between gap-4 py-3.5"
                     >
-                      <span className="truncate font-medium text-neutral-950 group-hover:underline">
+                      <span className="truncate font-medium text-ink-950 group-hover:underline">
                         {client.fullName}
                       </span>
                       <span className="flex shrink-0 items-center gap-4">
                         <ClientStatusBadge status={client.status} />
-                        <span className="w-20 text-right text-xs text-neutral-400">
+                        <span className="w-20 text-right text-xs text-ink-400">
                           {formatDate(client.createdAtUtc)}
                         </span>
                       </span>

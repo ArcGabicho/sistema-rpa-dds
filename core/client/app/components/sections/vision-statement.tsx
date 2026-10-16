@@ -4,13 +4,13 @@ export function VisionStatement() {
   return (
     <section className="bg-ink-950 py-24">
       <Container className="max-w-3xl">
-        <span className="inline-flex items-center rounded-full border border-ink-800 px-4 py-1.5 text-xs font-medium text-paper">
+        <span className="inline-flex items-center rounded-full border border-white/10 px-4 py-1.5 text-xs font-medium text-white">
           Nuestra Visión y Propósito
         </span>
-        <p className="mt-6 font-display text-2xl font-bold leading-snug text-paper sm:text-3xl">
+        <p className="mt-6 font-display text-2xl font-semibold leading-snug text-white sm:text-3xl">
           Equilibramos los desafíos de hoy con la visión del mañana.
         </p>
-        <div className="mt-6 flex flex-col gap-4 text-paper-dim">
+        <div className="mt-6 flex flex-col gap-4 text-white/70">
           <p className="leading-relaxed">
             En Data Discovery Solutions, acompañamos a organizaciones que
             buscan crecer de manera sostenible, superando retos operativos y

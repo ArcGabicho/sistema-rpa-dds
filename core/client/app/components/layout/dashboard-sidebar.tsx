@@ -69,7 +69,7 @@ export function DashboardSidebar({
               aria-current={isActive ? "page" : undefined}
               className={`flex h-10 items-center gap-3 rounded-full px-4 text-sm transition-colors ${
                 isActive
-                  ? "bg-white font-medium text-neutral-950"
+                  ? "bg-white font-medium text-ink-950"
                   : "text-white/70 hover:bg-white/10 hover:text-white"
               }`}
             >
@@ -82,7 +82,7 @@ export function DashboardSidebar({
 
       <div className="mt-auto flex flex-col gap-4 border-t border-white/10 pt-5">
         <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-neutral-950">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-ink-950">
             {getInitials(user?.name)}
           </span>
           <div className="min-w-0">

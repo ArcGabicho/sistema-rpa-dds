@@ -9,14 +9,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { SITE } from "@/lib/site-config";
 
 const FIELD_BASE =
-  "h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-neutral-950 outline-none transition-colors placeholder:text-neutral-400";
+  "h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
 
 export default function IngresarPage() {
   const { register, errors, isSubmitting, onSubmit } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0d1722]">
+    <div className="relative min-h-screen overflow-hidden bg-ink-950">
       <FacadeBackdrop />
 
       <div className="relative flex min-h-screen flex-col gap-3 p-3 sm:p-4 lg:flex-row lg:gap-4">
@@ -53,16 +53,16 @@ export default function IngresarPage() {
 
         <main className="flex flex-1 items-center justify-center rounded-[20px] bg-white px-6 py-12 sm:px-12 lg:flex-none lg:basis-[44%] lg:px-16">
           <div className="w-full max-w-[26rem]">
-            <h2 className="font-display text-3xl font-semibold tracking-tight text-neutral-950">
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-ink-950">
               Bienvenido de nuevo
             </h2>
-            <p className="mt-2 text-sm text-neutral-500">
+            <p className="mt-2 text-sm text-ink-500">
               Ingresa para acceder al panel de administración.
             </p>
 
             <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-5">
               <div>
-                <label htmlFor="email" className="text-sm font-medium text-neutral-950">
+                <label htmlFor="email" className="text-sm font-medium text-ink-950">
                   Correo
                 </label>
                 <input
@@ -73,7 +73,7 @@ export default function IngresarPage() {
                   aria-invalid={errors.email ? true : undefined}
                   aria-describedby={errors.email ? "email-error" : undefined}
                   className={`mt-1.5 ${FIELD_BASE} ${
-                    errors.email ? "border-red-400 focus:border-red-500" : "border-neutral-200 focus:border-neutral-950"
+                    errors.email ? "border-red-400 focus:border-red-500" : "border-line focus:border-brand-500"
                   }`}
                   {...register("email")}
                 />
@@ -85,7 +85,7 @@ export default function IngresarPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="text-sm font-medium text-neutral-950">
+                <label htmlFor="password" className="text-sm font-medium text-ink-950">
                   Contraseña
                 </label>
                 <div className="relative mt-1.5">
@@ -97,7 +97,7 @@ export default function IngresarPage() {
                     aria-invalid={errors.password ? true : undefined}
                     aria-describedby={errors.password ? "password-error" : undefined}
                     className={`${FIELD_BASE} pr-11 ${
-                      errors.password ? "border-red-400 focus:border-red-500" : "border-neutral-200 focus:border-neutral-950"
+                      errors.password ? "border-red-400 focus:border-red-500" : "border-line focus:border-brand-500"
                     }`}
                     {...register("password")}
                   />
@@ -105,7 +105,7 @@ export default function IngresarPage() {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-950"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-950"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -122,10 +122,10 @@ export default function IngresarPage() {
               </div>
 
               <div className="flex items-center justify-between gap-4">
-                <label className="flex items-center gap-2 text-sm text-neutral-500">
+                <label className="flex items-center gap-2 text-sm text-ink-500">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded-[4px] border-neutral-300 accent-neutral-950"
+                    className="h-4 w-4 rounded-[4px] border-line accent-brand-700"
                     {...register("rememberMe")}
                   />
                   Recordarme
@@ -134,7 +134,7 @@ export default function IngresarPage() {
                   href={`mailto:${SITE.email}?subject=${encodeURIComponent(
                     "Restablecer contraseña del panel",
                   )}`}
-                  className="text-sm text-neutral-500 transition-colors hover:text-neutral-950"
+                  className="text-sm text-ink-500 transition-colors hover:text-ink-950"
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -143,20 +143,20 @@ export default function IngresarPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-neutral-950 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:opacity-60"
+                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-700 text-sm font-medium text-white transition-colors hover:bg-ink-900 disabled:opacity-60"
               >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isSubmitting ? "Ingresando..." : "Ingresar"}
               </button>
             </form>
 
-            <p className="mt-10 text-center text-sm text-neutral-500">
+            <p className="mt-10 text-center text-sm text-ink-500">
               ¿No tienes cuenta?{" "}
               <a
                 href={`mailto:${SITE.email}?subject=${encodeURIComponent(
                   "Solicitud de acceso al panel",
                 )}`}
-                className="font-semibold text-neutral-950 hover:underline"
+                className="font-semibold text-ink-950 hover:underline"
               >
                 Solicita acceso
               </a>

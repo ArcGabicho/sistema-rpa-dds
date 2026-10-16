@@ -20,7 +20,7 @@ export default function VisionMisionValoresPage() {
         intro="No solo implementamos tecnología, construimos confianza y resultados. Nuestro compromiso es ayudarte a crecer con soluciones inteligentes y accesibles."
       />
 
-      <section className="bg-paper py-24">
+      <section className="bg-white py-24">
         <Container>
           <MissionStatement />
           <CoreValues />

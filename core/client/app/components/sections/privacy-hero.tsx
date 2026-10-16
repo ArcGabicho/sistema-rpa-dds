@@ -1,14 +1,16 @@
+import { FacadeBackdrop } from "@/components/layout/facade-backdrop";
 import { Container } from "@/components/ui/container";
 import { PRIVACY_LAST_UPDATED } from "@/lib/privacy-data";
 
 export function PrivacyHero() {
   return (
-    <section className="bg-ink-950 py-16">
-      <Container className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-paper sm:text-4xl">
+    <section className="relative overflow-hidden pt-32 pb-16 sm:pt-40 lg:pb-24">
+      <FacadeBackdrop tone="light" />
+      <Container className="relative text-center">
+        <h1 className="font-display text-4xl font-semibold tracking-tight text-ink-950 sm:text-5xl">
           Políticas de Privacidad
         </h1>
-        <p className="mt-3 text-sm text-paper-dim">
+        <p className="mt-3 text-sm text-ink-500">
           Última actualización: {PRIVACY_LAST_UPDATED}
         </p>
       </Container>

@@ -25,12 +25,12 @@ export function ServiceUseCase({
   const active = useCases[activeIndex];
 
   return (
-    <section className="border-t border-line bg-paper py-20">
+    <section className="bg-white py-20">
       <Container className="max-w-3xl">
-        <h2 className="text-center font-display text-2xl font-bold leading-snug text-ink-950 sm:text-3xl">
+        <h2 className="text-center font-display text-2xl font-semibold leading-snug text-ink-950 sm:text-3xl">
           {heading}
         </h2>
-        <p className="mt-4 text-center leading-relaxed text-slate">{intro}</p>
+        <p className="mt-4 text-center leading-relaxed text-ink-700">{intro}</p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-2">
           {useCases.map((useCase, index) => {
@@ -43,8 +43,8 @@ export function ServiceUseCase({
                 aria-pressed={isActive}
                 className={`rounded-full px-4 py-2 text-xs font-medium transition-colors ${
                   isActive
-                    ? "bg-brass-500 text-paper"
-                    : "bg-mist text-ink-800 hover:bg-line"
+                    ? "bg-brand-700 text-white"
+                    : "bg-brand-50 text-ink-700 hover:bg-brand-200"
                 }`}
               >
                 {useCase.title}
@@ -63,14 +63,14 @@ export function ServiceUseCase({
             className="mt-8 rounded-2xl border border-line p-8 sm:p-10"
           >
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brass-500 text-paper">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-white">
                 {active.icon}
               </span>
               <div>
-                <h3 className="font-display text-xl font-bold text-ink-950">
+                <h3 className="font-display text-xl font-semibold text-ink-950">
                   {active.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate">
+                <p className="mt-2 text-sm leading-relaxed text-ink-700">
                   {active.description}
                 </p>
               </div>
@@ -78,8 +78,8 @@ export function ServiceUseCase({
 
             <ul className="mt-6 grid gap-2.5 border-t border-line pt-6 sm:grid-cols-2">
               {active.bullets.map((bullet) => (
-                <li key={bullet} className="flex gap-2.5 text-sm text-ink-800">
-                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brass-400" />
+                <li key={bullet} className="flex gap-2.5 text-sm text-ink-700">
+                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand-400" />
                   {bullet}
                 </li>
               ))}

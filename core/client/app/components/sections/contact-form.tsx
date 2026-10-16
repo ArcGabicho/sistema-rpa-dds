@@ -1,11 +1,17 @@
 "use client";
 
-import { Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { SERVICE_OPTIONS } from "@/lib/contact-schema";
 import { useContact } from "@/hooks/use-contact";
 
 const FIELD_BASE =
-  "w-full rounded-xl border bg-paper px-4 py-3 text-sm text-ink-950 outline-none transition-colors placeholder:text-slate/60 focus:border-brass-400";
+  "w-full rounded-lg border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
+
+function fieldState(hasError: boolean) {
+  return hasError
+    ? "border-red-400 focus:border-red-500"
+    : "border-line focus:border-brand-500";
+}
 
 export function ContactForm() {
   const { register, errors, isSubmitting, onSubmit } = useContact();
@@ -14,49 +20,75 @@ export function ContactForm() {
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
+          <label htmlFor="fullName" className="sr-only">
+            Nombre completo
+          </label>
           <input
             id="fullName"
             type="text"
             placeholder="*Nombre completo"
-            className={`${FIELD_BASE} ${errors.fullName ? "border-red-400" : "border-line"}`}
+            aria-invalid={errors.fullName ? true : undefined}
+            aria-describedby={errors.fullName ? "fullName-error" : undefined}
+            className={`h-11 ${FIELD_BASE} ${fieldState(!!errors.fullName)}`}
             {...register("fullName")}
           />
           {errors.fullName && (
-            <p className="mt-1.5 text-xs text-red-500">{errors.fullName.message}</p>
+            <p id="fullName-error" className="mt-1.5 text-xs text-red-500">
+              {errors.fullName.message}
+            </p>
           )}
         </div>
 
         <div>
+          <label htmlFor="email" className="sr-only">
+            Correo electrónico
+          </label>
           <input
             id="email"
             type="email"
             placeholder="*Correo electrónico"
-            className={`${FIELD_BASE} ${errors.email ? "border-red-400" : "border-line"}`}
+            aria-invalid={errors.email ? true : undefined}
+            aria-describedby={errors.email ? "email-error" : undefined}
+            className={`h-11 ${FIELD_BASE} ${fieldState(!!errors.email)}`}
             {...register("email")}
           />
           {errors.email && (
-            <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>
+            <p id="email-error" className="mt-1.5 text-xs text-red-500">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
         <div>
+          <label htmlFor="phone" className="sr-only">
+            Número de teléfono
+          </label>
           <input
             id="phone"
             type="tel"
             placeholder="*Número de teléfono"
-            className={`${FIELD_BASE} ${errors.phone ? "border-red-400" : "border-line"}`}
+            aria-invalid={errors.phone ? true : undefined}
+            aria-describedby={errors.phone ? "phone-error" : undefined}
+            className={`h-11 ${FIELD_BASE} ${fieldState(!!errors.phone)}`}
             {...register("phone")}
           />
           {errors.phone && (
-            <p className="mt-1.5 text-xs text-red-500">{errors.phone.message}</p>
+            <p id="phone-error" className="mt-1.5 text-xs text-red-500">
+              {errors.phone.message}
+            </p>
           )}
         </div>
 
         <div>
+          <label htmlFor="service" className="sr-only">
+            ¿Cuál es tu necesidad?
+          </label>
           <select
             id="service"
             defaultValue=""
-            className={`${FIELD_BASE} ${errors.service ? "border-red-400" : "border-line"}`}
+            aria-invalid={errors.service ? true : undefined}
+            aria-describedby={errors.service ? "service-error" : undefined}
+            className={`h-11 px-3 ${FIELD_BASE} ${fieldState(!!errors.service)}`}
             {...register("service")}
           >
             <option value="" disabled>
@@ -69,33 +101,40 @@ export function ContactForm() {
             ))}
           </select>
           {errors.service && (
-            <p className="mt-1.5 text-xs text-red-500">{errors.service.message}</p>
+            <p id="service-error" className="mt-1.5 text-xs text-red-500">
+              {errors.service.message}
+            </p>
           )}
         </div>
       </div>
 
       <div>
+        <label htmlFor="message" className="sr-only">
+          Mensaje
+        </label>
         <textarea
           id="message"
           rows={5}
           placeholder="Escribe tu mensaje..."
-          className={`${FIELD_BASE} resize-none ${
-            errors.message ? "border-red-400" : "border-line"
-          }`}
+          aria-invalid={errors.message ? true : undefined}
+          aria-describedby={errors.message ? "message-error" : undefined}
+          className={`resize-none py-3 ${FIELD_BASE} ${fieldState(!!errors.message)}`}
           {...register("message")}
         />
         {errors.message && (
-          <p className="mt-1.5 text-xs text-red-500">{errors.message.message}</p>
+          <p id="message-error" className="mt-1.5 text-xs text-red-500">
+            {errors.message.message}
+          </p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brass-500 px-6 py-3.5 text-sm font-medium text-paper transition-colors hover:bg-brass-600 disabled:opacity-60 sm:w-auto"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-700 px-6 text-sm font-medium text-white transition-colors hover:bg-ink-900 disabled:opacity-60 sm:w-auto sm:self-start"
       >
+        {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         {isSubmitting ? "Enviando..." : "Enviar solicitud"}
-        <Send className="h-4 w-4" />
       </button>
     </form>
   );

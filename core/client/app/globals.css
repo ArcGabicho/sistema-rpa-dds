@@ -3,35 +3,41 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0b1d4b;
+  --foreground: #17273a;
 
-  /* Ink — DDS's deep navy: heading text on light pages, and the fill for
-     the dark accent bands/panels used sparingly for contrast */
-  --color-ink-950: #0b1d4b;
-  --color-ink-900: #0d2565;
-  --color-ink-800: #16327a;
-  --color-ink-700: #204ab0;
+  /* Palette taken from the hero robot illustration
+     (public/assets/hero-porada.svg), used across the site, the login and
+     the dashboard. */
 
-  /* Paper — white surfaces, and reversed (light) text on the dark bands */
-  --color-paper: #ffffff;
-  --color-paper-dim: #cdd4ef;
+  /* Ink — the robot's navy: headings and body text on light surfaces, and
+     the dark bands, frame and facade. 950/900/700 are the robot's own
+     tones; 500/400 are lighter tints of 700 for secondary text. */
+  --color-ink-950: #17273a;
+  --color-ink-900: #1a3a60;
+  --color-ink-800: #24456b;
+  --color-ink-700: #345574;
+  --color-ink-500: #5b7a96;
+  --color-ink-400: #8ea7bd;
 
-  /* Slate / line / mist — supporting neutrals for the light pages */
-  --color-slate: #57678a;
-  --color-line: #dbe0ec;
-  --color-mist: #f1f5fc;
+  /* Brand — the robot's blues, from its pale glass to its deep blue.
+     700 is the primary action color: the only blue dark enough to carry
+     white text accessibly. */
+  --color-brand-50: #f5faff;
+  --color-brand-100: #ebf5ff;
+  --color-brand-200: #c8e5fe;
+  --color-brand-300: #9dcaf1;
+  --color-brand-400: #68a7df;
+  --color-brand-500: #359cfd;
+  --color-brand-600: #2080d9;
+  --color-brand-700: #0857a0;
 
-  /* Blue — DDS's primary accent */
-  --color-brass-300: #a8c3ff;
-  --color-brass-400: #6491ff;
-  --color-brass-500: #204ab0;
-  --color-brass-600: #16357f;
+  /* Glow — the robot's bright cyan, for actions and accents on dark
+     surfaces (always with ink-950 text on top). */
+  --color-glow-300: #94e2ff;
+  --color-glow-400: #70d9ff;
 
-  /* Mint — DDS's secondary accent, reserved for diagram strokes and
-     validated / success states */
-  --color-signal-300: #7be8c4;
-  --color-signal-400: #03e78b;
-  --color-signal-500: #04b872;
+  /* Line — the robot's cool grey, for borders and dividers. */
+  --color-line: #d9e0e6;
 }
 
 @theme inline {
@@ -42,22 +48,22 @@
   --color-ink-900: var(--color-ink-900);
   --color-ink-800: var(--color-ink-800);
   --color-ink-700: var(--color-ink-700);
+  --color-ink-500: var(--color-ink-500);
+  --color-ink-400: var(--color-ink-400);
 
-  --color-paper: var(--color-paper);
-  --color-paper-dim: var(--color-paper-dim);
+  --color-brand-50: var(--color-brand-50);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-200: var(--color-brand-200);
+  --color-brand-300: var(--color-brand-300);
+  --color-brand-400: var(--color-brand-400);
+  --color-brand-500: var(--color-brand-500);
+  --color-brand-600: var(--color-brand-600);
+  --color-brand-700: var(--color-brand-700);
 
-  --color-slate: var(--color-slate);
+  --color-glow-300: var(--color-glow-300);
+  --color-glow-400: var(--color-glow-400);
+
   --color-line: var(--color-line);
-  --color-mist: var(--color-mist);
-
-  --color-brass-300: var(--color-brass-300);
-  --color-brass-400: var(--color-brass-400);
-  --color-brass-500: var(--color-brass-500);
-  --color-brass-600: var(--color-brass-600);
-
-  --color-signal-300: var(--color-signal-300);
-  --color-signal-400: var(--color-signal-400);
-  --color-signal-500: var(--color-signal-500);
 
   --font-sans: var(--font-instrument-sans);
   --font-display: var(--font-instrument-sans);
@@ -81,6 +87,6 @@ html {
 }
 
 ::selection {
-  background: var(--color-brass-400);
-  color: var(--color-paper);
+  background: var(--color-brand-700);
+  color: #ffffff;
 }

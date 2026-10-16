@@ -8,7 +8,7 @@ import { ROLE_OPTIONS, type User } from "@/lib/users-schema";
 import { formatDate } from "@/lib/format-date";
 
 const ROLE_SELECT =
-  "h-9 rounded-lg border border-neutral-200 bg-white px-2.5 text-sm text-neutral-950 outline-none transition-colors focus:border-neutral-950 disabled:opacity-60";
+  "h-9 rounded-lg border border-line bg-white px-2.5 text-sm text-ink-950 outline-none transition-colors focus:border-brand-500 disabled:opacity-60";
 const DELETE_BUTTON =
   "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60";
 
@@ -66,14 +66,14 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-neutral-200">
+    <div className="overflow-hidden rounded-xl border border-line">
       {/* Mobile: stacked rows */}
-      <ul className="divide-y divide-neutral-200 sm:hidden">
+      <ul className="divide-y divide-line sm:hidden">
         {users.map((user) => (
           <li key={user.id} className="flex flex-col gap-3 p-4">
             <div>
-              <p className="font-medium text-neutral-950">{user.fullName}</p>
-              <p className="text-sm text-neutral-500">{user.email}</p>
+              <p className="font-medium text-ink-950">{user.fullName}</p>
+              <p className="text-sm text-ink-500">{user.email}</p>
             </div>
             <div className="flex items-center justify-between gap-3">
               <select
@@ -101,7 +101,7 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
                 </button>
               )}
             </div>
-            <p className="text-xs text-neutral-400">Último ingreso: {formatLastLogin(user.lastLoginAtUtc)}</p>
+            <p className="text-xs text-ink-400">Último ingreso: {formatLastLogin(user.lastLoginAtUtc)}</p>
           </li>
         ))}
       </ul>
@@ -109,7 +109,7 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
       {/* Desktop: table */}
       <div className="hidden overflow-x-auto sm:block">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50 text-xs text-neutral-500">
+          <thead className="border-b border-line bg-brand-50 text-xs text-ink-500">
             <tr>
               <th className="px-5 py-3 font-medium">Nombre</th>
               <th className="px-5 py-3 font-medium">Correo</th>
@@ -120,16 +120,16 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-200">
+          <tbody className="divide-y divide-line">
             {users.map((user) => (
               <tr key={user.id}>
-                <td className="px-5 py-3.5 font-medium text-neutral-950">
+                <td className="px-5 py-3.5 font-medium text-ink-950">
                   {user.fullName}
                   {user.id === currentUserId && (
-                    <span className="ml-2 text-xs font-normal text-neutral-400">(tú)</span>
+                    <span className="ml-2 text-xs font-normal text-ink-400">(tú)</span>
                   )}
                 </td>
-                <td className="px-5 py-3.5 text-neutral-500">{user.email}</td>
+                <td className="px-5 py-3.5 text-ink-500">{user.email}</td>
                 <td className="px-5 py-3.5">
                   <select
                     value={user.role}
@@ -145,7 +145,7 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
                     ))}
                   </select>
                 </td>
-                <td className="px-5 py-3.5 whitespace-nowrap text-neutral-500">
+                <td className="px-5 py-3.5 whitespace-nowrap text-ink-500">
                   {formatLastLogin(user.lastLoginAtUtc)}
                 </td>
                 <td className="px-5 py-3.5 text-right">
