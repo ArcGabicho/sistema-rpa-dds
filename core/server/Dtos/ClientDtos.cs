@@ -32,6 +32,8 @@ public class ClientResponse
     public required DateTime CreatedAtUtc { get; set; }
     public int? AssignedToUserId { get; set; }
     public string? AssignedToName { get; set; }
+    // Set once the request has been converted into an opportunity.
+    public int? OportunidadId { get; set; }
 }
 
 public class UpdateClientRequest

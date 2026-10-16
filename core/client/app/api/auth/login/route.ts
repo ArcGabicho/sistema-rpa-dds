@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { loginSchema } from "@/lib/auth-schema";
 import { AUTH_COOKIE_NAME, getApiUrl } from "@/lib/auth";
+import { clientIpHeaders, tooManyRequests } from "@/lib/client-ip";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   try {
     backendResponse = await fetch(`${getApiUrl()}/api/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...clientIpHeaders(request) },
       body: JSON.stringify(parsed.data),
       cache: "no-store",
     });
@@ -29,10 +30,8 @@ export async function POST(request: Request) {
   }
 
   if (backendResponse.status === 429) {
-    return NextResponse.json(
-      { message: "Demasiados intentos. Espera unos minutos e intenta de nuevo." },
-      { status: 429 },
-    );
+    const body = await tooManyRequests(backendResponse);
+    return NextResponse.json(body, { status: 429, headers: { "Retry-After": String(body.retryAfterSeconds) } });
   }
 
   if (!backendResponse.ok) {

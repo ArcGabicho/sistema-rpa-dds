@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2, ShieldAlert } from "lucide-react";
 import { FacadeBackdrop } from "@/components/layout/facade-backdrop";
 import { useAuth } from "@/hooks/use-auth";
 import { SITE } from "@/lib/site-config";
@@ -12,7 +12,8 @@ const FIELD_BASE =
   "h-11 w-full rounded-md border bg-white px-3.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-ink-400";
 
 export default function IngresarPage() {
-  const { register, errors, isSubmitting, onSubmit } = useAuth();
+  const { register, errors, isSubmitting, locked, secondsLeft, onSubmit } = useAuth();
+  const countdown = `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`;
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -140,13 +141,26 @@ export default function IngresarPage() {
                 </a>
               </div>
 
+              {locked && (
+                <p
+                  role="status"
+                  className="flex items-start gap-2.5 rounded-md border border-line bg-brand-50 px-3.5 py-3 text-sm text-ink-700"
+                >
+                  <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-brand-700" />
+                  <span>
+                    Por seguridad pausamos el ingreso tras varios intentos. Podrás intentarlo de nuevo en{" "}
+                    <span className="font-semibold text-ink-950 tabular-nums">{countdown}</span>.
+                  </span>
+                </p>
+              )}
+
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || locked}
                 className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-brand-700 text-sm font-semibold text-white transition-colors hover:bg-ink-900 disabled:opacity-60"
               >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isSubmitting ? "Ingresando..." : "Ingresar"}
+                {isSubmitting ? "Ingresando..." : locked ? `Espera ${countdown}` : "Ingresar"}
               </button>
             </form>
 

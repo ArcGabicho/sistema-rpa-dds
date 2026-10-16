@@ -19,6 +19,7 @@ type Client = {
   createdAtUtc: string;
   assignedToUserId: number | null;
   assignedToName: string | null;
+  oportunidadId: number | null;
 };
 
 type PagedClients = {
@@ -32,6 +33,14 @@ type PagedClients = {
 const SERVICE_LABELS = Object.fromEntries(
   SERVICE_OPTIONS.map((option) => [option.value, option.label]),
 );
+
+function EnEmbudoBadge() {
+  return (
+    <span className="inline-flex items-center rounded-full border border-brand-300 px-2.5 py-1 text-xs font-medium text-brand-700">
+      En el embudo
+    </span>
+  );
+}
 
 async function getClients(page: number): Promise<{ data: PagedClients | null; error: boolean }> {
   const token = await getSessionToken();
@@ -55,7 +64,7 @@ async function getClients(page: number): Promise<{ data: PagedClients | null; er
   }
 }
 
-export default async function ClientesPage({
+export default async function SolicitudesPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string }>;
@@ -69,16 +78,16 @@ export default async function ClientesPage({
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
-        Clientes
+        Solicitudes web
       </h1>
       <p className="mt-1.5 text-sm text-ink-500">
-        Solicitudes recibidas desde el formulario de contacto del sitio público.
+        Lo que llega por el formulario de contacto del sitio. Conviértelas en oportunidades para darles seguimiento.
       </p>
 
       <div className="mt-8 overflow-hidden rounded-lg bg-white shadow-card">
         {error || !data ? (
           <p className="p-6 text-sm text-ink-500">
-            No se pudo cargar la lista de clientes. Intenta de nuevo más tarde.
+            No se pudo cargar la lista de solicitudes. Intenta de nuevo más tarde.
           </p>
         ) : data.items.length === 0 ? (
           <p className="p-6 text-sm text-ink-500">
@@ -93,12 +102,15 @@ export default async function ClientesPage({
               {data.items.map((client) => (
                 <li key={client.id}>
                   <Link
-                    href={`/dashboard/clientes/${client.id}`}
+                    href={`/dashboard/solicitudes/${client.id}`}
                     className="flex flex-col gap-1.5 p-4 transition-colors active:bg-brand-50"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-medium text-ink-950">{client.fullName}</p>
-                      <ClientStatusBadge status={client.status} />
+                      <span className="flex shrink-0 gap-1.5">
+                        {client.oportunidadId && <EnEmbudoBadge />}
+                        <ClientStatusBadge status={client.status} />
+                      </span>
                     </div>
                     <p className="text-sm text-ink-500">{client.email}</p>
                     <p className="text-sm text-ink-500">{client.phone}</p>
@@ -130,7 +142,7 @@ export default async function ClientesPage({
                     <tr key={client.id} className="transition-colors hover:bg-brand-50">
                       <td className="px-5 py-4">
                         <Link
-                          href={`/dashboard/clientes/${client.id}`}
+                          href={`/dashboard/solicitudes/${client.id}`}
                           className="font-medium text-ink-950 hover:underline"
                         >
                           {client.fullName}
@@ -144,7 +156,10 @@ export default async function ClientesPage({
                         {SERVICE_LABELS[client.service] ?? client.service}
                       </td>
                       <td className="px-5 py-4">
-                        <ClientStatusBadge status={client.status} />
+                        <span className="flex flex-wrap gap-1.5">
+                          <ClientStatusBadge status={client.status} />
+                          {client.oportunidadId && <EnEmbudoBadge />}
+                        </span>
                       </td>
                       <td className="px-5 py-4 text-ink-500">{client.assignedToName ?? "—"}</td>
                       <td className="px-5 py-4 whitespace-nowrap text-ink-500">
@@ -160,7 +175,7 @@ export default async function ClientesPage({
               page={data.page}
               totalPages={data.totalPages}
               totalCount={data.totalCount}
-              basePath="/dashboard/clientes"
+              basePath="/dashboard/solicitudes"
             />
           </>
         )}

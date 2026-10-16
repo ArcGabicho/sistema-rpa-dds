@@ -7,6 +7,7 @@ import { SERVICE_OPTIONS } from "@/lib/contact-schema";
 import { ClientStatusBadge } from "@/components/ui/client-status-badge";
 import { ClientAssignmentPanel } from "@/components/sections/client-assignment-panel";
 import { ClientNotesPanel } from "@/components/sections/client-notes-panel";
+import { ConvertirSolicitudPanel } from "@/components/comercial/convertir-solicitud-panel";
 import { formatDateTime } from "@/lib/format-date";
 
 type Client = {
@@ -20,6 +21,7 @@ type Client = {
   createdAtUtc: string;
   assignedToUserId: number | null;
   assignedToName: string | null;
+  oportunidadId: number | null;
 };
 
 type ClientNote = {
@@ -87,11 +89,11 @@ export default async function ClienteDetailsPage({
   return (
     <div>
       <Link
-        href="/dashboard/clientes"
+        href="/dashboard/solicitudes"
         className="inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors hover:text-ink-950"
       >
         <ArrowLeft className="h-4 w-4" />
-        Clientes
+        Solicitudes web
       </Link>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -104,7 +106,7 @@ export default async function ClienteDetailsPage({
         {SERVICE_LABELS[client.service] ?? client.service} · {formatDateTime(client.createdAtUtc)}
       </p>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-6">
           <section className="rounded-lg bg-white shadow-card p-6">
             <h2 className="text-base font-semibold text-ink-950">Datos de contacto</h2>
@@ -134,12 +136,15 @@ export default async function ClienteDetailsPage({
           />
         </div>
 
-        <ClientAssignmentPanel
-          clientId={client.id}
-          status={client.status}
-          assignedToUserId={client.assignedToUserId}
-          users={users}
-        />
+        <div className="flex flex-col gap-6">
+          <ConvertirSolicitudPanel solicitudId={client.id} oportunidadId={client.oportunidadId} />
+          <ClientAssignmentPanel
+            clientId={client.id}
+            status={client.status}
+            assignedToUserId={client.assignedToUserId}
+            users={users}
+          />
+        </div>
       </div>
     </div>
   );

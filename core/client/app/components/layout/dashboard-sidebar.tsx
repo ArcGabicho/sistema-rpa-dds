@@ -28,7 +28,10 @@ export function DashboardSidebar({
   onClose?: () => void;
 }) {
   const pathname = usePathname();
-  const visibleNav = DASHBOARD_NAV.filter((item) => !item.adminOnly || user?.role === "Admin");
+  const visibleNav = DASHBOARD_NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.adminOnly || user?.role === "Admin"),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <aside className="flex h-full w-72 shrink-0 flex-col border-r border-line bg-white px-3 py-5">
@@ -52,30 +55,39 @@ export function DashboardSidebar({
         )}
       </div>
 
-      <nav className="mt-8 flex flex-col gap-0.5">
-        {visibleNav.map((item) => {
-          const isActive =
-            item.href === "/dashboard"
-              ? pathname === item.href
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              aria-current={isActive ? "page" : undefined}
-              className={`relative flex h-10 items-center gap-3 rounded-md px-3 text-sm transition-colors ${
-                isActive
-                  ? "bg-brand-100 font-semibold text-brand-700 before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-700"
-                  : "text-ink-700 hover:bg-brand-50 hover:text-ink-950"
-              }`}
-            >
-              <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="mt-8 flex flex-col gap-6 overflow-y-auto">
+        {visibleNav.map((group, index) => (
+          <div key={group.title ?? index} className="flex flex-col gap-0.5">
+            {group.title && (
+              <p className="px-3 pb-1.5 text-[11px] font-semibold tracking-wide text-ink-400 uppercase">
+                {group.title}
+              </p>
+            )}
+            {group.items.map((item) => {
+              const isActive =
+                item.href === "/dashboard"
+                  ? pathname === item.href
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onNavigate}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`relative flex h-10 items-center gap-3 rounded-md px-3 text-sm transition-colors ${
+                    isActive
+                      ? "bg-brand-100 font-semibold text-brand-700 before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-700"
+                      : "text-ink-700 hover:bg-brand-50 hover:text-ink-950"
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       <div className="mt-auto flex flex-col gap-4 border-t border-line px-2 pt-5">

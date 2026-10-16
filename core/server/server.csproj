@@ -20,10 +20,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.22.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Seed data copied from another project (namespace OpenClient); kept
-         out of the build until it's adapted to this project's models. -->
-    <Compile Remove="Data/Seeds/**" />
-  </ItemGroup>
-
 </Project>

@@ -4,10 +4,11 @@ namespace Server.Dtos;
 
 public class LoginRequest
 {
-    [Required, EmailAddress]
+    [Required, EmailAddress, MaxLength(256)]
     public required string Email { get; set; }
 
-    [Required]
+    // Capped so nobody can make the server hash megabytes per attempt.
+    [Required, MaxLength(128)]
     public required string Password { get; set; }
 
     public bool RememberMe { get; set; }

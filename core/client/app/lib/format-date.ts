@@ -28,3 +28,16 @@ export function formatDateTime(value: string) {
     timeZone: TIME_ZONE,
   });
 }
+
+// Date-only fields (a deadline, an estimated close date) come from the API as
+// "2026-10-20T00:00:00" with no zone: read the calendar date as written
+// instead of converting it, which would shift it a day back in Lima.
+export function formatDay(value: string) {
+  const [year, month, day] = value.slice(0, 10).split("-");
+  return `${day}/${month}/${year}`;
+}
+
+// Today in Lima as "YYYY-MM-DD", to compare against date-only fields.
+export function todayInLima() {
+  return new Date().toLocaleDateString("en-CA", { timeZone: TIME_ZONE });
+}

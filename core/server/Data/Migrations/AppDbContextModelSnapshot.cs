@@ -22,6 +22,47 @@ namespace server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Server.Models.Actividad", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OportunidadId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("EmpresaId", "CreatedAtUtc");
+
+                    b.HasIndex("OportunidadId", "CreatedAtUtc");
+
+                    b.ToTable("Actividades");
+                });
+
             modelBuilder.Entity("Server.Models.AdminUser", b =>
                 {
                     b.Property<int>("Id")
@@ -147,6 +188,229 @@ namespace server.Data.Migrations
                     b.ToTable("ClientNotes");
                 });
 
+            modelBuilder.Entity("Server.Models.Contacto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Apellidos")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Cargo")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombres")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Telefono")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("Contactos");
+                });
+
+            modelBuilder.Entity("Server.Models.Empresa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Direccion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Distrito")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("NombreComercial")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Origen")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Provincia")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("RazonSocial")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Rubro")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Ruc")
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<string>("SitioWeb")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Estado");
+
+                    b.HasIndex("NombreComercial");
+
+                    b.HasIndex("ResponsableId");
+
+                    b.HasIndex("Ruc")
+                        .IsUnique()
+                        .HasFilter("[Ruc] IS NOT NULL");
+
+                    b.ToTable("Empresas");
+                });
+
+            modelBuilder.Entity("Server.Models.Oportunidad", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CerradaAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ContactoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Etapa")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("FechaCierreEstimada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MotivoPerdida")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProximaAccion")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTime?>("ProximaAccionFecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Servicio")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("SolicitudId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("ValorEstimado")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactoId");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("Etapa");
+
+                    b.HasIndex("ProximaAccionFecha");
+
+                    b.HasIndex("ResponsableId");
+
+                    b.HasIndex("SolicitudId")
+                        .IsUnique()
+                        .HasFilter("[SolicitudId] IS NOT NULL");
+
+                    b.ToTable("Oportunidades");
+                });
+
+            modelBuilder.Entity("Server.Models.Actividad", b =>
+                {
+                    b.HasOne("Server.Models.AdminUser", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.Oportunidad", "Oportunidad")
+                        .WithMany("Actividades")
+                        .HasForeignKey("OportunidadId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("Empresa");
+
+                    b.Navigation("Oportunidad");
+                });
+
             modelBuilder.Entity("Server.Models.Client", b =>
                 {
                     b.HasOne("Server.Models.AdminUser", "AssignedToUser")
@@ -176,9 +440,73 @@ namespace server.Data.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("Server.Models.Contacto", b =>
+                {
+                    b.HasOne("Server.Models.Empresa", "Empresa")
+                        .WithMany("Contactos")
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("Server.Models.Empresa", b =>
+                {
+                    b.HasOne("Server.Models.AdminUser", "Responsable")
+                        .WithMany()
+                        .HasForeignKey("ResponsableId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Responsable");
+                });
+
+            modelBuilder.Entity("Server.Models.Oportunidad", b =>
+                {
+                    b.HasOne("Server.Models.Contacto", "Contacto")
+                        .WithMany()
+                        .HasForeignKey("ContactoId");
+
+                    b.HasOne("Server.Models.Empresa", "Empresa")
+                        .WithMany("Oportunidades")
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.AdminUser", "Responsable")
+                        .WithMany()
+                        .HasForeignKey("ResponsableId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Server.Models.Client", "Solicitud")
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Contacto");
+
+                    b.Navigation("Empresa");
+
+                    b.Navigation("Responsable");
+
+                    b.Navigation("Solicitud");
+                });
+
             modelBuilder.Entity("Server.Models.Client", b =>
                 {
                     b.Navigation("Notes");
+                });
+
+            modelBuilder.Entity("Server.Models.Empresa", b =>
+                {
+                    b.Navigation("Contactos");
+
+                    b.Navigation("Oportunidades");
+                });
+
+            modelBuilder.Entity("Server.Models.Oportunidad", b =>
+                {
+                    b.Navigation("Actividades");
                 });
 #pragma warning restore 612, 618
         }

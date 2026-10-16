@@ -46,6 +46,8 @@ services:
       Admin__Password: ${ADMIN_PASSWORD}
       Admin__FullName: ${ADMIN_FULL_NAME:-Administrador}
       Cors__AllowedOrigins__0: ${CLIENT_ORIGIN:-http://localhost:3000}
+      # Fill the empty local database with demo companies and pipeline.
+      Seed__DatosDemo: ${SEED_DATOS_DEMO:-true}
     ports:
       - "${SERVER_PORT:-8080}:8080"
     healthcheck:

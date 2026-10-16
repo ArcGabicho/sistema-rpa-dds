@@ -1,8 +1,6 @@
 using System.Text;
-using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Server.Data;
@@ -51,32 +49,11 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
-// Rate limiting: guard the login endpoint against brute-force attempts.
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    options.AddPolicy("login", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(5),
-                QueueLimit = 0,
-            }));
-
-    // Guard the public contact form against spam submissions.
-    options.AddPolicy("contact", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(10),
-                QueueLimit = 0,
-            }));
-});
+// Rate limits for every request, the login and the contact form (see
+// Services/RateLimiting.cs), plus the per-account login lockout.
+builder.Services.AddRateLimits();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<LoginThrottle>();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:3000"];
@@ -91,13 +68,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply pending migrations and seed the admin user on startup.
+// Apply pending migrations and seed the admin user (and, in development, the
+// demo prospect base) on startup.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
     await db.Database.MigrateAsync();
     await AdminSeeder.SeedAsync(db, app.Configuration, logger);
+    await EmpresaSeeder.SeedAsync(db, app.Configuration, logger);
 }
 
 // Configure the HTTP request pipeline.
@@ -107,8 +86,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("client");
-app.UseRateLimiter();
+// After authentication, so the global limit can tell users apart.
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));

@@ -16,28 +16,30 @@ public class AuthController(
     AppDbContext db,
     PasswordHasher<AdminUser> passwordHasher,
     TokenService tokenService,
+    LoginThrottle throttle,
     ILogger<AuthController> logger
 ) : ControllerBase
 {
     [HttpPost("login")]
-    [EnableRateLimiting("login")]
+    [EnableRateLimiting(RateLimiting.Login)]
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
     {
         var email = request.Email.Trim().ToLowerInvariant();
+        if (throttle.Bloqueo(email) is { } espera)
+        {
+            logger.LogWarning("Inicio de sesión bloqueado para {Email} por intentos fallidos", email);
+            await RateLimiting.WriteTooManyAsync(HttpContext, espera);
+            return new EmptyResult();
+        }
+
         var user = await db.AdminUsers.SingleOrDefaultAsync(u => u.Email == email);
-
-        if (user is null)
+        if (user is null || passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
         {
+            throttle.Fallo(email);
             logger.LogWarning("Intento de inicio de sesión fallido para {Email}", email);
             return Unauthorized(new { message = "Correo o contraseña incorrectos." });
         }
-
-        var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
-        if (result == PasswordVerificationResult.Failed)
-        {
-            logger.LogWarning("Intento de inicio de sesión fallido para {Email}", email);
-            return Unauthorized(new { message = "Correo o contraseña incorrectos." });
-        }
+        throttle.Exito(email);
 
         user.LastLoginAtUtc = DateTime.UtcNow;
         await db.SaveChangesAsync();

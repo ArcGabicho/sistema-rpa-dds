@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { contactSchema } from "@/lib/contact-schema";
 import { getApiUrl } from "@/lib/auth";
+import { clientIpHeaders, tooManyRequests } from "@/lib/client-ip";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   try {
     backendResponse = await fetch(`${getApiUrl()}/api/clients`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...clientIpHeaders(request) },
       body: JSON.stringify(parsed.data),
       cache: "no-store",
     });
@@ -29,9 +30,10 @@ export async function POST(request: Request) {
   }
 
   if (backendResponse.status === 429) {
+    const body = await tooManyRequests(backendResponse);
     return NextResponse.json(
-      { message: "Demasiadas solicitudes. Espera unos minutos e intenta de nuevo." },
-      { status: 429 },
+      { ...body, message: "Ya recibimos varias solicitudes desde tu conexión. Espera unos minutos e intenta de nuevo." },
+      { status: 429, headers: { "Retry-After": String(body.retryAfterSeconds) } },
     );
   }
 
