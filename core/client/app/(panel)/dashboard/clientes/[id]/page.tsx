@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { getApiUrl } from "@/lib/auth";
 import { getSessionToken } from "@/lib/session";
 import { SERVICE_OPTIONS } from "@/lib/contact-schema";
 import { ClientStatusBadge } from "@/components/ui/client-status-badge";
 import { ClientAssignmentPanel } from "@/components/sections/client-assignment-panel";
 import { ClientNotesPanel } from "@/components/sections/client-notes-panel";
+import { formatDateTime } from "@/lib/format-date";
 
 type Client = {
   id: number;
@@ -69,16 +72,6 @@ async function getUsers(token: string): Promise<TeamUser[]> {
   }
 }
 
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString("es-PE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export default async function ClienteDetailsPage({
   params,
 }: {
@@ -93,41 +86,52 @@ export default async function ClienteDetailsPage({
 
   return (
     <div>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl font-bold text-ink-950">{client.fullName}</h1>
-            <ClientStatusBadge status={client.status} />
-          </div>
-          <p className="mt-1 text-sm text-slate">
-            {SERVICE_LABELS[client.service] ?? client.service} · {formatDateTime(client.createdAtUtc)}
-          </p>
-        </div>
-      </div>
+      <Link
+        href="/dashboard/clientes"
+        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-950"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Clientes
+      </Link>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-        <div className="flex flex-col gap-6">
-          <div className="rounded-2xl border border-line bg-paper p-6">
-            <p className="font-display text-sm font-bold text-ink-950">Datos de contacto</p>
-            <dl className="mt-4 flex flex-col divide-y divide-line text-sm">
-              <div className="flex justify-between gap-4 py-2.5">
-                <dt className="text-slate">Correo</dt>
-                <dd className="font-medium text-ink-950">
-                  <a href={`mailto:${client.email}`} className="hover:text-brass-500">
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">
+          {client.fullName}
+        </h1>
+        <ClientStatusBadge status={client.status} />
+      </div>
+      <p className="mt-1.5 text-sm text-neutral-500">
+        {SERVICE_LABELS[client.service] ?? client.service} · {formatDateTime(client.createdAtUtc)}
+      </p>
+
+      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="flex min-w-0 flex-col gap-10">
+          <section>
+            <h2 className="text-base font-semibold text-neutral-950">Datos de contacto</h2>
+            <dl className="mt-3 divide-y divide-neutral-200 border-y border-neutral-200 text-sm">
+              <div className="flex justify-between gap-4 py-3">
+                <dt className="text-neutral-500">Correo</dt>
+                <dd className="min-w-0 truncate font-medium text-neutral-950">
+                  <a href={`mailto:${client.email}`} className="hover:underline">
                     {client.email}
                   </a>
                 </dd>
               </div>
-              <div className="flex justify-between gap-4 py-2.5">
-                <dt className="text-slate">Teléfono</dt>
-                <dd className="font-medium text-ink-950">{client.phone}</dd>
+              <div className="flex justify-between gap-4 py-3">
+                <dt className="text-neutral-500">Teléfono</dt>
+                <dd className="font-medium text-neutral-950">{client.phone}</dd>
               </div>
             </dl>
-            <p className="mt-4 text-sm text-slate">Mensaje</p>
-            <p className="mt-1.5 text-sm text-ink-950">{client.message}</p>
-          </div>
+            <h3 className="mt-6 text-sm font-medium text-neutral-950">Mensaje</h3>
+            <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+              {client.message}
+            </p>
+          </section>
 
-          <ClientNotesPanel clientId={client.id} notes={notes} />
+          <ClientNotesPanel
+            clientId={client.id}
+            notes={notes.map((note) => ({ ...note, createdAtLabel: formatDateTime(note.createdAtUtc) }))}
+          />
         </div>
 
         <ClientAssignmentPanel

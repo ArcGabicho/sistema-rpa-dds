@@ -9,18 +9,9 @@ type ClientNote = {
   id: number;
   message: string;
   authorName: string;
-  createdAtUtc: string;
+  // Pre-formatted by the server page: see formatDateTime in lib/format-date.
+  createdAtLabel: string;
 };
-
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString("es-PE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export function ClientNotesPanel({ clientId, notes }: { clientId: number; notes: ClientNote[] }) {
   const router = useRouter();
@@ -55,37 +46,44 @@ export function ClientNotesPanel({ clientId, notes }: { clientId: number; notes:
   }
 
   return (
-    <div className="rounded-2xl border border-line bg-paper p-6">
-      <p className="font-display text-sm font-bold text-ink-950">Notas del equipo</p>
+    <section>
+      <h2 className="text-base font-semibold text-neutral-950">Notas del equipo</h2>
 
-      <ul className="mt-4 flex max-h-72 flex-col gap-3 overflow-y-auto">
-        {notes.length === 0 && <li className="text-sm text-slate">Aún no hay notas para este lead.</li>}
+      <ul className="mt-3 flex max-h-80 flex-col divide-y divide-neutral-200 overflow-y-auto border-y border-neutral-200">
+        {notes.length === 0 && (
+          <li className="py-4 text-sm text-neutral-500">Aún no hay notas para este lead.</li>
+        )}
         {notes.map((note) => (
-          <li key={note.id} className="rounded-xl bg-mist p-3.5 text-sm">
-            <p className="text-ink-950">{note.message}</p>
-            <p className="mt-1.5 text-xs text-slate">
-              {note.authorName} · {formatDateTime(note.createdAtUtc)}
+          <li key={note.id} className="py-3.5 text-sm">
+            <p className="whitespace-pre-line text-neutral-800">{note.message}</p>
+            <p className="mt-1 text-xs text-neutral-400">
+              {note.authorName} · {note.createdAtLabel}
             </p>
           </li>
         ))}
       </ul>
 
       <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+        <label htmlFor="client-note" className="sr-only">
+          Nueva nota
+        </label>
         <input
+          id="client-note"
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Escribe una nota interna..."
-          className="w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink-950 outline-none transition-colors placeholder:text-slate/60 focus:border-brass-400"
+          className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3.5 text-sm text-neutral-950 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-950"
         />
         <button
           type="submit"
           disabled={submitting || !message.trim()}
-          className="inline-flex shrink-0 items-center justify-center rounded-xl bg-brass-500 px-4 text-paper transition-colors hover:bg-brass-600 disabled:opacity-60"
+          aria-label="Agregar nota"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-neutral-950 text-white transition-colors hover:bg-neutral-800 disabled:opacity-40"
         >
           <Send className="h-4 w-4" />
         </button>
       </form>
-    </div>
+    </section>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
-import { AuthVisual } from "@/components/sections/auth-visual";
+import { FacadeBackdrop } from "@/components/layout/facade-backdrop";
 import { useAuth } from "@/hooks/use-auth";
 import { SITE } from "@/lib/site-config";
 
@@ -17,7 +17,7 @@ export default function IngresarPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0d1722]">
-      <AuthVisual />
+      <FacadeBackdrop />
 
       <div className="relative flex min-h-screen flex-col gap-3 p-3 sm:p-4 lg:flex-row lg:gap-4">
         <div className="flex flex-col justify-between px-3 py-3 sm:px-5 lg:flex-1 lg:px-10 lg:py-8">

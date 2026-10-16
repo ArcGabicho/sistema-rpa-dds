@@ -11,7 +11,7 @@ const STATUS_OPTIONS = [
 ];
 
 const FIELD_BASE =
-  "w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink-950 outline-none transition-colors focus:border-brass-400";
+  "h-11 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm text-neutral-950 outline-none transition-colors focus:border-neutral-950 disabled:opacity-60";
 
 export function ClientAssignmentPanel({
   clientId,
@@ -52,12 +52,15 @@ export function ClientAssignmentPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-line bg-paper p-6">
-      <p className="font-display text-sm font-bold text-ink-950">Seguimiento</p>
+    <aside className="h-fit rounded-xl bg-neutral-50 p-5">
+      <h2 className="text-base font-semibold text-neutral-950">Seguimiento</h2>
       <div className="mt-4 flex flex-col gap-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-ink-950">Estado</label>
+          <label htmlFor="client-status" className="mb-1.5 block text-sm font-medium text-neutral-950">
+            Estado
+          </label>
           <select
+            id="client-status"
             value={status}
             disabled={saving}
             onChange={(e) => update(e.target.value, assignedToUserId)}
@@ -72,8 +75,11 @@ export function ClientAssignmentPanel({
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-ink-950">Asignado a</label>
+          <label htmlFor="client-assignee" className="mb-1.5 block text-sm font-medium text-neutral-950">
+            Asignado a
+          </label>
           <select
+            id="client-assignee"
             value={assignedToUserId ?? ""}
             disabled={saving}
             onChange={(e) => update(status, e.target.value ? Number(e.target.value) : null)}
@@ -88,6 +94,6 @@ export function ClientAssignmentPanel({
           </select>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

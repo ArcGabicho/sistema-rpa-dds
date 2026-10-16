@@ -29,16 +29,18 @@ export default async function UsuariosPage() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-ink-950">Usuarios</h1>
-          <p className="mt-1 text-sm text-slate">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">
+            Usuarios
+          </h1>
+          <p className="mt-1.5 text-sm text-neutral-500">
             Administra quién puede acceder al panel y con qué rol.
           </p>
         </div>
         <Link
           href="/dashboard/usuarios/nuevo"
-          className="inline-flex items-center gap-2 rounded-full bg-brass-500 px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-brass-600"
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
         >
           <UserPlus className="h-4 w-4" />
           Nuevo usuario
@@ -47,7 +49,7 @@ export default async function UsuariosPage() {
 
       <div className="mt-8">
         {error ? (
-          <p className="rounded-2xl border border-line bg-paper p-8 text-sm text-slate">
+          <p className="rounded-xl bg-neutral-50 p-6 text-sm text-neutral-500">
             No se pudieron cargar los usuarios. Intenta de nuevo más tarde.
           </p>
         ) : (

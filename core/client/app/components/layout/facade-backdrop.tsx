@@ -38,7 +38,7 @@ const PANES = RIDGE_BASES.slice(0, -1).flatMap((left, col) => {
   });
 });
 
-export function AuthVisual() {
+export function FacadeBackdrop() {
   return (
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -47,7 +47,7 @@ export function AuthVisual() {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="auth-visual-shade" x1="1" y1="0" x2="0" y2="1">
+        <linearGradient id="facade-backdrop-shade" x1="1" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#060c14" stopOpacity="0" />
           <stop offset="0.55" stopColor="#060c14" stopOpacity="0.35" />
           <stop offset="1" stopColor="#060c14" stopOpacity="0.9" />
@@ -77,7 +77,7 @@ export function AuthVisual() {
         <line x1="980" y1="0" x2="520" y2="610" />
       </g>
 
-      <rect width={WIDTH} height={HEIGHT} fill="url(#auth-visual-shade)" />
+      <rect width={WIDTH} height={HEIGHT} fill="url(#facade-backdrop-shade)" />
     </svg>
   );
 }
