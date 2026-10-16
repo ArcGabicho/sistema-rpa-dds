@@ -158,20 +158,18 @@ else
   log "JWT_SECRET ya está configurado, se conserva. Usa --force para rotarlo."
 fi
 
-# 6. Azure SQL connection string — the database is created outside this
-#    repo (Azure portal), so it's asked for, never generated. Not affected
-#    by --force: an existing value is always kept.
-if [ -z "$(get_env_var .env DB_CONNECTION_STRING)" ]; then
-  log "Configura la base de datos (Azure SQL Database):"
-  db_connection_string=$(prompt_secret "Cadena de conexión de Azure SQL (Enter para completarla luego)")
-  if [ -n "$db_connection_string" ]; then
-    # Single quotes: Docker Compose then reads $ or # in the password literally.
-    set_env_var .env DB_CONNECTION_STRING "'$db_connection_string'"
-  else
-    warn "DB_CONNECTION_STRING quedó vacío; complétalo en .env antes de levantar el stack."
+# 6. Local SQL Server sa password (the development database in
+#    docker/docker-compose.yml) — generated like the JWT secret, only while
+#    still at its .env.example placeholder. The Azure SQL connection string
+#    (DB_CONNECTION_STRING) is production-only and isn't asked for here.
+if needs_value .env MSSQL_SA_PASSWORD; then
+  log "Generando MSSQL_SA_PASSWORD (base SQL Server local de desarrollo)..."
+  set_env_var .env MSSQL_SA_PASSWORD "$(random_secret)"
+  if [ "$FORCE" = "1" ]; then
+    warn "Si la base local ya existía, conserva la contraseña anterior: ejecuta scripts/clear.sh para recrearla."
   fi
 else
-  log "DB_CONNECTION_STRING ya está configurado, se conserva."
+  log "MSSQL_SA_PASSWORD ya está configurado, se conserva. Usa --force para rotarlo."
 fi
 
 log "Listo. Revisa $TARGET_DIR/.env y luego ejecuta scripts/run.sh para levantar el stack."

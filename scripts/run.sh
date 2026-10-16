@@ -8,11 +8,11 @@ set -euo pipefail
 #       scripts/run.sh down        -> stop the stack
 #       scripts/run.sh logs -f server
 #   scripts/run.sh dev
-#       Server in Docker, client with `next dev` on the host (hot reload).
-#       Ctrl+C stops both.
+#       Server and its database in Docker, client with `next dev` on the
+#       host (hot reload). Ctrl+C stops all three.
 #
-# Either way the API connects to the Azure SQL database in
-# DB_CONNECTION_STRING — there is no local database container.
+# Either way the API uses the local SQL Server container from
+# docker/docker-compose.yml, never the Azure SQL database.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker/docker-compose.yml"
@@ -31,9 +31,9 @@ env_value() {
   sed -n "s/^$1=//p" "$ENV_FILE" | tail -n1 | sed -e "s/^'\(.*\)'$/\1/" -e 's/^"\(.*\)"$/\1/'
 }
 
-require_connection_string() {
-  [ -n "$(env_value DB_CONNECTION_STRING)" ] \
-    || die "Falta DB_CONNECTION_STRING en .env (la cadena de conexión de Azure SQL)."
+require_sa_password() {
+  [ -n "$(env_value MSSQL_SA_PASSWORD)" ] \
+    || die "Falta MSSQL_SA_PASSWORD en .env (la contraseña de la base SQL Server local). Ejecuta scripts/setup.sh."
 }
 
 if [ ! -f "$ENV_FILE" ]; then
@@ -44,11 +44,11 @@ fi
 
 if [ "${1:-}" = "dev" ]; then
   command -v npm > /dev/null 2>&1 || die "Falta 'npm'. Instálalo antes de continuar."
-  require_connection_string
+  require_sa_password
 
-  log "Levantando el servidor en Docker..."
+  log "Levantando la base de datos y el servidor en Docker..."
   compose up -d --build --wait server
-  trap 'log "Deteniendo el servidor..."; compose stop server' EXIT
+  trap 'log "Deteniendo el servidor y la base de datos..."; compose stop server sqlserver' EXIT
 
   cd "$ROOT_DIR/core/client"
   if [ ! -d node_modules ]; then
@@ -71,6 +71,6 @@ if [ "$#" -eq 0 ] || [[ "$1" == -* ]]; then
   set -- up --build "$@"
 fi
 
-[ "$1" != "up" ] || require_connection_string
+[ "$1" != "up" ] || require_sa_password
 
 compose "$@"
