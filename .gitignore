@@ -48,5 +48,3 @@ obj/
 *.suo
 .vs/
 core/server/appsettings.Development.json
-# Windows "downloaded from the internet" markers
-*:Zone.Identifier
