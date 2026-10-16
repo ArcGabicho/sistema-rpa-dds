@@ -9,6 +9,13 @@ import { Benefits } from "@/components/sections/benefits";
 import { CaseStudies } from "@/components/sections/case-studies";
 import { Faq } from "@/components/sections/faq";
 import { CtaBanner } from "@/components/sections/cta-banner";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, pageMetadata } from "@/lib/metadata";
+
+export const metadata = pageMetadata({
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  path: "/",
+});
 
 export default function Home() {
   return (

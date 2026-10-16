@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/sections/page-hero";
 import { MissionStatement } from "@/components/sections/mission-statement";
 import { CoreValues } from "@/components/sections/core-values";
 import { VisionStatement } from "@/components/sections/vision-statement";
 import { CtaBanner } from "@/components/sections/cta-banner";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Visión, Misión y Valores | Data Discovery Solutions",
-  description:
-    "No solo implementamos tecnología, construimos confianza y resultados. Conoce la misión, visión y valores de Data Discovery Solutions.",
-};
+  description: "No solo implementamos tecnología, construimos confianza y resultados. Conoce la misión, visión y valores de Data Discovery Solutions.",
+  path: "/vision-mision-valores",
+});
 
 export default function VisionMisionValoresPage() {
   return (

@@ -68,6 +68,7 @@ services:
       NODE_ENV: production
       API_URL: http://server:8080
       JWT_SECRET: ${JWT_SECRET}
+      SITE_URL: ${SITE_URL:-}
     ports:
       - "${CLIENT_PORT:-3000}:3000"
     networks:
