@@ -4,18 +4,24 @@ import { Pencil } from "lucide-react";
 import { ActividadTimeline } from "@/components/comercial/actividad-timeline";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
 import { EtapaStepper } from "@/components/comercial/etapa-stepper";
+import { OportunidadDiagnosticos } from "@/components/diagnostico/oportunidad-diagnosticos";
 import { ProximaAccionCard } from "@/components/comercial/proxima-accion-card";
 import { EtapaBadge } from "@/components/ui/comercial-badges";
 import { PageHeader } from "@/components/ui/page-header";
 import { BUTTON_SECONDARY, CARD } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
-import { SERVICIO_LABELS, formatSoles, fullName, type Oportunidad } from "@/lib/comercial";
+import { SERVICIO_LABELS, formatSoles, fullName, type Oportunidad, type Paged } from "@/lib/comercial";
+import type { DiagnosticoItem } from "@/lib/diagnostico";
 import { formatDate, formatDateTime, formatDay, todayInLima } from "@/lib/format-date";
 import { getSessionUser, isAdmin } from "@/lib/session";
 
 export default async function OportunidadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [oportunidad, user] = await Promise.all([apiGet<Oportunidad>(`oportunidades/${id}`), getSessionUser()]);
+  const [oportunidad, user, diagnosticos] = await Promise.all([
+    apiGet<Oportunidad>(`oportunidades/${id}`),
+    getSessionUser(),
+    /^\d+$/.test(id) ? apiGet<Paged<DiagnosticoItem>>(`diagnosticos?oportunidadId=${id}&pageSize=10`) : null,
+  ]);
   if (!oportunidad) notFound();
 
   const abierta = oportunidad.etapa !== "ganada" && oportunidad.etapa !== "perdida";
@@ -79,6 +85,8 @@ export default async function OportunidadPage({ params }: { params: Promise<{ id
               today={todayInLima()}
             />
           )}
+
+          <OportunidadDiagnosticos oportunidadId={oportunidad.id} diagnosticos={diagnosticos?.items ?? null} />
 
           <section className={`${CARD} p-5`}>
             <h2 className="text-sm font-semibold text-ink-950">Detalles</h2>

@@ -9,6 +9,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<ClientNote> ClientNotes => Set<ClientNote>();
     public DbSet<Secreto> Secretos => Set<Secreto>();
+    public DbSet<Diagnostico> Diagnosticos => Set<Diagnostico>();
+    public DbSet<ProcesoEvaluado> ProcesosEvaluados => Set<ProcesoEvaluado>();
     public DbSet<AccesoSecreto> AccesosSecreto => Set<AccesoSecreto>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Contacto> Contactos => Set<Contacto>();
@@ -140,6 +142,51 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany()
                 .HasForeignKey(a => a.AutorId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Diagnóstico y ROI. A diagnosis goes with its company; its link to an
+        // opportunity is NoAction in the database (ClientSetNull) — deleting
+        // the company already cascades along a second path through the
+        // opportunity, which SQL Server refuses — and the opportunities API
+        // detaches diagnoses before deleting one.
+        modelBuilder.Entity<Diagnostico>(entity =>
+        {
+            entity.HasIndex(d => d.Estado);
+            entity.Property(d => d.Titulo).HasMaxLength(200).IsRequired();
+            entity.Property(d => d.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(d => d.CostoHora).HasPrecision(10, 2);
+            entity.Property(d => d.Resumen).HasMaxLength(4000);
+            entity.HasOne(d => d.Empresa)
+                .WithMany()
+                .HasForeignKey(d => d.EmpresaId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(d => d.Oportunidad)
+                .WithMany()
+                .HasForeignKey(d => d.OportunidadId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.Responsable)
+                .WithMany()
+                .HasForeignKey(d => d.ResponsableId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ProcesoEvaluado>(entity =>
+        {
+            entity.HasIndex(p => new { p.DiagnosticoId, p.Orden });
+            entity.Property(p => p.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(p => p.Area).HasMaxLength(120);
+            entity.Property(p => p.Descripcion).HasMaxLength(2000);
+            entity.Property(p => p.Servicio).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.MinutosPorEjecucion).HasPrecision(10, 2);
+            entity.Property(p => p.TasaError).HasPrecision(5, 2);
+            entity.Property(p => p.CostoHora).HasPrecision(10, 2);
+            entity.Property(p => p.PorcentajeAutomatizable).HasPrecision(5, 2);
+            entity.Property(p => p.CostoImplementacion).HasPrecision(14, 2);
+            entity.Property(p => p.CostoMensual).HasPrecision(14, 2);
+            entity.HasOne(p => p.Diagnostico)
+                .WithMany(d => d.Procesos)
+                .HasForeignKey(p => p.DiagnosticoId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Bóveda. A company's secrets go with it; the audit trail outlives

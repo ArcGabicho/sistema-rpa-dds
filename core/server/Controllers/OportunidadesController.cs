@@ -133,7 +133,7 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
             Descripcion = $"Oportunidad creada en la etapa {OportunidadEtapa.Label(etapa)}.",
             AutorId = autorId.Value,
         });
-        await MarkClienteIfWonAsync(oportunidad, ct);
+        await Embudo.MarcarClienteSiGanadaAsync(db, oportunidad, ct);
         await db.SaveChangesAsync(ct);
 
         return CreatedAtAction(nameof(GetById), new { id = oportunidad.Id }, new { id = oportunidad.Id });
@@ -159,7 +159,7 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
         oportunidad.ResponsableId = request.ResponsableId;
         oportunidad.ProximaAccion = Normalize(request.ProximaAccion);
         oportunidad.ProximaAccionFecha = request.ProximaAccionFecha;
-        await ChangeEtapaAsync(oportunidad, request.Etapa, request.MotivoPerdida, autorId.Value, ct);
+        await Embudo.CambiarEtapaAsync(db, oportunidad, request.Etapa, request.MotivoPerdida, autorId, ct);
 
         oportunidad.UpdatedAtUtc = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
@@ -178,7 +178,7 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
         var autorId = await db.GetCurrentUserIdAsync(User, ct);
         if (autorId is null) return Unauthorized();
 
-        await ChangeEtapaAsync(oportunidad, request.Etapa, request.MotivoPerdida, autorId.Value, ct);
+        await Embudo.CambiarEtapaAsync(db, oportunidad, request.Etapa, request.MotivoPerdida, autorId, ct);
         oportunidad.UpdatedAtUtc = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
         return NoContent();
@@ -247,46 +247,14 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
         if (oportunidad is null) return NotFound();
 
         // Activities cascade on the client side (ClientCascade): they're loaded
-        // above so EF deletes them along with the opportunity.
+        // above so EF deletes them along with the opportunity. Diagnoses stay
+        // with the company, unlinked (their FK is NoAction in the database).
+        await db.Diagnosticos
+            .Where(d => d.OportunidadId == id)
+            .ExecuteUpdateAsync(set => set.SetProperty(d => d.OportunidadId, (int?)null), ct);
         db.Oportunidades.Remove(oportunidad);
         await db.SaveChangesAsync(ct);
         return NoContent();
-    }
-
-    // Logs the move on the timeline, keeps the loss reason only for lost deals
-    // and promotes the company to "cliente" on a win.
-    private async Task ChangeEtapaAsync(Oportunidad oportunidad, string etapa, string? motivoPerdida, int autorId, CancellationToken ct)
-    {
-        oportunidad.MotivoPerdida = etapa == OportunidadEtapa.Perdida ? Normalize(motivoPerdida) : null;
-        if (oportunidad.Etapa == etapa) return;
-
-        oportunidad.CerradaAtUtc = OportunidadEtapa.Abiertas.Contains(etapa) ? null : DateTime.UtcNow;
-
-        var descripcion = $"Etapa: {OportunidadEtapa.Label(oportunidad.Etapa)} → {OportunidadEtapa.Label(etapa)}.";
-        if (oportunidad.MotivoPerdida is not null) descripcion += $" Motivo: {oportunidad.MotivoPerdida}";
-
-        oportunidad.Etapa = etapa;
-        db.Actividades.Add(new Actividad
-        {
-            EmpresaId = oportunidad.EmpresaId,
-            OportunidadId = oportunidad.Id,
-            Tipo = ActividadTipo.CambioEtapa,
-            Descripcion = descripcion,
-            AutorId = autorId,
-        });
-        await MarkClienteIfWonAsync(oportunidad, ct);
-    }
-
-    private async Task MarkClienteIfWonAsync(Oportunidad oportunidad, CancellationToken ct)
-    {
-        if (oportunidad.Etapa != OportunidadEtapa.Ganada) return;
-
-        var empresa = await db.Empresas.FindAsync([oportunidad.EmpresaId], ct);
-        if (empresa is not null && empresa.Estado != EmpresaEstado.Cliente)
-        {
-            empresa.Estado = EmpresaEstado.Cliente;
-            empresa.UpdatedAtUtc = DateTime.UtcNow;
-        }
     }
 
     private async Task<ActionResult?> ValidateAsync(int empresaId, int? contactoId, string servicio, string etapa, int? responsableId, CancellationToken ct)

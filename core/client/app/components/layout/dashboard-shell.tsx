@@ -10,7 +10,8 @@ import type { SessionUser } from "@/lib/session";
 
 // Azure portal-style shell: a white sidebar against a pale workspace, where
 // each page lays its content out in white Fluent cards. The workspace
-// scrolls on its own so the sidebar stays put.
+// scrolls on its own so the sidebar stays put. When printing (a diagnosis
+// report, say), only the page's content is printed, on white.
 export function DashboardShell({
   user,
   children,
@@ -21,8 +22,8 @@ export function DashboardShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-brand-50">
-      <div className="hidden lg:flex">
+    <div className="flex h-dvh overflow-hidden bg-brand-50 print:block print:h-auto print:overflow-visible print:bg-white">
+      <div className="hidden lg:flex print:hidden">
         <DashboardSidebar user={user} />
       </div>
 
@@ -44,7 +45,7 @@ export function DashboardShell({
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-line bg-white px-4 lg:hidden">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-line bg-white px-4 lg:hidden print:hidden">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <Image src="/assets/icon.png" alt="" width={24} height={24} className="h-6 w-6" />
             <span className="font-display text-sm font-semibold text-ink-950">{SITE.shortName}</span>
@@ -60,7 +61,7 @@ export function DashboardShell({
           </button>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8 lg:px-10">
+        <main className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8 lg:px-10 print:overflow-visible print:p-0">
           {children}
         </main>
       </div>

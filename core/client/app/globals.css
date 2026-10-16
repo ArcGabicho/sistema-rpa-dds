@@ -92,6 +92,18 @@ html {
   text-transform: none;
 }
 
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 ::selection {
   background: var(--color-brand-700);
   color: #ffffff;

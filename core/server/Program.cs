@@ -81,6 +81,7 @@ using (var scope = app.Services.CreateScope())
     // Resolved here so a malformed vault key stops the API at startup.
     var cifrado = scope.ServiceProvider.GetRequiredService<BovedaCifrado>();
     await BovedaSeeder.SeedAsync(db, app.Configuration, cifrado, logger);
+    await DiagnosticoSeeder.SeedAsync(db, app.Configuration, logger);
 }
 
 // Configure the HTTP request pipeline.

@@ -16,6 +16,14 @@ export const CHART = {
 
 export const AXIS_TICK = { fill: CHART.ink500, fontSize: 12 };
 
+// Prioritization quadrants (diagnosis): the more urgent, the deeper the blue.
+export const CUADRANTE_COLORES: Record<string, string> = {
+  quick_win: CHART.brand700,
+  estrategico: CHART.brand500,
+  mejora_menor: "#94e2ff",
+  postergar: CHART.ink400,
+};
+
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
 // "2026-05" -> "may" (or "may 2026" when asked for the year).

@@ -6,7 +6,7 @@ import { getSessionToken } from "@/lib/session";
 // Authenticated pass-through to the API for the panel's client components:
 // /api/panel/empresas/12/contactos -> {API_URL}/api/empresas/12/contactos,
 // with the session's JWT attached. Only the modules listed here go through.
-const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda"]);
+const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda", "diagnosticos", "procesos"]);
 
 // Nothing from the panel's API (vault values least of all) may be cached.
 const NO_STORE = { "Cache-Control": "no-store" };
