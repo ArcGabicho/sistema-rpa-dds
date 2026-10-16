@@ -73,6 +73,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* sileo title-cases toast titles ("No Se Pudo..."), which reads wrong in
+   Spanish; keep them in sentence case as written. Scoped under :root
+   because sileo also injects its stylesheet at runtime, after this one. */
+:root [data-sileo-title] {
+  text-transform: none;
+}
+
 ::selection {
   background: var(--color-brass-400);
   color: var(--color-paper);
