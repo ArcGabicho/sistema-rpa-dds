@@ -193,6 +193,10 @@ public class DiagnosticosController(AppDbContext db) : ControllerBase
         var diagnostico = await db.Diagnosticos.FindAsync([id], ct);
         if (diagnostico is null) return NotFound();
 
+        // Proposals built from it stay, unlinked (their FK is NoAction).
+        await db.Propuestas
+            .Where(p => p.DiagnosticoId == id)
+            .ExecuteUpdateAsync(set => set.SetProperty(p => p.DiagnosticoId, (int?)null), ct);
         db.Diagnosticos.Remove(diagnostico);
         await db.SaveChangesAsync(ct);
         return NoContent();

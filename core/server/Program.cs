@@ -82,6 +82,7 @@ using (var scope = app.Services.CreateScope())
     var cifrado = scope.ServiceProvider.GetRequiredService<BovedaCifrado>();
     await BovedaSeeder.SeedAsync(db, app.Configuration, cifrado, logger);
     await DiagnosticoSeeder.SeedAsync(db, app.Configuration, logger);
+    await PropuestaSeeder.SeedAsync(db, app.Configuration, logger);
 }
 
 // Configure the HTTP request pipeline.

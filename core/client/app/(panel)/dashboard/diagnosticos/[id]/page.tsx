@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FileText } from "lucide-react";
+import { FilePen, FileText } from "lucide-react";
 import { MatrizChart } from "@/components/charts/matriz-chart";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
 import { DiagnosticoAjustes } from "@/components/diagnostico/diagnostico-ajustes";
@@ -9,7 +9,7 @@ import { TotalesStrip } from "@/components/diagnostico/totales-strip";
 import { EtapaBadge } from "@/components/ui/comercial-badges";
 import { DiagnosticoEstadoBadge } from "@/components/ui/diagnostico-badges";
 import { PageHeader } from "@/components/ui/page-header";
-import { BUTTON_SECONDARY, CARD } from "@/components/ui/panel-styles";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
 import type { TeamUser } from "@/lib/comercial";
 import type { Diagnostico } from "@/lib/diagnostico";
@@ -47,6 +47,12 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
               <FileText className="h-4 w-4" />
               Ver informe
             </Link>
+            {diagnostico.procesos.length > 0 && (
+              <Link href={`/dashboard/propuestas/nueva?diagnosticoId=${diagnostico.id}`} className={BUTTON_PRIMARY}>
+                <FilePen className="h-4 w-4" />
+                Crear propuesta
+              </Link>
+            )}
             {isAdmin(user) && (
               <EliminarButton
                 path={`diagnosticos/${diagnostico.id}`}

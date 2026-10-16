@@ -576,6 +576,186 @@ namespace server.Data.Migrations
                     b.ToTable("ProcesosEvaluados");
                 });
 
+            modelBuilder.Entity("Server.Models.Propuesta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("AhorroAnualEstimado")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("CondicionesPago")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DescuentoPorcentaje")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int?>("DiagnosticoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EnviadaAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Exclusiones")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("Introduccion")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("Moneda")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("MotivoRechazo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("OportunidadId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RespondidaAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Supuestos")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ValidaHasta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiagnosticoId");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("Estado");
+
+                    b.HasIndex("OportunidadId");
+
+                    b.HasIndex("ResponsableId");
+
+                    b.HasIndex("Codigo", "Version")
+                        .IsUnique();
+
+                    b.ToTable("Propuestas");
+                });
+
+            modelBuilder.Entity("Server.Models.PropuestaFase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PropuestaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Semanas")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropuestaId", "Orden");
+
+                    b.ToTable("PropuestaFases");
+                });
+
+            modelBuilder.Entity("Server.Models.PropuestaItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Cantidad")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Detalle")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<int>("PropuestaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropuestaId", "Orden");
+
+                    b.ToTable("PropuestaItems");
+                });
+
             modelBuilder.Entity("Server.Models.Secreto", b =>
                 {
                     b.Property<int>("Id")
@@ -802,6 +982,58 @@ namespace server.Data.Migrations
                     b.Navigation("Diagnostico");
                 });
 
+            modelBuilder.Entity("Server.Models.Propuesta", b =>
+                {
+                    b.HasOne("Server.Models.Diagnostico", "Diagnostico")
+                        .WithMany()
+                        .HasForeignKey("DiagnosticoId");
+
+                    b.HasOne("Server.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.Oportunidad", "Oportunidad")
+                        .WithMany()
+                        .HasForeignKey("OportunidadId");
+
+                    b.HasOne("Server.Models.AdminUser", "Responsable")
+                        .WithMany()
+                        .HasForeignKey("ResponsableId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Diagnostico");
+
+                    b.Navigation("Empresa");
+
+                    b.Navigation("Oportunidad");
+
+                    b.Navigation("Responsable");
+                });
+
+            modelBuilder.Entity("Server.Models.PropuestaFase", b =>
+                {
+                    b.HasOne("Server.Models.Propuesta", "Propuesta")
+                        .WithMany("Fases")
+                        .HasForeignKey("PropuestaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Propuesta");
+                });
+
+            modelBuilder.Entity("Server.Models.PropuestaItem", b =>
+                {
+                    b.HasOne("Server.Models.Propuesta", "Propuesta")
+                        .WithMany("Items")
+                        .HasForeignKey("PropuestaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Propuesta");
+                });
+
             modelBuilder.Entity("Server.Models.Secreto", b =>
                 {
                     b.HasOne("Server.Models.Empresa", "Empresa")
@@ -832,6 +1064,13 @@ namespace server.Data.Migrations
             modelBuilder.Entity("Server.Models.Oportunidad", b =>
                 {
                     b.Navigation("Actividades");
+                });
+
+            modelBuilder.Entity("Server.Models.Propuesta", b =>
+                {
+                    b.Navigation("Fases");
+
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Server.Models.Secreto", b =>

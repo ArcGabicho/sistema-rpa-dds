@@ -3,16 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 
-// Asks why a deal was lost before marking it so: the reasons are what the
-// team learns from (price, timing, a competitor…).
+// Asks why a deal was lost (or a proposal rejected) before marking it so:
+// the reasons are what the team learns from (price, timing, a competitor…).
 export function MotivoPerdidaDialog({
   open,
   titulo,
+  encabezado = "Marcar como perdida",
+  pregunta = "¿Por qué se perdió?",
+  confirmar = "Marcar como perdida",
   onCancel,
   onConfirm,
 }: {
   open: boolean;
   titulo?: string;
+  encabezado?: string;
+  pregunta?: string;
+  confirmar?: string;
   onCancel: () => void;
   onConfirm: (motivo: string) => void;
 }) {
@@ -44,10 +50,10 @@ export function MotivoPerdidaDialog({
         }}
         className="p-6"
       >
-        <h2 className="text-base font-semibold text-ink-950">Marcar como perdida</h2>
+        <h2 className="text-base font-semibold text-ink-950">{encabezado}</h2>
         {titulo && <p className="mt-1 text-sm text-ink-500">{titulo}</p>}
         <label htmlFor="motivo-perdida" className="mt-5 mb-1.5 block text-sm font-medium text-ink-950">
-          ¿Por qué se perdió?
+          {pregunta}
         </label>
         <input
           id="motivo-perdida"
@@ -70,7 +76,7 @@ export function MotivoPerdidaDialog({
             Cancelar
           </button>
           <button type="submit" disabled={!motivo.trim()} className={BUTTON_PRIMARY}>
-            Marcar como perdida
+            {confirmar}
           </button>
         </div>
       </form>

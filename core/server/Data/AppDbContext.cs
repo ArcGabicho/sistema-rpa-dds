@@ -11,6 +11,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Secreto> Secretos => Set<Secreto>();
     public DbSet<Diagnostico> Diagnosticos => Set<Diagnostico>();
     public DbSet<ProcesoEvaluado> ProcesosEvaluados => Set<ProcesoEvaluado>();
+    public DbSet<Propuesta> Propuestas => Set<Propuesta>();
+    public DbSet<PropuestaItem> PropuestaItems => Set<PropuestaItem>();
+    public DbSet<PropuestaFase> PropuestaFases => Set<PropuestaFase>();
     public DbSet<AccesoSecreto> AccesosSecreto => Set<AccesoSecreto>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Contacto> Contactos => Set<Contacto>();
@@ -187,6 +190,49 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany(d => d.Procesos)
                 .HasForeignKey(p => p.DiagnosticoId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Propuestas. Like diagnoses, a proposal goes with its company, and its
+        // links to the opportunity and the diagnosis are NoAction in the
+        // database (the APIs detach proposals before deleting either).
+        modelBuilder.Entity<Propuesta>(entity =>
+        {
+            entity.HasIndex(p => new { p.Codigo, p.Version }).IsUnique();
+            entity.HasIndex(p => p.Estado);
+            entity.Property(p => p.Codigo).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.Titulo).HasMaxLength(200).IsRequired();
+            entity.Property(p => p.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.Moneda).HasMaxLength(3).IsRequired();
+            entity.Property(p => p.DescuentoPorcentaje).HasPrecision(5, 2);
+            entity.Property(p => p.AhorroAnualEstimado).HasPrecision(14, 2);
+            entity.Property(p => p.Introduccion).HasMaxLength(4000);
+            entity.Property(p => p.Supuestos).HasMaxLength(4000);
+            entity.Property(p => p.Exclusiones).HasMaxLength(4000);
+            entity.Property(p => p.CondicionesPago).HasMaxLength(1000);
+            entity.Property(p => p.MotivoRechazo).HasMaxLength(500);
+            entity.HasOne(p => p.Empresa).WithMany().HasForeignKey(p => p.EmpresaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(p => p.Oportunidad).WithMany().HasForeignKey(p => p.OportunidadId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(p => p.Diagnostico).WithMany().HasForeignKey(p => p.DiagnosticoId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(p => p.Responsable).WithMany().HasForeignKey(p => p.ResponsableId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<PropuestaItem>(entity =>
+        {
+            entity.HasIndex(i => new { i.PropuestaId, i.Orden });
+            entity.Property(i => i.Tipo).HasMaxLength(20).IsRequired();
+            entity.Property(i => i.Descripcion).HasMaxLength(300).IsRequired();
+            entity.Property(i => i.Detalle).HasMaxLength(2000);
+            entity.Property(i => i.Cantidad).HasPrecision(10, 2);
+            entity.Property(i => i.PrecioUnitario).HasPrecision(14, 2);
+            entity.HasOne(i => i.Propuesta).WithMany(p => p.Items).HasForeignKey(i => i.PropuestaId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PropuestaFase>(entity =>
+        {
+            entity.HasIndex(f => new { f.PropuestaId, f.Orden });
+            entity.Property(f => f.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(f => f.Descripcion).HasMaxLength(1000);
+            entity.HasOne(f => f.Propuesta).WithMany(p => p.Fases).HasForeignKey(f => f.PropuestaId).OnDelete(DeleteBehavior.Cascade);
         });
 
         // Bóveda. A company's secrets go with it; the audit trail outlives
