@@ -22,6 +22,7 @@ export const propuestaSchema = z.object({
         detalle: z.string().trim().max(2000),
         cantidad: z.number({ message: "Cantidad." }).gt(0, "Mayor que 0.").max(100_000),
         precioUnitario: monto("Precio."),
+        procesoOrigenId: z.number().nullable(),
       }),
     )
     .max(100, "Máximo 100 ítems."),

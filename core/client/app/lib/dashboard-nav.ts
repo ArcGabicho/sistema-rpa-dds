@@ -1,4 +1,4 @@
-import { Building2, ClipboardList, FileText, Inbox, SquareKanban, LayoutDashboard, UserCog, Vault } from "lucide-react";
+import { Building2, ClipboardList, FileText, FolderKanban, Inbox, SquareKanban, LayoutDashboard, UserCog, Vault } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type DashboardNavItem = {
@@ -28,7 +28,10 @@ export const DASHBOARD_NAV: DashboardNavGroup[] = [
   },
   {
     title: "Entrega",
-    items: [{ label: "Bóveda", href: "/dashboard/boveda", icon: Vault }],
+    items: [
+      { label: "Proyectos", href: "/dashboard/proyectos", icon: FolderKanban },
+      { label: "Bóveda", href: "/dashboard/boveda", icon: Vault },
+    ],
   },
   {
     title: "Administración",

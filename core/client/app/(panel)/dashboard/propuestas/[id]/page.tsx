@@ -1,26 +1,31 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FolderKanban } from "lucide-react";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
 import { PropuestaAcciones } from "@/components/propuesta/propuesta-acciones";
 import { PropuestaEditor } from "@/components/propuesta/propuesta-editor";
 import { PropuestaResumen } from "@/components/propuesta/propuesta-resumen";
 import { PageHeader } from "@/components/ui/page-header";
-import { CARD } from "@/components/ui/panel-styles";
+import { BUTTON_PRIMARY, CARD } from "@/components/ui/panel-styles";
 import { PropuestaEstadoBadge } from "@/components/ui/propuesta-badges";
 import { apiGet } from "@/lib/api";
 import type { TeamUser } from "@/lib/comercial";
 import { formatDate, formatDay, todayInLima } from "@/lib/format-date";
+import type { Paged } from "@/lib/comercial";
 import { PROPUESTA_ESTADO_LABELS, type Propuesta } from "@/lib/propuesta";
+import type { ProyectoItem } from "@/lib/proyecto";
 import { getSessionUser, isAdmin } from "@/lib/session";
 
 export default async function PropuestaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [propuesta, users, user] = await Promise.all([
+  const [propuesta, users, user, proyectos] = await Promise.all([
     apiGet<Propuesta>(`propuestas/${id}`),
     apiGet<TeamUser[]>("users"),
     getSessionUser(),
+    /^\d+$/.test(id) ? apiGet<Paged<ProyectoItem>>(`proyectos?propuestaId=${id}&pageSize=1`) : null,
   ]);
   if (!propuesta) notFound();
+  const proyecto = proyectos?.items[0];
 
   const today = todayInLima();
   const nombre = `${propuesta.codigo} v${propuesta.version}`;
@@ -60,6 +65,18 @@ export default async function PropuestaPage({ params }: { params: Promise<{ id: 
         }
         actions={
           <>
+            {propuesta.estado === "aceptada" &&
+              (proyecto ? (
+                <Link href={`/dashboard/proyectos/${proyecto.id}`} className={BUTTON_PRIMARY}>
+                  <FolderKanban className="h-4 w-4" />
+                  Ver proyecto
+                </Link>
+              ) : (
+                <Link href={`/dashboard/proyectos/nuevo?propuestaId=${propuesta.id}`} className={BUTTON_PRIMARY}>
+                  <FolderKanban className="h-4 w-4" />
+                  Crear proyecto
+                </Link>
+              ))}
             <PropuestaAcciones
               id={propuesta.id}
               estado={propuesta.estado}

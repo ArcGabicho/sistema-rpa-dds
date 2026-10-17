@@ -92,6 +92,10 @@ public class PropuestaItem
     public decimal Cantidad { get; set; } = 1;
     public decimal PrecioUnitario { get; set; }
     public int Orden { get; set; }
+
+    // The diagnosis process this line automates, if it came from one (no FK:
+    // a soft link, like ProcesoProyecto.ProcesoOrigenId).
+    public int? ProcesoOrigenId { get; set; }
 }
 
 // A step of the schedule, in weeks; they run one after the other.

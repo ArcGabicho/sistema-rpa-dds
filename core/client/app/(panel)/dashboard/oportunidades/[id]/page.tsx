@@ -6,6 +6,7 @@ import { EliminarButton } from "@/components/comercial/eliminar-button";
 import { EtapaStepper } from "@/components/comercial/etapa-stepper";
 import { OportunidadDiagnosticos } from "@/components/diagnostico/oportunidad-diagnosticos";
 import { OportunidadPropuestas } from "@/components/propuesta/oportunidad-propuestas";
+import { OportunidadProyecto } from "@/components/proyecto/oportunidad-proyecto";
 import { ProximaAccionCard } from "@/components/comercial/proxima-accion-card";
 import { EtapaBadge } from "@/components/ui/comercial-badges";
 import { PageHeader } from "@/components/ui/page-header";
@@ -14,17 +15,19 @@ import { apiGet } from "@/lib/api";
 import { SERVICIO_LABELS, formatSoles, fullName, type Oportunidad, type Paged } from "@/lib/comercial";
 import type { DiagnosticoItem } from "@/lib/diagnostico";
 import type { PropuestaListItem } from "@/lib/propuesta";
+import type { ProyectoItem } from "@/lib/proyecto";
 import { formatDate, formatDateTime, formatDay, todayInLima } from "@/lib/format-date";
 import { getSessionUser, isAdmin } from "@/lib/session";
 
 export default async function OportunidadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const valido = /^\d+$/.test(id);
-  const [oportunidad, user, diagnosticos, propuestas] = await Promise.all([
+  const [oportunidad, user, diagnosticos, propuestas, proyectos] = await Promise.all([
     apiGet<Oportunidad>(`oportunidades/${id}`),
     getSessionUser(),
     valido ? apiGet<Paged<DiagnosticoItem>>(`diagnosticos?oportunidadId=${id}&pageSize=10`) : null,
     valido ? apiGet<Paged<PropuestaListItem>>(`propuestas?oportunidadId=${id}&pageSize=10`) : null,
+    valido ? apiGet<Paged<ProyectoItem>>(`proyectos?oportunidadId=${id}&pageSize=5`) : null,
   ]);
   if (!oportunidad) notFound();
 
@@ -89,6 +92,8 @@ export default async function OportunidadPage({ params }: { params: Promise<{ id
               today={todayInLima()}
             />
           )}
+
+          <OportunidadProyecto proyectos={proyectos?.items ?? []} />
 
           <OportunidadDiagnosticos oportunidadId={oportunidad.id} diagnosticos={diagnosticos?.items ?? null} />
 

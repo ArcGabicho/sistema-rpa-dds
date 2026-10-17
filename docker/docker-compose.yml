@@ -43,6 +43,10 @@ services:
       Jwt__Secret: ${JWT_SECRET}
       Jwt__ExpiresInMinutes: ${JWT_EXPIRES_IN_MINUTES:-60}
       Boveda__ClaveMaestra: ${BOVEDA_CLAVE_MAESTRA:-}
+      # PDD drafting with Claude (optional: without a key it's turned off).
+      IA__ApiKey: ${ANTHROPIC_API_KEY:-}
+      IA__Modelo: ${IA_MODELO:-claude-sonnet-5-5}
+      IA__BaseUrl: ${IA_BASE_URL:-}
       Admin__Email: ${ADMIN_EMAIL}
       Admin__Password: ${ADMIN_PASSWORD}
       Admin__FullName: ${ADMIN_FULL_NAME:-Administrador}

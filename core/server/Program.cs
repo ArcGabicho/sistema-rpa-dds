@@ -26,6 +26,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton<BovedaCifrado>();
+// PDD drafting with Claude (Services/IaRedactor.cs). IA:BaseUrl is only
+// changed to point the tests at a stand-in for Anthropic's API.
+builder.Services.AddHttpClient<IaRedactor>(client =>
+{
+    client.BaseAddress = new Uri((builder.Configuration["IA:BaseUrl"] is { Length: > 0 } url ? url : "https://api.anthropic.com").TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(90);
+});
 builder.Services.AddSingleton<PasswordHasher<AdminUser>>();
 
 var jwtSecret = builder.Configuration[$"{JwtOptions.SectionName}:Secret"]
@@ -83,6 +90,7 @@ using (var scope = app.Services.CreateScope())
     await BovedaSeeder.SeedAsync(db, app.Configuration, cifrado, logger);
     await DiagnosticoSeeder.SeedAsync(db, app.Configuration, logger);
     await PropuestaSeeder.SeedAsync(db, app.Configuration, logger);
+    await ProyectoSeeder.SeedAsync(db, app.Configuration, logger);
 }
 
 // Configure the HTTP request pipeline.

@@ -33,6 +33,8 @@ public class PropuestaItemDto
 
     [Range(0, 1_000_000_000, ErrorMessage = "El precio no puede ser negativo.")]
     public decimal PrecioUnitario { get; set; }
+
+    public int? ProcesoOrigenId { get; set; }
 }
 
 public class PropuestaFaseDto

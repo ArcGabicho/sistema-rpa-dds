@@ -58,6 +58,7 @@ public static class PropuestaBorrador
                 Cantidad = 1,
                 PrecioUnitario = p.CostoImplementacion,
                 Orden = ++orden,
+                ProcesoOrigenId = p.Id,
             });
         }
 

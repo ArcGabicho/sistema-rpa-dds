@@ -139,6 +139,7 @@ public class PropuestasController(AppDbContext db) : ControllerBase
                 Detalle = i.Detalle,
                 Cantidad = i.Cantidad,
                 PrecioUnitario = i.PrecioUnitario,
+                ProcesoOrigenId = i.ProcesoOrigenId,
             }).ToList(),
             Fases = p.Fases.OrderBy(f => f.Orden).Select(f => new PropuestaFaseDto
             {
@@ -248,6 +249,7 @@ public class PropuestasController(AppDbContext db) : ControllerBase
             Cantidad = i.Cantidad,
             PrecioUnitario = i.PrecioUnitario,
             Orden = n + 1,
+            ProcesoOrigenId = i.ProcesoOrigenId,
         }).ToList();
         propuesta.Fases = request.Fases.Select((f, n) => new PropuestaFase
         {
@@ -375,6 +377,7 @@ public class PropuestasController(AppDbContext db) : ControllerBase
             Items = origen.Items.OrderBy(i => i.Orden).Select(i => new PropuestaItem
             {
                 Tipo = i.Tipo, Descripcion = i.Descripcion, Detalle = i.Detalle, Cantidad = i.Cantidad, PrecioUnitario = i.PrecioUnitario, Orden = i.Orden,
+                ProcesoOrigenId = i.ProcesoOrigenId,
             }).ToList(),
             Fases = origen.Fases.OrderBy(f => f.Orden).Select(f => new PropuestaFase
             {
@@ -401,6 +404,10 @@ public class PropuestasController(AppDbContext db) : ControllerBase
         var propuesta = await db.Propuestas.FindAsync([id], ct);
         if (propuesta is null) return NotFound();
 
+        // A project built from it stays, unlinked (its FK is NoAction).
+        await db.Proyectos
+            .Where(p => p.PropuestaId == id)
+            .ExecuteUpdateAsync(set => set.SetProperty(p => p.PropuestaId, (int?)null), ct);
         db.Propuestas.Remove(propuesta);
         await db.SaveChangesAsync(ct);
         return NoContent();

@@ -408,6 +408,50 @@ namespace server.Data.Migrations
                     b.ToTable("Empresas");
                 });
 
+            modelBuilder.Entity("Server.Models.Hito", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletadoAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProyectoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProyectoId", "Orden");
+
+                    b.ToTable("Hitos");
+                });
+
             modelBuilder.Entity("Server.Models.Oportunidad", b =>
                 {
                     b.Property<int>("Id")
@@ -576,6 +620,117 @@ namespace server.Data.Migrations
                     b.ToTable("ProcesosEvaluados");
                 });
 
+            modelBuilder.Entity("Server.Models.ProcesoProyecto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Area")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etapa")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NotasLevantamiento")
+                        .HasMaxLength(8000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PddAlcance")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PddAprobadoAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PddAprobadoPor")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("PddConIa")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PddEntradas")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddEstado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PddExcepciones")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddObjetivo")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddPasosActuales")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddPasosPropuestos")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddPreguntas")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddReglas")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddSalidas")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PddSistemas")
+                        .HasMaxLength(6000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PddVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProcesoOrigenId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProyectoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Servicio")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProyectoId", "Orden");
+
+                    b.ToTable("ProcesosProyecto");
+                });
+
             modelBuilder.Entity("Server.Models.Propuesta", b =>
                 {
                     b.Property<int>("Id")
@@ -741,6 +896,9 @@ namespace server.Data.Migrations
                         .HasPrecision(14, 2)
                         .HasColumnType("decimal(14,2)");
 
+                    b.Property<int?>("ProcesoOrigenId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PropuestaId")
                         .HasColumnType("int");
 
@@ -754,6 +912,70 @@ namespace server.Data.Migrations
                     b.HasIndex("PropuestaId", "Orden");
 
                     b.ToTable("PropuestaItems");
+                });
+
+            modelBuilder.Entity("Server.Models.Proyecto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("FechaFinPlan")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaFinReal")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("OportunidadId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PropuestaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("Estado");
+
+                    b.HasIndex("OportunidadId");
+
+                    b.HasIndex("PropuestaId");
+
+                    b.HasIndex("ResponsableId");
+
+                    b.ToTable("Proyectos");
                 });
 
             modelBuilder.Entity("Server.Models.Secreto", b =>
@@ -823,6 +1045,60 @@ namespace server.Data.Migrations
                     b.HasIndex("VenceEl");
 
                     b.ToTable("Secretos");
+                });
+
+            modelBuilder.Entity("Server.Models.Tarea", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bloqueo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("CompletadaAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("FechaLimite")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("HitoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProyectoId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HitoId");
+
+                    b.HasIndex("ProyectoId", "Orden");
+
+                    b.HasIndex("ResponsableId", "Estado");
+
+                    b.ToTable("Tareas");
                 });
 
             modelBuilder.Entity("Server.Models.AccesoSecreto", b =>
@@ -940,6 +1216,17 @@ namespace server.Data.Migrations
                     b.Navigation("Responsable");
                 });
 
+            modelBuilder.Entity("Server.Models.Hito", b =>
+                {
+                    b.HasOne("Server.Models.Proyecto", "Proyecto")
+                        .WithMany("Hitos")
+                        .HasForeignKey("ProyectoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proyecto");
+                });
+
             modelBuilder.Entity("Server.Models.Oportunidad", b =>
                 {
                     b.HasOne("Server.Models.Contacto", "Contacto")
@@ -980,6 +1267,17 @@ namespace server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Diagnostico");
+                });
+
+            modelBuilder.Entity("Server.Models.ProcesoProyecto", b =>
+                {
+                    b.HasOne("Server.Models.Proyecto", "Proyecto")
+                        .WithMany("Procesos")
+                        .HasForeignKey("ProyectoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proyecto");
                 });
 
             modelBuilder.Entity("Server.Models.Propuesta", b =>
@@ -1034,6 +1332,36 @@ namespace server.Data.Migrations
                     b.Navigation("Propuesta");
                 });
 
+            modelBuilder.Entity("Server.Models.Proyecto", b =>
+                {
+                    b.HasOne("Server.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.Oportunidad", "Oportunidad")
+                        .WithMany()
+                        .HasForeignKey("OportunidadId");
+
+                    b.HasOne("Server.Models.Propuesta", "Propuesta")
+                        .WithMany()
+                        .HasForeignKey("PropuestaId");
+
+                    b.HasOne("Server.Models.AdminUser", "Responsable")
+                        .WithMany()
+                        .HasForeignKey("ResponsableId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Empresa");
+
+                    b.Navigation("Oportunidad");
+
+                    b.Navigation("Propuesta");
+
+                    b.Navigation("Responsable");
+                });
+
             modelBuilder.Entity("Server.Models.Secreto", b =>
                 {
                     b.HasOne("Server.Models.Empresa", "Empresa")
@@ -1042,6 +1370,30 @@ namespace server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("Server.Models.Tarea", b =>
+                {
+                    b.HasOne("Server.Models.Hito", "Hito")
+                        .WithMany()
+                        .HasForeignKey("HitoId");
+
+                    b.HasOne("Server.Models.Proyecto", "Proyecto")
+                        .WithMany("Tareas")
+                        .HasForeignKey("ProyectoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Models.AdminUser", "Responsable")
+                        .WithMany()
+                        .HasForeignKey("ResponsableId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Hito");
+
+                    b.Navigation("Proyecto");
+
+                    b.Navigation("Responsable");
                 });
 
             modelBuilder.Entity("Server.Models.Client", b =>
@@ -1071,6 +1423,15 @@ namespace server.Data.Migrations
                     b.Navigation("Fases");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Server.Models.Proyecto", b =>
+                {
+                    b.Navigation("Hitos");
+
+                    b.Navigation("Procesos");
+
+                    b.Navigation("Tareas");
                 });
 
             modelBuilder.Entity("Server.Models.Secreto", b =>

@@ -14,6 +14,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Propuesta> Propuestas => Set<Propuesta>();
     public DbSet<PropuestaItem> PropuestaItems => Set<PropuestaItem>();
     public DbSet<PropuestaFase> PropuestaFases => Set<PropuestaFase>();
+    public DbSet<Proyecto> Proyectos => Set<Proyecto>();
+    public DbSet<Hito> Hitos => Set<Hito>();
+    public DbSet<Tarea> Tareas => Set<Tarea>();
+    public DbSet<ProcesoProyecto> ProcesosProyecto => Set<ProcesoProyecto>();
     public DbSet<AccesoSecreto> AccesosSecreto => Set<AccesoSecreto>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Contacto> Contactos => Set<Contacto>();
@@ -233,6 +237,58 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(f => f.Nombre).HasMaxLength(200).IsRequired();
             entity.Property(f => f.Descripcion).HasMaxLength(1000);
             entity.HasOne(f => f.Propuesta).WithMany(p => p.Fases).HasForeignKey(f => f.PropuestaId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Proyectos. A project goes with its company; its links to the
+        // opportunity and the proposal are NoAction (the APIs detach projects
+        // before deleting either), and so is a task's link to its milestone
+        // (deleting the project already cascades to both).
+        modelBuilder.Entity<Proyecto>(entity =>
+        {
+            entity.HasIndex(p => p.Estado);
+            entity.Property(p => p.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(p => p.Descripcion).HasMaxLength(2000);
+            entity.Property(p => p.Estado).HasMaxLength(20).IsRequired();
+            entity.HasOne(p => p.Empresa).WithMany().HasForeignKey(p => p.EmpresaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(p => p.Oportunidad).WithMany().HasForeignKey(p => p.OportunidadId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(p => p.Propuesta).WithMany().HasForeignKey(p => p.PropuestaId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(p => p.Responsable).WithMany().HasForeignKey(p => p.ResponsableId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Hito>(entity =>
+        {
+            entity.HasIndex(h => new { h.ProyectoId, h.Orden });
+            entity.Property(h => h.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(h => h.Descripcion).HasMaxLength(1000);
+            entity.Property(h => h.Estado).HasMaxLength(20).IsRequired();
+            entity.HasOne(h => h.Proyecto).WithMany(p => p.Hitos).HasForeignKey(h => h.ProyectoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Tarea>(entity =>
+        {
+            entity.HasIndex(t => new { t.ProyectoId, t.Orden });
+            entity.HasIndex(t => new { t.ResponsableId, t.Estado });
+            entity.Property(t => t.Titulo).HasMaxLength(300).IsRequired();
+            entity.Property(t => t.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(t => t.Bloqueo).HasMaxLength(500);
+            entity.HasOne(t => t.Proyecto).WithMany(p => p.Tareas).HasForeignKey(t => t.ProyectoId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(t => t.Hito).WithMany().HasForeignKey(t => t.HitoId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(t => t.Responsable).WithMany().HasForeignKey(t => t.ResponsableId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ProcesoProyecto>(entity =>
+        {
+            entity.HasIndex(p => new { p.ProyectoId, p.Orden });
+            entity.Property(p => p.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(p => p.Area).HasMaxLength(120);
+            entity.Property(p => p.Servicio).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.Etapa).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.PddEstado).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.NotasLevantamiento).HasMaxLength(8000);
+            foreach (var campo in new[] { "PddObjetivo", "PddAlcance", "PddSistemas", "PddEntradas", "PddSalidas", "PddPasosActuales", "PddReglas", "PddExcepciones", "PddPasosPropuestos", "PddPreguntas" })
+                entity.Property(campo).HasMaxLength(6000);
+            entity.Property(p => p.PddAprobadoPor).HasMaxLength(200);
+            entity.HasOne(p => p.Proyecto).WithMany(x => x.Procesos).HasForeignKey(p => p.ProyectoId).OnDelete(DeleteBehavior.Cascade);
         });
 
         // Bóveda. A company's secrets go with it; the audit trail outlives

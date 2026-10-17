@@ -34,6 +34,8 @@ export type PropuestaItem = {
   detalle: string | null;
   cantidad: number;
   precioUnitario: number;
+  // The diagnosis process the line automates, if any (carried to the project).
+  procesoOrigenId?: number | null;
 };
 
 export type PropuestaFase = { nombre: string; descripcion: string | null; semanas: number };

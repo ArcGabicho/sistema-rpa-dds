@@ -6,10 +6,13 @@ import { getSessionToken } from "@/lib/session";
 // Authenticated pass-through to the API for the panel's client components:
 // /api/panel/empresas/12/contactos -> {API_URL}/api/empresas/12/contactos,
 // with the session's JWT attached. Only the modules listed here go through.
-const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda", "diagnosticos", "procesos", "propuestas"]);
+const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda", "diagnosticos", "procesos", "propuestas", "proyectos"]);
 
 // Nothing from the panel's API (vault values least of all) may be cached.
 const NO_STORE = { "Cache-Control": "no-store" };
+
+// Drafting a PDD with AI can take a while.
+export const maxDuration = 60;
 
 type Context = { params: Promise<{ path: string[] }> };
 

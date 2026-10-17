@@ -32,6 +32,7 @@ function toValues(p: Propuesta): PropuestaValues {
       detalle: i.detalle ?? "",
       cantidad: i.cantidad,
       precioUnitario: i.precioUnitario,
+      procesoOrigenId: i.procesoOrigenId ?? null,
     })),
     fases: p.fases.map((f) => ({ nombre: f.nombre, descripcion: f.descripcion ?? "", semanas: f.semanas })),
   };
@@ -217,7 +218,7 @@ export function PropuestaEditor({ propuesta, users }: { propuesta: Propuesta; us
   });
 
   const nuevoItem = (tipo: "implementacion" | "mensual") =>
-    items.append({ tipo, descripcion: "", detalle: "", cantidad: 1, precioUnitario: 0 }, { shouldFocus: true });
+    items.append({ tipo, descripcion: "", detalle: "", cantidad: 1, precioUnitario: 0, procesoOrigenId: null }, { shouldFocus: true });
 
   return (
     <form onSubmit={onSubmit} noValidate className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
