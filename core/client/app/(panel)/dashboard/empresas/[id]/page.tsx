@@ -5,6 +5,7 @@ import { EmpresaCredenciales } from "@/components/boveda/empresa-credenciales";
 import { ActividadTimeline } from "@/components/comercial/actividad-timeline";
 import { ContactosPanel } from "@/components/comercial/contactos-panel";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
+import { EmpresaOperacion } from "@/components/operacion/empresa-operacion";
 import { ProximaAccionLabel } from "@/components/comercial/proxima-accion-label";
 import { EmpresaEstadoBadge, EtapaBadge } from "@/components/ui/comercial-badges";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,6 +14,7 @@ import { apiGet } from "@/lib/api";
 import type { SecretoItem } from "@/lib/boveda";
 import { ETAPAS_ABIERTAS, formatSoles, type Empresa, type Paged } from "@/lib/comercial";
 import { formatDate, formatDateTime, todayInLima } from "@/lib/format-date";
+import type { BotItem, Contrato, IncidenciaItem } from "@/lib/operacion";
 import { getSessionUser, isAdmin } from "@/lib/session";
 
 function website(url: string) {
@@ -21,10 +23,14 @@ function website(url: string) {
 
 export default async function EmpresaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [empresa, user, credenciales] = await Promise.all([
+  const numerico = /^\d+$/.test(id);
+  const [empresa, user, credenciales, bots, contratos, incidencias] = await Promise.all([
     apiGet<Empresa>(`empresas/${id}`),
     getSessionUser(),
-    /^\d+$/.test(id) ? apiGet<Paged<SecretoItem>>(`boveda?empresaId=${id}&pageSize=50`) : null,
+    numerico ? apiGet<Paged<SecretoItem>>(`boveda?empresaId=${id}&pageSize=50`) : null,
+    numerico ? apiGet<Paged<BotItem>>(`bots?empresaId=${id}&pageSize=50`) : null,
+    numerico ? apiGet<Contrato[]>(`vencimientos/contratos?empresaId=${id}`) : null,
+    numerico ? apiGet<Paged<IncidenciaItem>>(`incidencias?empresaId=${id}&estado=abiertas&pageSize=1`) : null,
   ]);
   if (!empresa) notFound();
 
@@ -139,6 +145,13 @@ export default async function EmpresaPage({ params }: { params: Promise<{ id: st
               ))}
             </dl>
           </section>
+
+          <EmpresaOperacion
+            empresaId={empresa.id}
+            bots={bots?.items ?? []}
+            contratos={contratos ?? []}
+            incidenciasAbiertas={incidencias?.totalCount ?? 0}
+          />
 
           <ContactosPanel empresaId={empresa.id} contactos={empresa.contactos} />
 

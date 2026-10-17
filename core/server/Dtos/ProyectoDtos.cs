@@ -135,6 +135,8 @@ public class ProcesoProyectoItem
     public required string PddEstado { get; set; }
     public required int PddVersion { get; set; }
     public required bool TienePdd { get; set; }
+    // Its bot, once it's in production.
+    public int? BotId { get; set; }
 }
 
 // Filled in one place (ProyectosController.Llenar), so no `required` here.

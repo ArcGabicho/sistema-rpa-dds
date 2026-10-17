@@ -5,8 +5,15 @@
 const LOCALE = "es-PE";
 const TIME_ZONE = "America/Lima";
 
+// The API sends its UTC instants without a zone ("2026-10-16T18:54:15"):
+// read them as UTC, not as the runtime's local time — that only works where
+// the runtime happens to be in UTC, and shifts them 5 hours in Lima.
+export function instanteUtc(value: string) {
+  return Date.parse(/T\d{2}:\d{2}/.test(value) && !/(Z|[+-]\d{2}:?\d{2})$/i.test(value) ? `${value}Z` : value);
+}
+
 export function formatDate(value: string) {
-  return new Date(value).toLocaleDateString(LOCALE, {
+  return new Date(instanteUtc(value)).toLocaleDateString(LOCALE, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -19,7 +26,7 @@ export function formatDate(value: string) {
 // space vs. U+00A0), which breaks hydration if a client component renders it.
 // Pass the formatted string down as a prop instead.
 export function formatDateTime(value: string) {
-  return new Date(value).toLocaleString(LOCALE, {
+  return new Date(instanteUtc(value)).toLocaleString(LOCALE, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

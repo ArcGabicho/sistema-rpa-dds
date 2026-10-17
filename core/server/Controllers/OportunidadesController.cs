@@ -248,7 +248,8 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
 
         // Activities cascade on the client side (ClientCascade): they're loaded
         // above so EF deletes them along with the opportunity. Diagnoses and
-        // proposals (and projects) stay with the company, unlinked (their FKs are NoAction).
+        // proposals (and projects) stay with the company, unlinked (their FKs
+        // are NoAction), and so does a contract this one was renewing.
         await db.Diagnosticos
             .Where(d => d.OportunidadId == id)
             .ExecuteUpdateAsync(set => set.SetProperty(d => d.OportunidadId, (int?)null), ct);
@@ -258,6 +259,9 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
         await db.Proyectos
             .Where(p => p.OportunidadId == id)
             .ExecuteUpdateAsync(set => set.SetProperty(p => p.OportunidadId, (int?)null), ct);
+        await db.ContratosSoporte
+            .Where(c => c.OportunidadRenovacionId == id)
+            .ExecuteUpdateAsync(set => set.SetProperty(c => c.OportunidadRenovacionId, (int?)null), ct);
         db.Oportunidades.Remove(oportunidad);
         await db.SaveChangesAsync(ct);
         return NoContent();

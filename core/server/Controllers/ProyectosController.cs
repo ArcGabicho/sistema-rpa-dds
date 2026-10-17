@@ -78,6 +78,10 @@ public class ProyectosController(AppDbContext db, IaRedactor ia) : ControllerBas
         if (p is null) return NotFound();
 
         var hoy = Lima.Hoy;
+        var procesoIds = p.Procesos.Select(x => x.Id).ToList();
+        var bots = await db.Bots.AsNoTracking()
+            .Where(b => b.ProcesoProyectoId != null && procesoIds.Contains(b.ProcesoProyectoId.Value))
+            .ToDictionaryAsync(b => b.ProcesoProyectoId!.Value, b => b.Id, ct);
         var r = Llenar(new ProyectoResponse
         {
             Hitos = p.Hitos.OrderBy(h => h.Orden).Select(h => new HitoResponse
@@ -92,6 +96,7 @@ public class ProyectosController(AppDbContext db, IaRedactor ia) : ControllerBas
                 Id = x.Id, Nombre = x.Nombre, Area = x.Area, Servicio = x.Servicio, Etapa = x.Etapa,
                 PddEstado = x.PddEstado, PddVersion = x.PddVersion,
                 TienePdd = !string.IsNullOrWhiteSpace(x.PddObjetivo) || !string.IsNullOrWhiteSpace(x.PddPasosActuales),
+                BotId = bots.TryGetValue(x.Id, out var botId) ? botId : null,
             }).ToList(),
         }, p, hoy);
         r.Descripcion = p.Descripcion;
@@ -192,6 +197,10 @@ public class ProyectosController(AppDbContext db, IaRedactor ia) : ControllerBas
             .AsSplitQuery().FirstOrDefaultAsync(p => p.Id == id, ct);
         if (proyecto is null) return NotFound();
 
+        // Its bots keep running, unlinked from the project and its processes.
+        await db.Bots
+            .Where(b => b.ProyectoId == id)
+            .ExecuteUpdateAsync(set => set.SetProperty(b => b.ProyectoId, (int?)null).SetProperty(b => b.ProcesoProyectoId, (int?)null), ct);
         db.Proyectos.Remove(proyecto);
         await db.SaveChangesAsync(ct);
         return NoContent();
@@ -435,6 +444,7 @@ public class ProyectosController(AppDbContext db, IaRedactor ia) : ControllerBas
     {
         var p = await db.ProcesosProyecto.FindAsync([pid], ct);
         if (p is null) return NotFound();
+        await db.Bots.Where(b => b.ProcesoProyectoId == pid).ExecuteUpdateAsync(set => set.SetProperty(b => b.ProcesoProyectoId, (int?)null), ct);
         db.ProcesosProyecto.Remove(p);
         await db.SaveChangesAsync(ct);
         return NoContent();

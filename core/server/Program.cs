@@ -91,6 +91,7 @@ using (var scope = app.Services.CreateScope())
     await DiagnosticoSeeder.SeedAsync(db, app.Configuration, logger);
     await PropuestaSeeder.SeedAsync(db, app.Configuration, logger);
     await ProyectoSeeder.SeedAsync(db, app.Configuration, logger);
+    await OperacionSeeder.SeedAsync(db, app.Configuration, logger);
 }
 
 // Configure the HTTP request pipeline.

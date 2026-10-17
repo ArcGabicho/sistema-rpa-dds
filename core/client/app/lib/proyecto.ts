@@ -93,6 +93,7 @@ export type ProcesoProyectoItem = {
   pddEstado: string;
   pddVersion: number;
   tienePdd: boolean;
+  botId: number | null;
 };
 
 export type ProyectoItem = {

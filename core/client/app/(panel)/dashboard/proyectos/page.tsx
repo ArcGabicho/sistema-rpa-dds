@@ -11,7 +11,7 @@ import { progreso, type ProyectoItem } from "@/lib/proyecto";
 
 const FILTROS = [
   { value: "activos", label: "Activos" },
-  { value: "", label: "Todos" },
+  { value: "todos", label: "Todos" },
   { value: "completado", label: "Completados" },
   { value: "en_pausa", label: "En pausa" },
   { value: "cancelado", label: "Cancelados" },
@@ -26,7 +26,7 @@ export default async function ProyectosPage({
   const q = params.q?.trim() ?? "";
   const estado = params.estado === undefined ? "activos" : FILTROS.some((f) => f.value === params.estado) ? params.estado : "activos";
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
-  const query = new URLSearchParams({ page: String(page), pageSize: "25", ...(q && { q }), ...(estado && { estado }) });
+  const query = new URLSearchParams({ page: String(page), pageSize: "25", ...(q && { q }), ...(estado !== "todos" && { estado }) });
   const data = await apiGet<Paged<ProyectoItem>>(`proyectos?${query}`);
 
   const linkTo = (nextEstado: string) => {
@@ -53,7 +53,7 @@ export default async function ProyectosPage({
             const active = option.value === estado;
             return (
               <Link
-                key={option.value || "todos"}
+                key={option.value}
                 href={linkTo(option.value)}
                 aria-current={active ? "page" : undefined}
                 className={`border-b-2 px-3 pb-2.5 text-sm whitespace-nowrap transition-colors ${
@@ -80,7 +80,7 @@ export default async function ProyectosPage({
           <p className="p-6 text-sm text-ink-500">No se pudieron cargar los proyectos. Intenta de nuevo más tarde.</p>
         ) : data.items.length === 0 ? (
           <p className="p-6 text-sm text-ink-500">
-            {q || estado ? "Ningún proyecto coincide con el filtro." : "Aún no hay proyectos. Créalos desde una propuesta aceptada."}
+            {q || estado !== "todos" ? "Ningún proyecto coincide con el filtro." : "Aún no hay proyectos. Créalos desde una propuesta aceptada."}
           </p>
         ) : (
           <>

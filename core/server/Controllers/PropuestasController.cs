@@ -404,10 +404,13 @@ public class PropuestasController(AppDbContext db) : ControllerBase
         var propuesta = await db.Propuestas.FindAsync([id], ct);
         if (propuesta is null) return NotFound();
 
-        // A project built from it stays, unlinked (its FK is NoAction).
+        // A project or support contract built from it stays, unlinked (their FKs are NoAction).
         await db.Proyectos
             .Where(p => p.PropuestaId == id)
             .ExecuteUpdateAsync(set => set.SetProperty(p => p.PropuestaId, (int?)null), ct);
+        await db.ContratosSoporte
+            .Where(c => c.PropuestaId == id)
+            .ExecuteUpdateAsync(set => set.SetProperty(c => c.PropuestaId, (int?)null), ct);
         db.Propuestas.Remove(propuesta);
         await db.SaveChangesAsync(ct);
         return NoContent();

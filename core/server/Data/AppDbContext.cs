@@ -18,6 +18,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Hito> Hitos => Set<Hito>();
     public DbSet<Tarea> Tareas => Set<Tarea>();
     public DbSet<ProcesoProyecto> ProcesosProyecto => Set<ProcesoProyecto>();
+    public DbSet<Bot> Bots => Set<Bot>();
+    public DbSet<MedicionBot> MedicionesBot => Set<MedicionBot>();
+    public DbSet<Incidencia> Incidencias => Set<Incidencia>();
+    public DbSet<SeguimientoIncidencia> SeguimientosIncidencia => Set<SeguimientoIncidencia>();
+    public DbSet<ContratoSoporte> ContratosSoporte => Set<ContratoSoporte>();
+    public DbSet<Licencia> Licencias => Set<Licencia>();
     public DbSet<AccesoSecreto> AccesosSecreto => Set<AccesoSecreto>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Contacto> Contactos => Set<Contacto>();
@@ -289,6 +295,90 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 entity.Property(campo).HasMaxLength(6000);
             entity.Property(p => p.PddAprobadoPor).HasMaxLength(200);
             entity.HasOne(p => p.Proyecto).WithMany(x => x.Procesos).HasForeignKey(p => p.ProyectoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Operación y soporte. Bots, incidents, contracts and licenses go with
+        // their company; their other links (bot → project and process,
+        // incident and license → bot, contract → proposal and renewal
+        // opportunity) are NoAction in the database, and the APIs detach them
+        // before deleting the other side.
+        modelBuilder.Entity<Bot>(entity =>
+        {
+            entity.HasIndex(b => b.Estado);
+            entity.HasIndex(b => b.ProcesoProyectoId).IsUnique().HasFilter("[ProcesoProyectoId] IS NOT NULL");
+            entity.Property(b => b.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(b => b.Descripcion).HasMaxLength(2000);
+            entity.Property(b => b.Servicio).HasMaxLength(20).IsRequired();
+            entity.Property(b => b.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(b => b.Plataforma).HasMaxLength(100);
+            entity.Property(b => b.Horario).HasMaxLength(200);
+            entity.Property(b => b.HorasMesEstimadas).HasPrecision(10, 2);
+            entity.Property(b => b.CostoHora).HasPrecision(10, 2);
+            entity.Property(b => b.MinutosPorCaso).HasPrecision(10, 2);
+            entity.HasOne(b => b.Empresa).WithMany().HasForeignKey(b => b.EmpresaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(b => b.Proyecto).WithMany().HasForeignKey(b => b.ProyectoId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(b => b.ProcesoProyecto).WithMany().HasForeignKey(b => b.ProcesoProyectoId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(b => b.Responsable).WithMany().HasForeignKey(b => b.ResponsableId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<MedicionBot>(entity =>
+        {
+            entity.HasIndex(m => new { m.BotId, m.Mes }).IsUnique();
+            entity.Property(m => m.Notas).HasMaxLength(500);
+            entity.HasOne(m => m.Bot).WithMany(b => b.Mediciones).HasForeignKey(m => m.BotId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Incidencia>(entity =>
+        {
+            entity.HasIndex(i => i.Codigo).IsUnique();
+            entity.HasIndex(i => new { i.Estado, i.CreatedAtUtc });
+            entity.HasIndex(i => i.ResueltaAtUtc);
+            entity.Property(i => i.Codigo).HasMaxLength(20).IsRequired();
+            entity.Property(i => i.Titulo).HasMaxLength(200).IsRequired();
+            entity.Property(i => i.Descripcion).HasMaxLength(4000);
+            entity.Property(i => i.Severidad).HasMaxLength(20).IsRequired();
+            entity.Property(i => i.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(i => i.Canal).HasMaxLength(20).IsRequired();
+            entity.Property(i => i.Causa).HasMaxLength(20);
+            entity.Property(i => i.ReportadoPor).HasMaxLength(200);
+            entity.Property(i => i.Solucion).HasMaxLength(4000);
+            entity.HasOne(i => i.Empresa).WithMany().HasForeignKey(i => i.EmpresaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(i => i.Bot).WithMany().HasForeignKey(i => i.BotId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(i => i.Responsable).WithMany().HasForeignKey(i => i.ResponsableId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<SeguimientoIncidencia>(entity =>
+        {
+            entity.HasIndex(s => new { s.IncidenciaId, s.CreatedAtUtc });
+            entity.Property(s => s.Tipo).HasMaxLength(20).IsRequired();
+            entity.Property(s => s.Texto).HasMaxLength(2000).IsRequired();
+            entity.HasOne(s => s.Incidencia).WithMany(i => i.Seguimiento).HasForeignKey(s => s.IncidenciaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(s => s.Autor).WithMany().HasForeignKey(s => s.AutorId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ContratoSoporte>(entity =>
+        {
+            entity.HasIndex(c => new { c.Estado, c.FechaFin });
+            entity.Property(c => c.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.Estado).HasMaxLength(20).IsRequired();
+            entity.Property(c => c.Moneda).HasMaxLength(3).IsRequired();
+            entity.Property(c => c.MontoMensual).HasPrecision(14, 2);
+            entity.Property(c => c.Notas).HasMaxLength(1000);
+            entity.HasOne(c => c.Empresa).WithMany().HasForeignKey(c => c.EmpresaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.Propuesta).WithMany().HasForeignKey(c => c.PropuestaId).OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(c => c.OportunidadRenovacion).WithMany().HasForeignKey(c => c.OportunidadRenovacionId).OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<Licencia>(entity =>
+        {
+            entity.HasIndex(l => l.VenceEl);
+            entity.Property(l => l.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(l => l.Proveedor).HasMaxLength(100);
+            entity.Property(l => l.Moneda).HasMaxLength(3).IsRequired();
+            entity.Property(l => l.CostoAnual).HasPrecision(14, 2);
+            entity.Property(l => l.Notas).HasMaxLength(1000);
+            entity.HasOne(l => l.Empresa).WithMany().HasForeignKey(l => l.EmpresaId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(l => l.Bot).WithMany().HasForeignKey(l => l.BotId).OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         // Bóveda. A company's secrets go with it; the audit trail outlives
