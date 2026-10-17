@@ -13,6 +13,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/bots")]
 [Authorize]
+[Modulo(Modulo.Operacion)]
 public class BotsController(AppDbContext db) : ControllerBase
 {
     [HttpGet]
@@ -256,7 +257,7 @@ public class BotsController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var bot = await db.Bots.FindAsync([id], ct);

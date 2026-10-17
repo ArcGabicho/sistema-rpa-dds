@@ -6,6 +6,7 @@ import { ActividadTimeline } from "@/components/comercial/actividad-timeline";
 import { ContactosPanel } from "@/components/comercial/contactos-panel";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
 import { EmpresaOperacion } from "@/components/operacion/empresa-operacion";
+import { SoloLectura } from "@/components/permisos/solo-lectura";
 import { ProximaAccionLabel } from "@/components/comercial/proxima-accion-label";
 import { EmpresaEstadoBadge, EtapaBadge } from "@/components/ui/comercial-badges";
 import { PageHeader } from "@/components/ui/page-header";
@@ -15,7 +16,8 @@ import type { SecretoItem } from "@/lib/boveda";
 import { ETAPAS_ABIERTAS, formatSoles, type Empresa, type Paged } from "@/lib/comercial";
 import { formatDate, formatDateTime, todayInLima } from "@/lib/format-date";
 import type { BotItem, Contrato, IncidenciaItem } from "@/lib/operacion";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 function website(url: string) {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
@@ -24,14 +26,17 @@ function website(url: string) {
 export default async function EmpresaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const numerico = /^\d+$/.test(id);
-  const [empresa, user, credenciales, bots, contratos, incidencias] = await Promise.all([
+  const { me } = await getMe();
+  const verBoveda = puede(me, "boveda");
+  const verOperacion = puede(me, "operacion");
+  const [empresa, credenciales, bots, contratos, incidencias] = await Promise.all([
     apiGet<Empresa>(`empresas/${id}`),
-    getSessionUser(),
-    numerico ? apiGet<Paged<SecretoItem>>(`boveda?empresaId=${id}&pageSize=50`) : null,
-    numerico ? apiGet<Paged<BotItem>>(`bots?empresaId=${id}&pageSize=50`) : null,
-    numerico ? apiGet<Contrato[]>(`vencimientos/contratos?empresaId=${id}`) : null,
-    numerico ? apiGet<Paged<IncidenciaItem>>(`incidencias?empresaId=${id}&estado=abiertas&pageSize=1`) : null,
+    numerico && verBoveda ? apiGet<Paged<SecretoItem>>(`boveda?empresaId=${id}&pageSize=50`) : null,
+    numerico && verOperacion ? apiGet<Paged<BotItem>>(`bots?empresaId=${id}&pageSize=50`) : null,
+    numerico && verOperacion ? apiGet<Contrato[]>(`vencimientos/contratos?empresaId=${id}`) : null,
+    numerico && verOperacion ? apiGet<Paged<IncidenciaItem>>(`incidencias?empresaId=${id}&estado=abiertas&pageSize=1`) : null,
   ]);
+  const editar = puede(me, "comercial", "editar");
   if (!empresa) notFound();
 
   const today = todayInLima();
@@ -69,15 +74,19 @@ export default async function EmpresaPage({ params }: { params: Promise<{ id: st
         description={[empresa.rubro, empresa.provincia].filter(Boolean).join(" · ") || undefined}
         actions={
           <>
-            <Link href={`/dashboard/oportunidades/nueva?empresaId=${empresa.id}`} className={BUTTON_PRIMARY}>
-              <Plus className="h-4 w-4" />
-              Nueva oportunidad
-            </Link>
-            <Link href={`/dashboard/empresas/${empresa.id}/editar`} className={BUTTON_SECONDARY}>
-              <Pencil className="h-4 w-4" />
-              Editar
-            </Link>
-            {isAdmin(user) && (
+            {editar && (
+              <>
+                <Link href={`/dashboard/oportunidades/nueva?empresaId=${empresa.id}`} className={BUTTON_PRIMARY}>
+                  <Plus className="h-4 w-4" />
+                  Nueva oportunidad
+                </Link>
+                <Link href={`/dashboard/empresas/${empresa.id}/editar`} className={BUTTON_SECONDARY}>
+                  <Pencil className="h-4 w-4" />
+                  Editar
+                </Link>
+              </>
+            )}
+            {me?.esAdmin && (
               <EliminarButton
                 path={`empresas/${empresa.id}`}
                 confirmText={`¿Eliminar ${empresa.nombreComercial} con sus contactos, oportunidades e historial? Esta acción no se puede deshacer.`}
@@ -130,6 +139,7 @@ export default async function EmpresaPage({ params }: { params: Promise<{ id: st
             endpoint={`empresas/${empresa.id}/actividades`}
             actividades={empresa.actividades.map((a) => ({ ...a, createdAtLabel: formatDateTime(a.createdAtUtc) }))}
             showOportunidad
+            soloLectura={!editar}
           />
         </div>
 
@@ -146,21 +156,28 @@ export default async function EmpresaPage({ params }: { params: Promise<{ id: st
             </dl>
           </section>
 
-          <EmpresaOperacion
-            empresaId={empresa.id}
-            bots={bots?.items ?? []}
-            contratos={contratos ?? []}
-            incidenciasAbiertas={incidencias?.totalCount ?? 0}
-          />
+          {verOperacion && (
+            <EmpresaOperacion
+              empresaId={empresa.id}
+              bots={bots?.items ?? []}
+              contratos={contratos ?? []}
+              incidenciasAbiertas={incidencias?.totalCount ?? 0}
+            />
+          )}
 
-          <ContactosPanel empresaId={empresa.id} contactos={empresa.contactos} />
+          <SoloLectura activo={!editar}>
+            <ContactosPanel empresaId={empresa.id} contactos={empresa.contactos} />
+          </SoloLectura>
 
-          <EmpresaCredenciales
-            empresaId={empresa.id}
-            secretos={credenciales?.items ?? null}
-            today={today}
-            esAdmin={isAdmin(user)}
-          />
+          {verBoveda && (
+            <EmpresaCredenciales
+              empresaId={empresa.id}
+              secretos={credenciales?.items ?? null}
+              today={today}
+              esAdmin={me?.esAdmin === true}
+              puedeAgregar={puede(me, "boveda", "editar")}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -29,11 +29,14 @@ export function ActividadTimeline({
   endpoint,
   actividades,
   showOportunidad = false,
+  soloLectura = false,
 }: {
   // API path to post to, e.g. "oportunidades/12/actividades".
   endpoint: string;
   actividades: ActividadItem[];
   showOportunidad?: boolean;
+  // Without permission to edit, the history shows without the composer.
+  soloLectura?: boolean;
 }) {
   const router = useRouter();
   const [tipo, setTipo] = useState<string>("nota");
@@ -60,6 +63,7 @@ export function ActividadTimeline({
     <section className={`${CARD} p-6`}>
       <h2 className="text-base font-semibold text-ink-950">Actividad</h2>
 
+      {!soloLectura && (
       <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
         <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Tipo de actividad">
           {ACTIVIDAD_TIPOS.map((option) => {
@@ -111,11 +115,12 @@ export function ActividadTimeline({
           </button>
         </div>
       </form>
+      )}
 
       {actividades.length === 0 ? (
-        <p className="mt-5 border-t border-line pt-5 text-sm text-ink-500">Aún no hay actividad registrada.</p>
+        <p className={`text-sm text-ink-500 ${soloLectura ? "mt-3" : "mt-5 border-t border-line pt-5"}`}>Aún no hay actividad registrada.</p>
       ) : (
-        <ol className="mt-5 border-t border-line pt-5">
+        <ol className={soloLectura ? "mt-4" : "mt-5 border-t border-line pt-5"}>
           {actividades.map((actividad, index) => {
             const Icon = ICONS[actividad.tipo] ?? StickyNote;
             const automatic = actividad.tipo === "cambio_etapa";

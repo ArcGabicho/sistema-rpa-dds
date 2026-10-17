@@ -10,6 +10,7 @@ import { Field } from "@/components/ui/field";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import type { TeamUser } from "@/lib/comercial";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 // Start a project: from an accepted proposal (its phases become dated
 // milestones, its scope the processes and their tasks) or blank.
@@ -80,11 +81,7 @@ export function NuevoProyectoForm({
         <Field id="np-responsable" label="Jefe de proyecto">
           <select id="np-responsable" value={responsableId} onChange={(e) => setResponsableId(e.target.value)} className={input}>
             <option value="">Sin asignar</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} />
           </select>
         </Field>
         {propuesta && (

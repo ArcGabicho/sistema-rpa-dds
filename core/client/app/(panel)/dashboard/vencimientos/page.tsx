@@ -9,7 +9,8 @@ import { CARD } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
 import type { Paged } from "@/lib/comercial";
 import type { BotItem, Contrato, Licencia, VencimientoItem } from "@/lib/operacion";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede, type Me } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 const VISTAS = [
   { value: "calendario", label: "Próximos 90 días" },
@@ -23,7 +24,7 @@ const TIPOS: Record<string, { icon: LucideIcon; label: string }> = {
   credencial: { icon: KeyRound, label: "Credencial" },
 };
 
-function Calendario({ items }: { items: VencimientoItem[] }) {
+function Calendario({ items, me }: { items: VencimientoItem[]; me: Me | null }) {
   const grupos: [string, VencimientoItem[]][] = [
     ["Vencidos", items.filter((i) => i.dias < 0)],
     ["En los próximos 30 días", items.filter((i) => i.dias >= 0 && i.dias <= 30)],
@@ -46,7 +47,7 @@ function Calendario({ items }: { items: VencimientoItem[] }) {
                 const tipo = TIPOS[i.tipo]!;
                 const Icon = tipo.icon;
                 const href =
-                  i.tipo === "credencial" ? `/dashboard/boveda/${i.id}` : i.tipo === "contrato" ? "/dashboard/vencimientos?vista=contratos" : "/dashboard/vencimientos?vista=licencias";
+                  i.tipo === "credencial" ? (puede(me, "boveda") ? `/dashboard/boveda/${i.id}` : "/dashboard/vencimientos") : i.tipo === "contrato" ? "/dashboard/vencimientos?vista=contratos" : "/dashboard/vencimientos?vista=licencias";
                 return (
                   <li key={`${i.tipo}-${i.id}`} className="grid gap-3 px-5 py-3.5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                     <div className="flex min-w-0 gap-3">
@@ -80,14 +81,14 @@ function Calendario({ items }: { items: VencimientoItem[] }) {
                             Ver la renovación
                           </Link>
                         ) : (
-                          <OportunidadRenovacionButton contratoId={i.id} />
+                          puede(me, "comercial", "editar") && <OportunidadRenovacionButton contratoId={i.id} />
                         ))}
-                      {i.tipo === "licencia" && (
+                      {i.tipo === "licencia" && puede(me, "operacion", "editar") && (
                         <Link href="/dashboard/vencimientos?vista=licencias" className="text-xs font-medium text-brand-700 hover:underline">
                           Renovar
                         </Link>
                       )}
-                      {i.tipo === "credencial" && (
+                      {i.tipo === "credencial" && puede(me, "boveda") && (
                         <Link href={`/dashboard/boveda/${i.id}`} className="text-xs font-medium text-brand-700 hover:underline">
                           Rotar en la Bóveda
                         </Link>
@@ -106,13 +107,14 @@ function Calendario({ items }: { items: VencimientoItem[] }) {
 export default async function VencimientosPage({ searchParams }: { searchParams: Promise<{ vista?: string }> }) {
   const params = await searchParams;
   const vista = VISTAS.some((v) => v.value === params.vista) ? params.vista! : "calendario";
-  const user = await getSessionUser();
-  const esAdmin = isAdmin(user);
+  const { me } = await getMe();
+  const esAdmin = me?.esAdmin === true;
+  const editar = puede(me, "operacion", "editar");
 
   let contenido: React.ReactNode;
   if (vista === "contratos") {
     const contratos = await apiGet<Contrato[]>("vencimientos/contratos");
-    contenido = contratos ? <ContratosPanel contratos={contratos} esAdmin={esAdmin} /> : null;
+    contenido = contratos ? <ContratosPanel contratos={contratos} esAdmin={esAdmin} editar={editar} oportunidades={puede(me, "comercial", "editar")} /> : null;
   } else if (vista === "licencias") {
     const [licencias, bots] = await Promise.all([apiGet<Licencia[]>("vencimientos/licencias"), apiGet<Paged<BotItem>>("bots?pageSize=100")]);
     contenido = licencias ? (
@@ -120,11 +122,12 @@ export default async function VencimientosPage({ searchParams }: { searchParams:
         licencias={licencias}
         bots={(bots?.items ?? []).filter((b) => b.estado !== "retirado").map((b) => ({ id: b.id, nombre: b.nombre, empresaId: b.empresaId }))}
         esAdmin={esAdmin}
+        editar={editar}
       />
     ) : null;
   } else {
     const items = await apiGet<VencimientoItem[]>("vencimientos?dias=90");
-    contenido = items ? <Calendario items={items} /> : null;
+    contenido = items ? <Calendario items={items} me={me} /> : null;
   }
 
   return (

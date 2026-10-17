@@ -69,7 +69,8 @@ export type Paged<T> = {
   totalPages: number;
 };
 
-export type TeamUser = { id: number; fullName: string };
+// From GET api/users; deactivated users stay listed (activo false).
+export type TeamUser = { id: number; fullName: string; activo?: boolean };
 
 export type Contacto = {
   id: number;

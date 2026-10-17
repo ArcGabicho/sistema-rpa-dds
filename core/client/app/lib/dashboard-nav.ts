@@ -1,10 +1,13 @@
 import { Bot, Building2, CalendarClock, ClipboardList, FileText, FolderKanban, Inbox, LifeBuoy, SquareKanban, LayoutDashboard, UserCog, Vault } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { Modulo } from "@/lib/permisos";
 
 export type DashboardNavItem = {
   label: string;
   href: string;
   icon: LucideIcon;
+  // Shown to users who can at least see this module.
+  modulo?: Modulo;
   adminOnly?: boolean;
 };
 
@@ -19,26 +22,26 @@ export const DASHBOARD_NAV: DashboardNavGroup[] = [
   {
     title: "Comercial",
     items: [
-      { label: "Oportunidades", href: "/dashboard/oportunidades", icon: SquareKanban },
-      { label: "Diagnósticos", href: "/dashboard/diagnosticos", icon: ClipboardList },
-      { label: "Propuestas", href: "/dashboard/propuestas", icon: FileText },
-      { label: "Empresas", href: "/dashboard/empresas", icon: Building2 },
-      { label: "Solicitudes web", href: "/dashboard/solicitudes", icon: Inbox },
+      { label: "Oportunidades", href: "/dashboard/oportunidades", icon: SquareKanban, modulo: "comercial" },
+      { label: "Diagnósticos", href: "/dashboard/diagnosticos", icon: ClipboardList, modulo: "diagnosticos" },
+      { label: "Propuestas", href: "/dashboard/propuestas", icon: FileText, modulo: "propuestas" },
+      { label: "Empresas", href: "/dashboard/empresas", icon: Building2, modulo: "comercial" },
+      { label: "Solicitudes web", href: "/dashboard/solicitudes", icon: Inbox, modulo: "comercial" },
     ],
   },
   {
     title: "Entrega",
     items: [
-      { label: "Proyectos", href: "/dashboard/proyectos", icon: FolderKanban },
-      { label: "Bóveda", href: "/dashboard/boveda", icon: Vault },
+      { label: "Proyectos", href: "/dashboard/proyectos", icon: FolderKanban, modulo: "proyectos" },
+      { label: "Bóveda", href: "/dashboard/boveda", icon: Vault, modulo: "boveda" },
     ],
   },
   {
     title: "Operación",
     items: [
-      { label: "Bots", href: "/dashboard/bots", icon: Bot },
-      { label: "Incidencias", href: "/dashboard/incidencias", icon: LifeBuoy },
-      { label: "Vencimientos", href: "/dashboard/vencimientos", icon: CalendarClock },
+      { label: "Bots", href: "/dashboard/bots", icon: Bot, modulo: "operacion" },
+      { label: "Incidencias", href: "/dashboard/incidencias", icon: LifeBuoy, modulo: "operacion" },
+      { label: "Vencimientos", href: "/dashboard/vencimientos", icon: CalendarClock, modulo: "operacion" },
     ],
   },
   {

@@ -9,16 +9,18 @@ export function OportunidadPropuestas({
   oportunidadId,
   propuestas,
   today,
+  puedeCrear = true,
 }: {
   oportunidadId: number;
   propuestas: PropuestaListItem[] | null;
   today: string;
+  puedeCrear?: boolean;
 }) {
   return (
     <section className={`${CARD} p-5`}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-ink-950">Propuestas</h2>
-        {propuestas && propuestas.length > 0 && (
+        {puedeCrear && propuestas && propuestas.length > 0 && (
           <Link href={`/dashboard/propuestas/nueva?oportunidadId=${oportunidadId}`} className="text-xs font-semibold text-brand-700 hover:underline">
             Otra
           </Link>
@@ -28,11 +30,11 @@ export function OportunidadPropuestas({
         <p className="mt-2 text-sm text-ink-500">No se pudo cargar.</p>
       ) : propuestas.length === 0 ? (
         <>
-          <p className="mt-2 text-sm text-ink-500">Arma la propuesta desde el diagnóstico, o en blanco.</p>
-          <Link href={`/dashboard/propuestas/nueva?oportunidadId=${oportunidadId}`} className={`${BUTTON_SECONDARY} mt-3 h-9 w-full px-3`}>
+          <p className="mt-2 text-sm text-ink-500">{puedeCrear ? "Arma la propuesta desde el diagnóstico, o en blanco." : "Aún no tiene propuesta."}</p>
+          {puedeCrear && <Link href={`/dashboard/propuestas/nueva?oportunidadId=${oportunidadId}`} className={`${BUTTON_SECONDARY} mt-3 h-9 w-full px-3`}>
             <Plus className="h-4 w-4" />
             Nueva propuesta
-          </Link>
+          </Link>}
         </>
       ) : (
         <ul className="mt-2 divide-y divide-line">

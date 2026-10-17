@@ -12,12 +12,14 @@ import { apiGet } from "@/lib/api";
 import type { Paged, TeamUser } from "@/lib/comercial";
 import { formatDateTime, instanteUtc } from "@/lib/format-date";
 import { CANAL_LABELS, CAUSA_LABELS, SEVERIDAD_LABELS, duracion, relojServidor, type BotItem, type Incidencia } from "@/lib/operacion";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 export default async function IncidenciaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [incidencia, users, user] = await Promise.all([apiGet<Incidencia>(`incidencias/${id}`), apiGet<TeamUser[]>("users"), getSessionUser()]);
+  const [incidencia, users, { me }] = await Promise.all([apiGet<Incidencia>(`incidencias/${id}`), apiGet<TeamUser[]>("users"), getMe()]);
   if (!incidencia) notFound();
+  const editar = puede(me, "operacion", "editar");
   const bots = await apiGet<Paged<BotItem>>(`bots?empresaId=${incidencia.empresaId}&pageSize=100`);
 
   const ahora = relojServidor();
@@ -79,8 +81,8 @@ export default async function IncidenciaPage({ params }: { params: Promise<{ id:
         }
         actions={
           <>
-            <IncidenciaAcciones id={incidencia.id} estado={incidencia.estado} causa={incidencia.causa} />
-            {isAdmin(user) && (
+            {editar && <IncidenciaAcciones id={incidencia.id} estado={incidencia.estado} causa={incidencia.causa} />}
+            {me?.esAdmin && (
               <EliminarButton
                 path={`incidencias/${incidencia.id}`}
                 confirmText={`¿Eliminar la incidencia ${incidencia.codigo} con su seguimiento? Esta acción no se puede deshacer.`}
@@ -110,7 +112,7 @@ export default async function IncidenciaPage({ params }: { params: Promise<{ id:
               <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-ink-700">{incidencia.descripcion}</p>
             </section>
           )}
-          <SeguimientoPanel incidenciaId={incidencia.id} items={seguimiento} />
+          <SeguimientoPanel incidenciaId={incidencia.id} items={seguimiento} soloLectura={!editar} />
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">
@@ -154,11 +156,32 @@ export default async function IncidenciaPage({ params }: { params: Promise<{ id:
             </dl>
           </section>
 
-          <IncidenciaDetalles
+          {!editar && (
+            <section className={`${CARD} p-5`}>
+              <h2 className="text-base font-semibold text-ink-950">Detalles</h2>
+              <dl className="mt-3 divide-y divide-line border-t border-line text-sm">
+                {(
+                  [
+                    ["Severidad", SEVERIDAD_LABELS[incidencia.severidad] ?? incidencia.severidad],
+                    ["Causa", incidencia.causa ? CAUSA_LABELS[incidencia.causa] : null],
+                    ["Bot", incidencia.botNombre],
+                    ["Responsable", incidencia.responsableNombre ?? "Sin asignar"],
+                    ["Reportada por", incidencia.reportadoPor],
+                  ] as [string, string | null | undefined][]
+                ).map(([label, value]) => (
+                  <div key={label} className="flex justify-between gap-4 py-2.5">
+                    <dt className="shrink-0 text-ink-500">{label}</dt>
+                    <dd className="min-w-0 text-right text-ink-950">{value || <span className="text-ink-400">—</span>}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+          {editar && <IncidenciaDetalles
             incidencia={incidencia}
             bots={(bots?.items ?? []).filter((b) => b.estado !== "retirado" || b.id === incidencia.botId).map((b) => ({ id: b.id, nombre: b.nombre }))}
             users={users ?? []}
-          />
+          />}
         </div>
       </div>
     </div>

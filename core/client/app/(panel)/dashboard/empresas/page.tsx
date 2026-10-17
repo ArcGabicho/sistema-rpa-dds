@@ -6,6 +6,8 @@ import { Pagination } from "@/components/ui/pagination";
 import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
 import { EMPRESA_ESTADOS, type EmpresaItem, type Paged } from "@/lib/comercial";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 const FILTROS = [{ value: "", label: "Todas" }, ...EMPRESA_ESTADOS.map((e) => ({ value: e.value, label: `${e.label}s` }))];
 
@@ -20,7 +22,7 @@ export default async function EmpresasPage({
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
 
   const query = new URLSearchParams({ page: String(page), pageSize: "20", ...(q && { q }), ...(estado && { estado }) });
-  const data = await apiGet<Paged<EmpresaItem>>(`empresas?${query}`);
+  const [data, { me }] = await Promise.all([apiGet<Paged<EmpresaItem>>(`empresas?${query}`), getMe()]);
 
   const linkTo = (nextEstado: string) => {
     const next = new URLSearchParams({ ...(q && { q }), ...(nextEstado && { estado: nextEstado }) });
@@ -34,10 +36,12 @@ export default async function EmpresasPage({
         title="Empresas"
         description="Prospectos y clientes de DDS, con sus contactos y oportunidades."
         actions={
-          <Link href="/dashboard/empresas/nueva" className={BUTTON_PRIMARY}>
-            <Plus className="h-4 w-4" />
-            Nueva empresa
-          </Link>
+          puede(me, "comercial", "editar") && (
+            <Link href="/dashboard/empresas/nueva" className={BUTTON_PRIMARY}>
+              <Plus className="h-4 w-4" />
+              Nueva empresa
+            </Link>
+          )
         }
       />
 

@@ -11,6 +11,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/oportunidades")]
 [Authorize]
+[Modulo(Modulo.Comercial)]
 public class OportunidadesController(AppDbContext db) : ControllerBase
 {
     // etapa: one stage, or "abiertas" for every stage still in play.
@@ -240,7 +241,7 @@ public class OportunidadesController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var oportunidad = await db.Oportunidades.Include(o => o.Actividades).FirstOrDefaultAsync(o => o.Id == id, ct);

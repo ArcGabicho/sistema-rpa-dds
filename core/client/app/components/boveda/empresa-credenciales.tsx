@@ -12,11 +12,13 @@ export function EmpresaCredenciales({
   secretos,
   today,
   esAdmin,
+  puedeAgregar = true,
 }: {
   empresaId: number;
   secretos: SecretoItem[] | null;
   today: string;
   esAdmin: boolean;
+  puedeAgregar?: boolean;
 }) {
   return (
     <section className={`${CARD} overflow-hidden`}>
@@ -24,10 +26,12 @@ export function EmpresaCredenciales({
         <h2 className="text-base font-semibold text-ink-950">
           Credenciales {secretos && <span className="font-normal text-ink-500">{secretos.length}</span>}
         </h2>
-        <Link href={`/dashboard/boveda/nuevo?empresaId=${empresaId}`} className={`${BUTTON_SECONDARY} h-9 px-3`}>
-          <Plus className="h-4 w-4" />
-          Agregar
-        </Link>
+        {puedeAgregar && (
+          <Link href={`/dashboard/boveda/nuevo?empresaId=${empresaId}`} className={`${BUTTON_SECONDARY} h-9 px-3`}>
+            <Plus className="h-4 w-4" />
+            Agregar
+          </Link>
+        )}
       </div>
       {!secretos ? (
         <p className="border-t border-line px-5 py-4 text-sm text-ink-500">No se pudo cargar la bóveda.</p>

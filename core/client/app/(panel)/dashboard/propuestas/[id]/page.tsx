@@ -14,16 +14,18 @@ import { formatDate, formatDay, todayInLima } from "@/lib/format-date";
 import type { Paged } from "@/lib/comercial";
 import { PROPUESTA_ESTADO_LABELS, type Propuesta } from "@/lib/propuesta";
 import type { ProyectoItem } from "@/lib/proyecto";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 export default async function PropuestaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [propuesta, users, user, proyectos] = await Promise.all([
+  const { me } = await getMe();
+  const [propuesta, users, proyectos] = await Promise.all([
     apiGet<Propuesta>(`propuestas/${id}`),
     apiGet<TeamUser[]>("users"),
-    getSessionUser(),
-    /^\d+$/.test(id) ? apiGet<Paged<ProyectoItem>>(`proyectos?propuestaId=${id}&pageSize=1`) : null,
+    /^\d+$/.test(id) && puede(me, "proyectos") ? apiGet<Paged<ProyectoItem>>(`proyectos?propuestaId=${id}&pageSize=1`) : null,
   ]);
+  const editar = puede(me, "propuestas", "editar");
   if (!propuesta) notFound();
   const proyecto = proyectos?.items[0];
 
@@ -66,18 +68,21 @@ export default async function PropuestaPage({ params }: { params: Promise<{ id: 
         actions={
           <>
             {propuesta.estado === "aceptada" &&
+              puede(me, "proyectos") &&
               (proyecto ? (
                 <Link href={`/dashboard/proyectos/${proyecto.id}`} className={BUTTON_PRIMARY}>
                   <FolderKanban className="h-4 w-4" />
                   Ver proyecto
                 </Link>
               ) : (
-                <Link href={`/dashboard/proyectos/nuevo?propuestaId=${propuesta.id}`} className={BUTTON_PRIMARY}>
-                  <FolderKanban className="h-4 w-4" />
-                  Crear proyecto
-                </Link>
+                puede(me, "proyectos", "editar") && (
+                  <Link href={`/dashboard/proyectos/nuevo?propuestaId=${propuesta.id}`} className={BUTTON_PRIMARY}>
+                    <FolderKanban className="h-4 w-4" />
+                    Crear proyecto
+                  </Link>
+                )
               ))}
-            <PropuestaAcciones
+            {editar && <PropuestaAcciones
               id={propuesta.id}
               estado={propuesta.estado}
               esUltima={esUltima}
@@ -85,8 +90,8 @@ export default async function PropuestaPage({ params }: { params: Promise<{ id: 
               moneda={propuesta.moneda}
               valorPrimerAnio={propuesta.totales.valorPrimerAnio}
               conOportunidad={!!propuesta.oportunidadId}
-            />
-            {isAdmin(user) && (
+            />}
+            {me?.esAdmin && (
               <EliminarButton
                 path={`propuestas/${propuesta.id}`}
                 confirmText={`¿Eliminar la ${nombre}? Esta acción no se puede deshacer.`}
@@ -131,7 +136,7 @@ export default async function PropuestaPage({ params }: { params: Promise<{ id: 
       )}
 
       <div className="mt-6">
-        {propuesta.estado === "borrador" ? (
+        {propuesta.estado === "borrador" && editar ? (
           <PropuestaEditor propuesta={propuesta} users={users ?? []} />
         ) : (
           <PropuestaResumen propuesta={propuesta} />

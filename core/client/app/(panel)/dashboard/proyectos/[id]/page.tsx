@@ -5,6 +5,7 @@ import { Cronograma } from "@/components/proyecto/cronograma";
 import { ProcesosProyecto } from "@/components/proyecto/procesos-proyecto";
 import { ProyectoAjustes } from "@/components/proyecto/proyecto-ajustes";
 import { TareasPanel } from "@/components/proyecto/tareas-panel";
+import { SoloLectura } from "@/components/permisos/solo-lectura";
 import { PageHeader } from "@/components/ui/page-header";
 import { CARD } from "@/components/ui/panel-styles";
 import { ProyectoEstadoBadge } from "@/components/ui/proyecto-badges";
@@ -12,12 +13,14 @@ import { apiGet } from "@/lib/api";
 import type { TeamUser } from "@/lib/comercial";
 import { formatDay, todayInLima } from "@/lib/format-date";
 import { progreso, type Proyecto } from "@/lib/proyecto";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 export default async function ProyectoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [proyecto, users, user] = await Promise.all([apiGet<Proyecto>(`proyectos/${id}`), apiGet<TeamUser[]>("users"), getSessionUser()]);
+  const [proyecto, users, { me }] = await Promise.all([apiGet<Proyecto>(`proyectos/${id}`), apiGet<TeamUser[]>("users"), getMe()]);
   if (!proyecto) notFound();
+  const editar = puede(me, "proyectos", "editar");
 
   const today = todayInLima();
   const pct = progreso(proyecto);
@@ -59,7 +62,7 @@ export default async function ProyectoPage({ params }: { params: Promise<{ id: s
           </>
         }
         actions={
-          isAdmin(user) && (
+          me?.esAdmin && (
             <EliminarButton
               path={`proyectos/${proyecto.id}`}
               confirmText={`¿Eliminar el proyecto “${proyecto.nombre}” con sus hitos, tareas y PDDs? Esta acción no se puede deshacer.`}
@@ -91,11 +94,19 @@ export default async function ProyectoPage({ params }: { params: Promise<{ id: s
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0">
-          <TareasPanel proyectoId={proyecto.id} hitos={proyecto.hitos} tareas={proyecto.tareas} users={users ?? []} />
+          <SoloLectura activo={!editar} aviso="Solo lectura: tu acceso a Proyectos no permite cambiar tareas ni hitos.">
+            <TareasPanel proyectoId={proyecto.id} hitos={proyecto.hitos} tareas={proyecto.tareas} users={users ?? []} />
+          </SoloLectura>
         </div>
         <div className="flex min-w-0 flex-col gap-6">
-          <ProcesosProyecto proyectoId={proyecto.id} procesos={proyecto.procesosLista} />
-          <ProyectoAjustes proyecto={proyecto} users={users ?? []} />
+          <ProcesosProyecto
+            proyectoId={proyecto.id}
+            procesos={proyecto.procesosLista}
+            puedeAgregar={editar}
+            verBots={puede(me, "operacion")}
+            puedeRegistrarBot={puede(me, "operacion", "editar")}
+          />
+          {editar && <ProyectoAjustes proyecto={proyecto} users={users ?? []} />}
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { SITE } from "@/lib/site-config";
+import type { Me } from "@/lib/permisos";
 import type { SessionUser } from "@/lib/session";
 
 // Azure portal-style shell: a white sidebar against a pale workspace, where
@@ -14,9 +15,11 @@ import type { SessionUser } from "@/lib/session";
 // report, say), only the page's content is printed, on white.
 export function DashboardShell({
   user,
+  me,
   children,
 }: {
   user: SessionUser | null;
+  me: Me | null;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -24,7 +27,7 @@ export function DashboardShell({
   return (
     <div className="flex h-dvh overflow-hidden bg-brand-50 print:block print:h-auto print:overflow-visible print:bg-white">
       <div className="hidden lg:flex print:hidden">
-        <DashboardSidebar user={user} />
+        <DashboardSidebar user={user} me={me} />
       </div>
 
       {mobileOpen && (
@@ -37,6 +40,7 @@ export function DashboardShell({
           <div className="absolute inset-y-0 left-0 shadow-flyout">
             <DashboardSidebar
               user={user}
+              me={me}
               onClose={() => setMobileOpen(false)}
               onNavigate={() => setMobileOpen(false)}
             />

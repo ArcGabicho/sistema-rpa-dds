@@ -16,7 +16,19 @@ const LISTO_PARA_BOT = ["pruebas", "produccion"];
 
 // The processes the project automates, each with its stage and its PDD, and
 // its bot once it's in production.
-export function ProcesosProyecto({ proyectoId, procesos }: { proyectoId: number; procesos: ProcesoProyectoItem[] }) {
+export function ProcesosProyecto({
+  proyectoId,
+  procesos,
+  puedeAgregar = true,
+  verBots = true,
+  puedeRegistrarBot = true,
+}: {
+  proyectoId: number;
+  procesos: ProcesoProyectoItem[];
+  puedeAgregar?: boolean;
+  verBots?: boolean;
+  puedeRegistrarBot?: boolean;
+}) {
   const router = useRouter();
   const [agregando, setAgregando] = useState(false);
   const [nombre, setNombre] = useState("");
@@ -42,7 +54,7 @@ export function ProcesosProyecto({ proyectoId, procesos }: { proyectoId: number;
         <h2 className="text-base font-semibold text-ink-950">
           Procesos <span className="font-normal text-ink-500">{procesos.length}</span>
         </h2>
-        {!agregando && (
+        {puedeAgregar && !agregando && (
           <button type="button" onClick={() => setAgregando(true)} className={`${BUTTON_SECONDARY} h-9 px-3`}>
             <Plus className="h-4 w-4" />
             Proceso
@@ -96,7 +108,7 @@ export function ProcesosProyecto({ proyectoId, procesos }: { proyectoId: number;
                 </div>
                 <ChevronRight className="h-4 w-4 shrink-0 text-ink-400" />
               </Link>
-              {(p.botId || LISTO_PARA_BOT.includes(p.etapa)) && (
+              {((verBots && p.botId) || (puedeRegistrarBot && !p.botId && LISTO_PARA_BOT.includes(p.etapa))) && (
                 <div className="-mt-1 px-5 pb-3">
                   {p.botId ? (
                     <Link href={`/dashboard/bots/${p.botId}`} className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">

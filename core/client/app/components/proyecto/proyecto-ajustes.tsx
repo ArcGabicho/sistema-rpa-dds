@@ -11,6 +11,7 @@ import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/pa
 import type { TeamUser } from "@/lib/comercial";
 import { PROYECTO_ESTADOS, type Proyecto } from "@/lib/proyecto";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 const schema = z
   .object({
@@ -91,11 +92,7 @@ export function ProyectoAjustes({ proyecto, users }: { proyecto: Proyecto; users
       <Field id="py-responsable" label="Jefe de proyecto">
         <select id="py-responsable" className={input(false)} {...register("responsableId")}>
           <option value="">Sin asignar</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.fullName}
-            </option>
-          ))}
+          <UsuarioOptions users={users} actual={proyecto.responsableId} />
         </select>
       </Field>
       <Field id="py-descripcion" label="Descripción" optional error={errors.descripcion?.message}>

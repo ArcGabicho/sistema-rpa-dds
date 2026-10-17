@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { sileo } from "sileo";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 const STATUS_OPTIONS = [
   { value: "nuevo", label: "Nuevo" },
@@ -22,7 +23,7 @@ export function ClientAssignmentPanel({
   clientId: number;
   status: string;
   assignedToUserId: number | null;
-  users: { id: number; fullName: string }[];
+  users: { id: number; fullName: string; activo?: boolean }[];
 }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -86,11 +87,7 @@ export function ClientAssignmentPanel({
             className={FIELD_BASE}
           >
             <option value="">Sin asignar</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} actual={assignedToUserId} />
           </select>
         </div>
       </div>

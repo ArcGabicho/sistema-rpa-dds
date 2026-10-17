@@ -13,6 +13,7 @@ import { Field } from "@/components/ui/field";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import type { TeamUser } from "@/lib/comercial";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 const schema = z.object({
   titulo: z.string().trim().min(3, "Ponle un título (mínimo 3 caracteres).").max(200),
@@ -109,11 +110,7 @@ export function NuevoDiagnosticoForm({
         <Field id="nd-responsable" label="Responsable">
           <select id="nd-responsable" className={input(false)} {...register("responsableId")}>
             <option value="">Sin asignar</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} />
           </select>
         </Field>
         {oportunidad && (

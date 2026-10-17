@@ -11,7 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+// Every action checks the signed-in user's module permissions against the
+// database (Services/PermisosFilter.cs).
+builder.Services.AddControllers(options => options.Filters.Add<PermisosFilter>());
+builder.Services.AddScoped<PermisosService>();
 
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Falta la cadena de conexión 'ConnectionStrings:Default'.");

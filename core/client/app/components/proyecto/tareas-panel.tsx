@@ -11,6 +11,7 @@ import type { TeamUser } from "@/lib/comercial";
 import { formatDay } from "@/lib/format-date";
 import { HITO_ESTADOS, HITO_ESTADO_LABELS, TAREA_ESTADOS, type Hito, type Tarea } from "@/lib/proyecto";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 type Cambios = Partial<Pick<Tarea, "titulo" | "hitoId" | "estado" | "responsableId" | "fechaLimite" | "bloqueo">>;
 
@@ -339,11 +340,7 @@ export function TareasPanel({
                           className={`${SELECT} w-44`}
                         >
                           <option value="">Sin responsable</option>
-                          {users.map((u) => (
-                            <option key={u.id} value={u.id}>
-                              {u.fullName}
-                            </option>
-                          ))}
+                          <UsuarioOptions users={users} actual={t.responsableId} />
                         </select>
                         <input
                           aria-label="Fecha límite"

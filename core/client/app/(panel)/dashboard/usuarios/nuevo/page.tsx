@@ -1,27 +1,20 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { CreateUserForm } from "@/components/sections/create-user-form";
+import { NuevoUsuarioForm } from "@/components/usuarios/nuevo-usuario-form";
+import { PageHeader } from "@/components/ui/page-header";
+import { apiGet } from "@/lib/api";
+import type { RolPreset } from "@/lib/users-schema";
 
-export default function NuevoUsuarioPage() {
+export default async function NuevoUsuarioPage() {
+  const roles = await apiGet<RolPreset[]>("users/roles");
+
   return (
     <div>
-      <Link
-        href="/dashboard/usuarios"
-        className="inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors hover:text-ink-950"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Usuarios
-      </Link>
-
-      <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
-        Nuevo usuario
-      </h1>
-      <p className="mt-1.5 text-sm text-ink-500">
-        Crea un acceso para un trabajador con la contraseña temporal que definas aquí.
-      </p>
-
+      <PageHeader
+        back={{ href: "/dashboard/usuarios", label: "Usuarios" }}
+        title="Nuevo usuario"
+        description="Un acceso al panel para alguien del equipo, con una contraseña temporal."
+      />
       <div className="mt-8">
-        <CreateUserForm />
+        <NuevoUsuarioForm roles={roles ?? []} />
       </div>
     </div>
   );

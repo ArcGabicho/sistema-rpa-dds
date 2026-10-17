@@ -252,7 +252,7 @@ function RenovarLicenciaDialog({ licencia, onClose }: { licencia: Licencia; onCl
   );
 }
 
-export function LicenciasPanel({ licencias, bots, esAdmin }: { licencias: Licencia[]; bots: BotOpcion[]; esAdmin: boolean }) {
+export function LicenciasPanel({ licencias, bots, esAdmin, editar = true }: { licencias: Licencia[]; bots: BotOpcion[]; esAdmin: boolean; editar?: boolean }) {
   const [editando, setEditando] = useState<Licencia | null | "nueva">(null);
   const [renovando, setRenovando] = useState<Licencia | null>(null);
 
@@ -265,10 +265,12 @@ export function LicenciasPanel({ licencias, bots, esAdmin }: { licencias: Licenc
           </h2>
           <p className="mt-0.5 text-xs text-ink-500">De las plataformas de los bots, de los clientes y de DDS. Avisan 30 días antes.</p>
         </div>
-        <button type="button" onClick={() => setEditando("nueva")} className={`${BUTTON_SECONDARY} h-9 shrink-0 px-3`}>
-          <Plus className="h-4 w-4" />
-          Licencia
-        </button>
+        {editar && (
+          <button type="button" onClick={() => setEditando("nueva")} className={`${BUTTON_SECONDARY} h-9 shrink-0 px-3`}>
+            <Plus className="h-4 w-4" />
+            Licencia
+          </button>
+        )}
       </div>
       {licencias.length === 0 ? (
         <p className="border-t border-line px-5 py-4 text-sm text-ink-500">Aún no hay licencias registradas.</p>
@@ -305,7 +307,7 @@ export function LicenciasPanel({ licencias, bots, esAdmin }: { licencias: Licenc
                   {` · la paga ${l.pagaCliente ? "el cliente" : "DDS"}`}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 lg:justify-end">
+              {editar && <div className="flex flex-wrap gap-2 lg:justify-end">
                 <button type="button" onClick={() => setRenovando(l)} className={`${l.vencimiento === "vigente" ? BUTTON_SECONDARY : BUTTON_PRIMARY} h-9 px-3`}>
                   <RefreshCw className="h-4 w-4" />
                   Renovar
@@ -313,7 +315,7 @@ export function LicenciasPanel({ licencias, bots, esAdmin }: { licencias: Licenc
                 <button type="button" onClick={() => setEditando(l)} aria-label={`Editar la licencia ${l.nombre}`} className={`${BUTTON_SECONDARY} h-9 px-3`}>
                   <Pencil className="h-4 w-4" />
                 </button>
-              </div>
+              </div>}
             </li>
           ))}
         </ul>

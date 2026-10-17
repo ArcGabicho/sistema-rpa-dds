@@ -8,7 +8,8 @@ import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/pa
 import { apiGet } from "@/lib/api";
 import { SERVICIO_LABELS, formatSoles, type OportunidadItem, type Paged } from "@/lib/comercial";
 import { formatDate, todayInLima } from "@/lib/format-date";
-import { getSessionUser } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe, getSessionUser } from "@/lib/session";
 
 const VISTAS = [
   { value: "tablero", label: "Embudo" },
@@ -29,7 +30,8 @@ export default async function OportunidadesPage({
   const mias = params.mias === "1";
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
 
-  const user = await getSessionUser();
+  const [user, { me }] = await Promise.all([getSessionUser(), getMe()]);
+  const editar = puede(me, "comercial", "editar");
   const query = new URLSearchParams({
     etapa: vista === "tablero" ? "abiertas" : vista,
     ...(vista === "tablero" ? { pageSize: "200" } : { page: String(page), pageSize: "20" }),
@@ -54,10 +56,12 @@ export default async function OportunidadesPage({
         title="Oportunidades"
         description="El embudo comercial: de la primera conversación al contrato firmado."
         actions={
-          <Link href="/dashboard/oportunidades/nueva" className={BUTTON_PRIMARY}>
-            <Plus className="h-4 w-4" />
-            Nueva oportunidad
-          </Link>
+          editar && (
+            <Link href="/dashboard/oportunidades/nueva" className={BUTTON_PRIMARY}>
+              <Plus className="h-4 w-4" />
+              Nueva oportunidad
+            </Link>
+          )
         }
       />
 
@@ -134,7 +138,7 @@ export default async function OportunidadesPage({
               <span className="font-semibold text-ink-950">{formatSoles(total)}</span> en juego
               {q && ` · búsqueda: “${q}”`}
             </p>
-            <PipelineBoard items={data.items} today={todayInLima()} />
+            <PipelineBoard items={data.items} today={todayInLima()} soloLectura={!editar} />
           </>
         ) : data.items.length === 0 ? (
           <p className={`${CARD} p-6 text-sm text-ink-500`}>

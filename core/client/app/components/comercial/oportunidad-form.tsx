@@ -7,6 +7,7 @@ import { Field } from "@/components/ui/field";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import { useOportunidadForm } from "@/hooks/use-oportunidad-form";
 import { ETAPAS, SERVICIOS, fullName, type Empresa, type Oportunidad, type TeamUser } from "@/lib/comercial";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 export function OportunidadForm({
   oportunidad,
@@ -139,11 +140,7 @@ export function OportunidadForm({
         <Field id="op-responsable" label="Responsable" className="sm:col-span-2 sm:max-w-sm">
           <select id="op-responsable" className={input(false)} {...register("responsableId")}>
             <option value="">Sin asignar</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} actual={oportunidad?.responsableId} />
           </select>
         </Field>
       </fieldset>

@@ -15,6 +15,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/incidencias")]
 [Authorize]
+[Modulo(Modulo.Operacion)]
 public class IncidenciasController(AppDbContext db) : ControllerBase
 {
     [HttpGet]
@@ -286,7 +287,7 @@ public class IncidenciasController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var i = await db.Incidencias.FindAsync([id], ct);

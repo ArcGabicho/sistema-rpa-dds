@@ -15,6 +15,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/vencimientos")]
 [Authorize]
+[Modulo(Modulo.Operacion)]
 public class VencimientosController(AppDbContext db) : ControllerBase
 {
     // Everything expiring within `dias` days, and whatever already expired
@@ -138,8 +139,10 @@ public class VencimientosController(AppDbContext db) : ControllerBase
     }
 
     // Opens the opportunity to renew it (one open at a time), valued at a
-    // year of the fee, with its next step due a month before it ends.
+    // year of the fee, with its next step due a month before it ends. It's
+    // the sales team's call, so it needs Comercial rather than Operación.
     [HttpPost("contratos/{cid:int}/oportunidad")]
+    [Modulo(Modulo.Comercial, NivelAcceso.Editar)]
     public async Task<IActionResult> CrearOportunidadRenovacion(int cid, CancellationToken ct)
     {
         var autorId = await db.GetCurrentUserIdAsync(User, ct);
@@ -188,7 +191,7 @@ public class VencimientosController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("contratos/{cid:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> DeleteContrato(int cid, CancellationToken ct)
     {
         var contrato = await db.ContratosSoporte.FindAsync([cid], ct);
@@ -247,7 +250,7 @@ public class VencimientosController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("licencias/{lid:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> DeleteLicencia(int lid, CancellationToken ct)
     {
         var licencia = await db.Licencias.FindAsync([lid], ct);

@@ -1,200 +1,75 @@
-import Link from "next/link";
-import { EmbudoChart } from "@/components/charts/embudo-chart";
-import { ServiciosChart } from "@/components/charts/servicios-chart";
-import { VentasMensualesChart } from "@/components/charts/ventas-mensuales-chart";
-import { ProximaAccionLabel } from "@/components/comercial/proxima-accion-label";
-import { ClientStatusBadge } from "@/components/ui/client-status-badge";
-import { ActionLink } from "@/components/ui/action-link";
+import { MiTrabajoPanel, type MiTrabajo } from "@/components/resumen/mi-trabajo";
+import { SeccionResumen } from "@/components/resumen/resumen-ui";
+import { SeccionComercial, type DashboardSummary } from "@/components/resumen/seccion-comercial";
+import { SeccionEntrega, type EntregaResumen } from "@/components/resumen/seccion-entrega";
+import { SeccionOperacion } from "@/components/resumen/seccion-operacion";
 import { CARD } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
-import { solesCompacto } from "@/lib/chart-theme";
-import { formatSoles } from "@/lib/comercial";
-import { formatDate, todayInLima } from "@/lib/format-date";
-import { getSessionUser } from "@/lib/session";
+import { todayInLima } from "@/lib/format-date";
+import { relojServidor, type BotsResumen, type IncidenciasResumen, type VencimientoItem } from "@/lib/operacion";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
-type DashboardSummary = {
-  clientsTotal: number;
-  clientsNew: number;
-  recentClients: { id: number; fullName: string; status: string; createdAtUtc: string }[];
-  empresasTotal: number;
-  empresasClientes: number;
-  oportunidadesAbiertas: number;
-  valorEmbudo: number;
-  accionesVencidas: number;
-  embudo: { etapa: string; cantidad: number; valor: number }[];
-  proximasAcciones: {
-    oportunidadId: number;
-    titulo: string;
-    empresaNombre: string;
-    proximaAccion: string;
-    proximaAccionFecha: string;
-    responsableNombre: string | null;
-  }[];
-  mensual: { mes: string; creadas: number; ganadas: number; perdidas: number; valorGanado: number }[];
-  tasaCierre: number | null;
-  porServicio: { servicio: string; cantidad: number; valor: number }[];
+type Seccion = "comercial" | "entrega" | "operacion";
+
+// Each role sees its own area first.
+const ORDEN: Record<string, Seccion[]> = {
+  Comercial: ["comercial", "entrega", "operacion"],
+  Consultor: ["entrega", "comercial", "operacion"],
+  Soporte: ["operacion", "entrega", "comercial"],
 };
 
-const count = new Intl.NumberFormat("es-PE");
-
 export default async function DashboardPage() {
-  const [user, data] = await Promise.all([getSessionUser(), apiGet<DashboardSummary>("dashboard/summary")]);
+  const { me } = await getMe();
+  const ver = { comercial: puede(me, "comercial"), entrega: puede(me, "proyectos"), operacion: puede(me, "operacion") };
+  const [miTrabajo, comercial, entrega, bots, incidencias, vencimientos] = await Promise.all([
+    apiGet<MiTrabajo>("dashboard/mi-trabajo"),
+    ver.comercial ? apiGet<DashboardSummary>("dashboard/summary") : null,
+    ver.entrega ? apiGet<EntregaResumen>("dashboard/entrega") : null,
+    ver.operacion ? apiGet<BotsResumen>("bots/resumen") : null,
+    ver.operacion ? apiGet<IncidenciasResumen>("incidencias/resumen") : null,
+    ver.operacion ? apiGet<VencimientoItem[]>("vencimientos?dias=30") : null,
+  ]);
   const today = todayInLima();
-  const ganadas = data?.mensual.reduce((sum, m) => sum + m.ganadas, 0) ?? 0;
-  const cerradas = ganadas + (data?.mensual.reduce((sum, m) => sum + m.perdidas, 0) ?? 0);
-  const ganadoSeisMeses = data?.mensual.reduce((sum, m) => sum + m.valorGanado, 0) ?? 0;
+  const ahora = relojServidor();
+  const orden = (ORDEN[me?.role ?? ""] ?? ["comercial", "entrega", "operacion"]).filter((s) => ver[s]);
+  const error = <p className={`${CARD} mt-4 p-6 text-sm text-ink-500`}>No se pudo cargar. Intenta de nuevo más tarde.</p>;
+
+  const secciones: Record<Seccion, React.ReactNode> = {
+    comercial: (
+      <SeccionResumen key="comercial" titulo="Comercial" href="/dashboard/oportunidades" enlace="Ver el embudo">
+        {comercial ? <SeccionComercial data={comercial} today={today} /> : error}
+      </SeccionResumen>
+    ),
+    entrega: (
+      <SeccionResumen key="entrega" titulo="Entrega" href="/dashboard/proyectos" enlace="Ver proyectos">
+        {entrega ? <SeccionEntrega data={entrega} /> : error}
+      </SeccionResumen>
+    ),
+    operacion: (
+      <SeccionResumen key="operacion" titulo="Operación" href="/dashboard/bots" enlace="Ver bots">
+        {bots || incidencias ? <SeccionOperacion bots={bots} incidencias={incidencias} vencimientos={vencimientos} /> : error}
+      </SeccionResumen>
+    ),
+  };
 
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold tracking-tight text-ink-950 sm:text-3xl">
-        Bienvenido{user?.name ? `, ${user.name}` : ""}
+        Bienvenido{me?.fullName ? `, ${me.fullName}` : ""}
       </h1>
-      <p className="mt-1.5 text-sm text-ink-500">Cómo va el embudo comercial y qué toca hacer hoy.</p>
+      <p className="mt-1.5 text-sm text-ink-500">Lo que tienes pendiente y cómo van las áreas que ves.</p>
 
-      {!data ? (
-        <p className={`${CARD} mt-8 p-6 text-sm text-ink-500`}>
-          No se pudo cargar el resumen. Intenta de nuevo más tarde.
-        </p>
-      ) : (
-        <>
-          {/* The 1px gaps over a line-colored background draw the dividers, on two rows or one. */}
-          <dl className={`${CARD} mt-8 grid grid-cols-2 gap-px overflow-hidden bg-line lg:grid-cols-4`}>
-            <div className="bg-white p-5 sm:p-6">
-              <dt className="text-sm text-ink-500">Oportunidades abiertas</dt>
-              <dd className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
-                {data.oportunidadesAbiertas}
-              </dd>
-            </div>
-            <div className="bg-white p-5 sm:p-6">
-              <dt className="text-sm text-ink-500">Valor del embudo</dt>
-              <dd className="mt-2 font-display text-3xl font-semibold tracking-tight whitespace-nowrap text-ink-950 sm:text-4xl">
-                {/* The full amount doesn't fit half a phone's width. */}
-                <span className="sm:hidden">{solesCompacto(data.valorEmbudo)}</span>
-                <span className="max-sm:hidden">{formatSoles(data.valorEmbudo)}</span>
-              </dd>
-            </div>
-            <div className="bg-white p-5 sm:p-6">
-              <dt className="text-sm text-ink-500">Tasa de cierre</dt>
-              <dd className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
-                {data.tasaCierre === null ? "—" : `${Math.round(data.tasaCierre * 100)}%`}
-              </dd>
-              <dd className="mt-1 text-xs text-ink-400">
-                {ganadas} {ganadas === 1 ? "ganada" : "ganadas"} de {cerradas} cerradas en 6 meses
-              </dd>
-            </div>
-            <div className="bg-white p-5 sm:p-6">
-              <dt className="text-sm text-ink-500">Acciones vencidas</dt>
-              <dd
-                className={`mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl ${
-                  data.accionesVencidas > 0 ? "text-red-600" : "text-ink-950"
-                }`}
-              >
-                {data.accionesVencidas}
-              </dd>
-              <dd className="mt-1 text-xs text-ink-400">Seguimientos que ya pasaron de fecha</dd>
-            </div>
-          </dl>
-
-          <div className="mt-6 grid gap-6 xl:grid-cols-3">
-            {/* The grid stretches each card to its row's height: the charts grow
-                into it (flex-1) instead of leaving a blank strip below. */}
-            <section className={`${CARD} flex min-w-0 flex-col p-6 xl:col-span-2`}>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h2 className="text-base font-semibold text-ink-950">Ventas ganadas por mes</h2>
-                <p className="text-sm text-ink-500">
-                  <span className="font-semibold text-ink-950">{formatSoles(ganadoSeisMeses)}</span> en los últimos 6 meses
-                </p>
-              </div>
-              <div className="relative mt-5 min-h-60 flex-1">
-                <VentasMensualesChart meses={data.mensual} />
-              </div>
-            </section>
-
-            <section className={`${CARD} min-w-0 p-6`}>
-              <h2 className="text-base font-semibold text-ink-950">Embudo por servicio</h2>
-              <div className="mt-5">
-                <ServiciosChart servicios={data.porServicio} />
-              </div>
-            </section>
+      {miTrabajo && (miTrabajo.tareas || miTrabajo.acciones || miTrabajo.incidencias) && (
+        <section className="mt-8">
+          <h2 className="font-display text-lg font-semibold tracking-tight text-ink-950">Mi trabajo</h2>
+          <div className="mt-4">
+            <MiTrabajoPanel data={miTrabajo} today={today} ahora={ahora} />
           </div>
-
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
-            <section className={`${CARD} flex min-w-0 flex-col p-6`}>
-              <div className="flex items-center justify-between gap-4">
-                <h2 className="text-base font-semibold text-ink-950">Embudo por etapa</h2>
-                <ActionLink href="/dashboard/oportunidades">Ver tablero</ActionLink>
-              </div>
-              <div className="relative mt-4 min-h-56 flex-1">
-                <EmbudoChart etapas={data.embudo} />
-              </div>
-              <p className="mt-4 border-t border-line pt-4 text-xs text-ink-500">
-                {count.format(data.empresasTotal)} empresas registradas ·{" "}
-                {count.format(data.empresasClientes)} {data.empresasClientes === 1 ? "es cliente" : "son clientes"}
-              </p>
-            </section>
-
-            <section className={`${CARD} min-w-0 p-6`}>
-              <h2 className="text-base font-semibold text-ink-950">Próximas acciones</h2>
-              {data.proximasAcciones.length === 0 ? (
-                <p className="mt-3 border-t border-line pt-4 text-sm text-ink-500">
-                  No hay seguimientos programados en oportunidades abiertas.
-                </p>
-              ) : (
-                <ul className="mt-3 divide-y divide-line border-t border-line">
-                  {data.proximasAcciones.map((item) => (
-                    <li key={item.oportunidadId}>
-                      <Link href={`/dashboard/oportunidades/${item.oportunidadId}`} className="group block py-3">
-                        <p className="truncate text-sm font-medium text-ink-950 group-hover:underline">
-                          {item.titulo}
-                          <span className="font-normal text-ink-500"> · {item.empresaNombre}</span>
-                        </p>
-                        <div className="mt-1">
-                          <ProximaAccionLabel accion={item.proximaAccion} fecha={item.proximaAccionFecha} today={today} />
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          </div>
-
-          <section className={`${CARD} mt-6 p-6`}>
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="flex flex-wrap items-center gap-2 text-base font-semibold text-ink-950">
-                Solicitudes web recientes
-                {data.clientsNew > 0 && (
-                  <span className="rounded-full bg-brand-700 px-2 py-0.5 text-xs font-medium text-white">
-                    {data.clientsNew} sin atender
-                  </span>
-                )}
-              </h2>
-              <ActionLink href="/dashboard/solicitudes">Ver todas</ActionLink>
-            </div>
-
-            {data.recentClients.length === 0 ? (
-              <p className="mt-3 border-t border-line pt-4 text-sm text-ink-500">Aún no llegan solicitudes.</p>
-            ) : (
-              <ul className="mt-3 divide-y divide-line border-t border-line text-sm">
-                {data.recentClients.map((client) => (
-                  <li key={client.id}>
-                    <Link
-                      href={`/dashboard/solicitudes/${client.id}`}
-                      className="group flex items-center justify-between gap-4 py-3.5"
-                    >
-                      <span className="truncate font-medium text-ink-950 group-hover:underline">{client.fullName}</span>
-                      <span className="flex shrink-0 items-center gap-4">
-                        <ClientStatusBadge status={client.status} />
-                        <span className="w-20 text-right text-xs text-ink-400">{formatDate(client.createdAtUtc)}</span>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </>
+        </section>
       )}
+
+      {orden.map((s) => secciones[s])}
     </div>
   );
 }

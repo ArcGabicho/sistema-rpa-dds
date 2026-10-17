@@ -6,6 +6,7 @@ import { Field } from "@/components/ui/field";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import { useEmpresaForm } from "@/hooks/use-empresa-form";
 import { EMPRESA_ESTADOS, type Empresa, type TeamUser } from "@/lib/comercial";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 export function EmpresaForm({ empresa, users }: { empresa?: Empresa; users: TeamUser[] }) {
   const { register, errors, isSubmitting, onSubmit } = useEmpresaForm(empresa);
@@ -82,11 +83,7 @@ export function EmpresaForm({ empresa, users }: { empresa?: Empresa; users: Team
         <Field id="empresa-responsableId" label="Responsable">
           <select id="empresa-responsableId" className={input(false)} {...register("responsableId")}>
             <option value="">Sin asignar</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} actual={empresa?.responsableId} />
           </select>
         </Field>
         <Field id="empresa-origen" label="Origen" optional error={errors.origen?.message} hint="Feria, referido, web…">

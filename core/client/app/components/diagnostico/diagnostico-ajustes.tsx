@@ -11,6 +11,7 @@ import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/pa
 import type { TeamUser } from "@/lib/comercial";
 import { DIAGNOSTICO_ESTADOS, type Diagnostico } from "@/lib/diagnostico";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 const schema = z.object({
   titulo: z.string().trim().min(3, "Mínimo 3 caracteres.").max(200),
@@ -91,11 +92,7 @@ export function DiagnosticoAjustes({ diagnostico, users }: { diagnostico: Diagno
       <Field id="diag-responsable" label="Responsable">
         <select id="diag-responsable" className={input(false)} {...register("responsableId")}>
           <option value="">Sin asignar</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.fullName}
-            </option>
-          ))}
+          <UsuarioOptions users={users} actual={diagnostico.responsableId} />
         </select>
       </Field>
       <Field id="diag-resumen" label="Resumen ejecutivo" optional error={errors.resumen?.message} hint="Encabeza el informe para el cliente.">

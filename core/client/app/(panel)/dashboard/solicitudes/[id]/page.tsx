@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getApiUrl } from "@/lib/auth";
-import { getSessionToken } from "@/lib/session";
+import { SoloLectura } from "@/components/permisos/solo-lectura";
+import { puede } from "@/lib/permisos";
+import { getMe, getSessionToken } from "@/lib/session";
 import { SERVICE_OPTIONS } from "@/lib/contact-schema";
 import { ClientStatusBadge } from "@/components/ui/client-status-badge";
 import { ClientAssignmentPanel } from "@/components/sections/client-assignment-panel";
@@ -31,7 +33,7 @@ type ClientNote = {
   createdAtUtc: string;
 };
 
-type TeamUser = { id: number; fullName: string };
+type TeamUser = { id: number; fullName: string; activo?: boolean };
 
 const SERVICE_LABELS = Object.fromEntries(SERVICE_OPTIONS.map((option) => [option.value, option.label]));
 
@@ -83,8 +85,9 @@ export default async function ClienteDetailsPage({
   const token = await getSessionToken();
   if (!token) notFound();
 
-  const [client, notes, users] = await Promise.all([getClient(id, token), getNotes(id, token), getUsers(token)]);
+  const [client, notes, users, { me }] = await Promise.all([getClient(id, token), getNotes(id, token), getUsers(token), getMe()]);
   if (!client) notFound();
+  const editar = puede(me, "comercial", "editar");
 
   return (
     <div>
@@ -130,20 +133,24 @@ export default async function ClienteDetailsPage({
             </p>
           </section>
 
-          <ClientNotesPanel
-            clientId={client.id}
-            notes={notes.map((note) => ({ ...note, createdAtLabel: formatDateTime(note.createdAtUtc) }))}
-          />
+          <SoloLectura activo={!editar}>
+            <ClientNotesPanel
+              clientId={client.id}
+              notes={notes.map((note) => ({ ...note, createdAtLabel: formatDateTime(note.createdAtUtc) }))}
+            />
+          </SoloLectura>
         </div>
 
         <div className="flex flex-col gap-6">
-          <ConvertirSolicitudPanel solicitudId={client.id} oportunidadId={client.oportunidadId} />
-          <ClientAssignmentPanel
-            clientId={client.id}
-            status={client.status}
-            assignedToUserId={client.assignedToUserId}
-            users={users}
-          />
+          <SoloLectura activo={!editar}>
+            <ConvertirSolicitudPanel solicitudId={client.id} oportunidadId={client.oportunidadId} />
+            <ClientAssignmentPanel
+              clientId={client.id}
+              status={client.status}
+              assignedToUserId={client.assignedToUserId}
+              users={users}
+            />
+          </SoloLectura>
         </div>
       </div>
     </div>

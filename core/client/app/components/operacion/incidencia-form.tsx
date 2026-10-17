@@ -14,6 +14,7 @@ import type { TeamUser } from "@/lib/comercial";
 import { CANALES, SEVERIDADES, SLA_OBJETIVOS, duracion, type BotItem } from "@/lib/operacion";
 import { incidenciaSchema, type IncidenciaValues } from "@/lib/operacion-schema";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 // Reports an incident on a bot (its company comes with it) or on a company
 // without one. The severity sets its SLA, shown as it's chosen.
@@ -160,11 +161,7 @@ export function IncidenciaForm({ bots, botId, users, defaultResponsableId }: { b
         <Field id="inc-responsable" label="Responsable">
           <select id="inc-responsable" className={input(false)} {...register("responsableId")}>
             <option value="">Sin asignar</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} />
           </select>
         </Field>
       </div>

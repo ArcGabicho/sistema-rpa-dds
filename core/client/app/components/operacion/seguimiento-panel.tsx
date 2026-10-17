@@ -15,7 +15,7 @@ export type SeguimientoItem = Seguimiento & {
 
 // The incident's history, oldest first like a ticket thread: every change
 // is logged on its own, and the team adds notes as it works on it.
-export function SeguimientoPanel({ incidenciaId, items }: { incidenciaId: number; items: SeguimientoItem[] }) {
+export function SeguimientoPanel({ incidenciaId, items, soloLectura = false }: { incidenciaId: number; items: SeguimientoItem[]; soloLectura?: boolean }) {
   const router = useRouter();
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -59,6 +59,7 @@ export function SeguimientoPanel({ incidenciaId, items }: { incidenciaId: number
         })}
       </ol>
 
+      {!soloLectura && (
       <form onSubmit={agregar} className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
         <label htmlFor="seguimiento-texto" className="sr-only">
           Nota
@@ -79,6 +80,7 @@ export function SeguimientoPanel({ incidenciaId, items }: { incidenciaId: number
           </button>
         </div>
       </form>
+      )}
     </section>
   );
 }

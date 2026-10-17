@@ -10,7 +10,8 @@ import { apiGet } from "@/lib/api";
 import type { BovedaResumen, SecretoItem } from "@/lib/boveda";
 import type { Paged } from "@/lib/comercial";
 import { todayInLima } from "@/lib/format-date";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 const FILTROS = [
   { value: "", label: "Todas" },
@@ -35,12 +36,13 @@ export default async function BovedaPage({
     ...(q && { q }),
     ...(filtro === "dds" ? { soloDds: "true" } : filtro ? { estado: filtro } : {}),
   });
-  const [data, resumen, user] = await Promise.all([
+  const [data, resumen, sesion] = await Promise.all([
     apiGet<Paged<SecretoItem>>(`boveda?${query}`),
     apiGet<BovedaResumen>("boveda/resumen"),
-    getSessionUser(),
+    getMe(),
   ]);
-  const admin = isAdmin(user);
+  const { me } = sesion;
+  const admin = me?.esAdmin === true;
   const today = todayInLima();
 
   const conteo: Record<string, number | undefined> = { por_vencer: resumen?.porVencer, vencido: resumen?.vencidos };
@@ -63,10 +65,12 @@ export default async function BovedaPage({
                 Registro de accesos
               </Link>
             )}
-            <Link href="/dashboard/boveda/nuevo" className={BUTTON_PRIMARY}>
-              <Plus className="h-4 w-4" />
-              Nueva credencial
-            </Link>
+            {puede(me, "boveda", "editar") && (
+              <Link href="/dashboard/boveda/nuevo" className={BUTTON_PRIMARY}>
+                <Plus className="h-4 w-4" />
+                Nueva credencial
+              </Link>
+            )}
           </>
         }
       />

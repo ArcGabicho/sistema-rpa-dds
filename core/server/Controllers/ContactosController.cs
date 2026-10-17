@@ -13,6 +13,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/contactos")]
 [Authorize]
+[Modulo(Modulo.Comercial)]
 public class ContactosController(AppDbContext db) : ControllerBase
 {
     [HttpPut("{id:int}")]

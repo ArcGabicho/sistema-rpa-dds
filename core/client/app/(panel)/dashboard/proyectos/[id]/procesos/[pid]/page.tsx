@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
+import { SoloLectura } from "@/components/permisos/solo-lectura";
 import { PddEditor } from "@/components/proyecto/pdd-editor";
 import { PageHeader } from "@/components/ui/page-header";
 import { CARD } from "@/components/ui/panel-styles";
@@ -8,14 +9,16 @@ import { EtapaDesarrolloBadge, PddEstadoBadge } from "@/components/ui/proyecto-b
 import { apiGet } from "@/lib/api";
 import { formatNumero } from "@/lib/diagnostico";
 import { formatDate } from "@/lib/format-date";
+import { puede } from "@/lib/permisos";
 import type { ProcesoProyecto } from "@/lib/proyecto";
+import { getMe } from "@/lib/session";
 
 export default async function ProcesoProyectoPage({ params }: { params: Promise<{ id: string; pid: string }> }) {
   const { id, pid } = await params;
-  const [proceso, ia] = await Promise.all([
+  const [proceso, ia, { me }] = await Promise.all([
     apiGet<ProcesoProyecto>(`proyectos/procesos/${pid}`),
-    apiGet<{ configurada: boolean; modelo: string }>("proyectos/ia"),
-  ]);
+    apiGet<{ configurada: boolean; modelo: string }>("proyectos/ia"), getMe()]);
+  const editar = puede(me, "proyectos", "editar");
   if (!proceso || String(proceso.proyectoId) !== id) notFound();
 
   const volumen =
@@ -66,7 +69,9 @@ export default async function ProcesoProyectoPage({ params }: { params: Promise<
       )}
 
       <div className="mt-6">
-        <PddEditor proceso={proceso} iaConfigurada={ia?.configurada ?? false} iaModelo={ia?.modelo ?? ""} />
+        <SoloLectura activo={!editar} aviso="Solo lectura: tu acceso a Proyectos no permite cambiar el PDD. El documento se puede ver e imprimir.">
+          <PddEditor proceso={proceso} iaConfigurada={ia?.configurada ?? false} iaModelo={ia?.modelo ?? ""} />
+        </SoloLectura>
       </div>
     </div>
   );

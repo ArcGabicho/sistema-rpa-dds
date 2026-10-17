@@ -13,6 +13,7 @@ import { formatPayback, formatPorcentaje } from "@/lib/diagnostico";
 import { ITEM_TIPOS, MONEDAS, calcularTotales, formatMoneda, type Propuesta } from "@/lib/propuesta";
 import { propuestaSchema, type PropuestaValues } from "@/lib/propuesta-schema";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 function toValues(p: Propuesta): PropuestaValues {
   return {
@@ -255,11 +256,7 @@ export function PropuestaEditor({ propuesta, users }: { propuesta: Propuesta; us
           <Field id="prop-responsable" label="Responsable" className="sm:col-span-2 sm:max-w-sm">
             <select id="prop-responsable" className={input(false)} {...register("responsableId")}>
               <option value="">Sin asignar</option>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.fullName}
-                </option>
-              ))}
+              <UsuarioOptions users={users} actual={propuesta.responsableId} />
             </select>
           </Field>
         </section>

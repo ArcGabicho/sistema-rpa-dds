@@ -15,6 +15,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/proyectos")]
 [Authorize]
+[Modulo(Modulo.Proyectos)]
 public class ProyectosController(AppDbContext db, IaRedactor ia) : ControllerBase
 {
     [HttpGet]
@@ -188,7 +189,7 @@ public class ProyectosController(AppDbContext db, IaRedactor ia) : ControllerBas
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         // Loaded with its children: tasks point at milestones with a NoAction

@@ -5,6 +5,7 @@ import { AhorroChart, AhorroLeyenda } from "@/components/charts/ahorro-chart";
 import { EliminarButton } from "@/components/comercial/eliminar-button";
 import { IncidenciasLista } from "@/components/operacion/incidencias-lista";
 import { MedicionesPanel } from "@/components/operacion/mediciones-panel";
+import { SoloLectura } from "@/components/permisos/solo-lectura";
 import { BotEstadoBadge } from "@/components/ui/operacion-badges";
 import { PageHeader } from "@/components/ui/page-header";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD } from "@/components/ui/panel-styles";
@@ -14,7 +15,8 @@ import { SERVICIOS, formatSoles } from "@/lib/comercial";
 import { formatNumero, formatPorcentaje } from "@/lib/diagnostico";
 import { formatDateTime, formatDay, todayInLima } from "@/lib/format-date";
 import { nombreMes, relojServidor, type Bot } from "@/lib/operacion";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 // "YYYY-MM" from the bot's launch month to the current one (or its retirement).
 function mesesDesde(desde: string, hasta: string) {
@@ -36,8 +38,9 @@ function mesesDesde(desde: string, hasta: string) {
 
 export default async function BotPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [bot, user] = await Promise.all([apiGet<Bot>(`bots/${id}`), getSessionUser()]);
+  const [bot, { me }] = await Promise.all([apiGet<Bot>(`bots/${id}`), getMe()]);
   if (!bot) notFound();
+  const editar = puede(me, "operacion", "editar");
 
   const today = todayInLima();
   const ahora = relojServidor();
@@ -102,15 +105,19 @@ export default async function BotPage({ params }: { params: Promise<{ id: string
         }
         actions={
           <>
-            <Link href={`/dashboard/incidencias/nueva?botId=${bot.id}`} className={BUTTON_PRIMARY}>
-              <LifeBuoy className="h-4 w-4" />
-              Reportar incidencia
-            </Link>
-            <Link href={`/dashboard/bots/${bot.id}/editar`} className={BUTTON_SECONDARY}>
-              <Pencil className="h-4 w-4" />
-              Editar
-            </Link>
-            {isAdmin(user) && (
+            {editar && (
+              <>
+                <Link href={`/dashboard/incidencias/nueva?botId=${bot.id}`} className={BUTTON_PRIMARY}>
+                  <LifeBuoy className="h-4 w-4" />
+                  Reportar incidencia
+                </Link>
+                <Link href={`/dashboard/bots/${bot.id}/editar`} className={BUTTON_SECONDARY}>
+                  <Pencil className="h-4 w-4" />
+                  Editar
+                </Link>
+              </>
+            )}
+            {me?.esAdmin && (
               <EliminarButton
                 path={`bots/${bot.id}`}
                 confirmText={`¿Eliminar el bot “${bot.nombre}” con su registro mensual? Sus incidencias y licencias quedan con la empresa. Esta acción no se puede deshacer.`}
@@ -147,12 +154,14 @@ export default async function BotPage({ params }: { params: Promise<{ id: string
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
-          <MedicionesPanel
-            bot={bot}
-            mediciones={bot.mediciones}
-            meses={mesesDesde(bot.enProduccionDesde, bot.retiradoEl ?? today)}
-            pendientes={bot.mesesSinRegistro}
-          />
+          <SoloLectura activo={!editar}>
+            <MedicionesPanel
+              bot={bot}
+              mediciones={bot.mediciones}
+              meses={mesesDesde(bot.enProduccionDesde, bot.retiradoEl ?? today)}
+              pendientes={bot.mesesSinRegistro}
+            />
+          </SoloLectura>
 
           <section className={`${CARD} overflow-hidden`}>
             <div className="flex items-center justify-between gap-3 p-5">
@@ -201,9 +210,11 @@ export default async function BotPage({ params }: { params: Promise<{ id: string
           <section className={`${CARD} overflow-hidden`}>
             <div className="flex items-center justify-between gap-3 p-5">
               <h2 className="text-base font-semibold text-ink-950">Licencias</h2>
-              <Link href="/dashboard/vencimientos?vista=licencias" className="text-sm font-medium text-brand-700 hover:underline">
-                Gestionar
-              </Link>
+              {editar && (
+                <Link href="/dashboard/vencimientos?vista=licencias" className="text-sm font-medium text-brand-700 hover:underline">
+                  Gestionar
+                </Link>
+              )}
             </div>
             {bot.licencias.length === 0 ? (
               <p className="border-t border-line px-5 py-4 text-sm text-ink-500">Ninguna ligada a este bot.</p>

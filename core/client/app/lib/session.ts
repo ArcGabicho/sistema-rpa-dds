@@ -1,6 +1,8 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import { AUTH_COOKIE_NAME, getJwtSecretKey } from "@/lib/auth";
+import { AUTH_COOKIE_NAME, getApiUrl, getJwtSecretKey } from "@/lib/auth";
+import type { Me } from "@/lib/permisos";
 
 export type SessionUser = {
   id: number;
@@ -35,3 +37,20 @@ export function isAdmin(user: SessionUser | null) {
 export async function getSessionToken(): Promise<string | null> {
   return (await cookies()).get(AUTH_COOKIE_NAME)?.value ?? null;
 }
+
+// The signed-in user's effective permissions, from the API rather than the
+// token, so an admin's changes (or a deactivation) apply right away. Once
+// per request. `sesionInvalida`: the API rejected the session (the user was
+// deactivated or deleted); `me` is null too when the API can't be reached.
+export const getMe = cache(async (): Promise<{ me: Me | null; sesionInvalida: boolean }> => {
+  const token = await getSessionToken();
+  if (!token) return { me: null, sesionInvalida: true };
+  try {
+    const response = await fetch(`${getApiUrl()}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+    if (response.status === 401) return { me: null, sesionInvalida: true };
+    if (!response.ok) return { me: null, sesionInvalida: false };
+    return { me: (await response.json()) as Me, sesionInvalida: false };
+  } catch {
+    return { me: null, sesionInvalida: false };
+  }
+});

@@ -5,8 +5,10 @@ import { getSessionToken } from "@/lib/session";
 
 // Authenticated pass-through to the API for the panel's client components:
 // /api/panel/empresas/12/contactos -> {API_URL}/api/empresas/12/contactos,
-// with the session's JWT attached. Only the modules listed here go through.
-const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda", "diagnosticos", "procesos", "propuestas", "proyectos", "bots", "incidencias", "vencimientos"]);
+// with the session's JWT attached. Only the modules listed here go through,
+// plus a couple of single routes (signing in stays on its own route).
+const MODULES = new Set(["empresas", "contactos", "oportunidades", "clients", "boveda", "diagnosticos", "procesos", "propuestas", "proyectos", "bots", "incidencias", "vencimientos", "users", "dashboard"]);
+const RUTAS = new Set(["auth/me", "auth/clave"]);
 
 // Nothing from the panel's API (vault values least of all) may be cached.
 const NO_STORE = { "Cache-Control": "no-store" };
@@ -32,7 +34,7 @@ async function forward(request: Request, { params }: Context) {
   if (!token) return NextResponse.json({ message: "No autenticado." }, { status: 401 });
 
   const { path } = await params;
-  if (!MODULES.has(path[0] ?? "")) return NextResponse.json({ message: "No encontrado." }, { status: 404 });
+  if (!MODULES.has(path[0] ?? "") && !RUTAS.has(path.join("/"))) return NextResponse.json({ message: "No encontrado." }, { status: 404 });
 
   const { search } = new URL(request.url);
   const hasBody = request.method !== "GET" && request.method !== "DELETE";

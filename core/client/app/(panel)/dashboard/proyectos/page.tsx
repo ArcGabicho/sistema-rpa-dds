@@ -7,7 +7,9 @@ import { ProyectoEstadoBadge } from "@/components/ui/proyecto-badges";
 import { apiGet } from "@/lib/api";
 import type { Paged } from "@/lib/comercial";
 import { formatDay } from "@/lib/format-date";
+import { puede } from "@/lib/permisos";
 import { progreso, type ProyectoItem } from "@/lib/proyecto";
+import { getMe } from "@/lib/session";
 
 const FILTROS = [
   { value: "activos", label: "Activos" },
@@ -27,7 +29,7 @@ export default async function ProyectosPage({
   const estado = params.estado === undefined ? "activos" : FILTROS.some((f) => f.value === params.estado) ? params.estado : "activos";
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
   const query = new URLSearchParams({ page: String(page), pageSize: "25", ...(q && { q }), ...(estado !== "todos" && { estado }) });
-  const data = await apiGet<Paged<ProyectoItem>>(`proyectos?${query}`);
+  const [data, { me }] = await Promise.all([apiGet<Paged<ProyectoItem>>(`proyectos?${query}`), getMe()]);
 
   const linkTo = (nextEstado: string) => {
     const next = new URLSearchParams({ ...(q && { q }), estado: nextEstado });
@@ -40,10 +42,12 @@ export default async function ProyectosPage({
         title="Proyectos"
         description="La entrega de lo vendido: hitos, tareas y el PDD de cada proceso a automatizar."
         actions={
-          <Link href="/dashboard/proyectos/nuevo" className={BUTTON_PRIMARY}>
-            <Plus className="h-4 w-4" />
-            Nuevo proyecto
-          </Link>
+          puede(me, "proyectos", "editar") && (
+            <Link href="/dashboard/proyectos/nuevo" className={BUTTON_PRIMARY}>
+              <Plus className="h-4 w-4" />
+              Nuevo proyecto
+            </Link>
+          )
         }
       />
 

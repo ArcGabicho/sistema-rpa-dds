@@ -11,6 +11,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/empresas")]
 [Authorize]
+[Modulo(Modulo.Comercial)]
 public class EmpresasController(AppDbContext db) : ControllerBase
 {
     [HttpGet]
@@ -137,7 +138,7 @@ public class EmpresasController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var empresa = await db.Empresas.FindAsync([id], ct);

@@ -5,6 +5,8 @@ import { Pagination } from "@/components/ui/pagination";
 import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import { PropuestaEstadoBadge } from "@/components/ui/propuesta-badges";
 import { apiGet } from "@/lib/api";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 import type { Paged } from "@/lib/comercial";
 import { formatDate, formatDay, todayInLima } from "@/lib/format-date";
 import { formatMoneda, type PropuestaListItem } from "@/lib/propuesta";
@@ -28,7 +30,7 @@ export default async function PropuestasPage({
   const estado = FILTROS.some((f) => f.value === params.estado) ? params.estado! : "";
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
   const query = new URLSearchParams({ page: String(page), pageSize: "25", ...(q && { q }), ...(estado && { estado }) });
-  const data = await apiGet<Paged<PropuestaListItem>>(`propuestas?${query}`);
+  const [data, { me }] = await Promise.all([apiGet<Paged<PropuestaListItem>>(`propuestas?${query}`), getMe()]);
   const today = todayInLima();
 
   const linkTo = (nextEstado: string) => {
@@ -43,10 +45,12 @@ export default async function PropuestasPage({
         title="Propuestas"
         description="Las propuestas técnicas y económicas, sus versiones y qué respondió cada cliente."
         actions={
-          <Link href="/dashboard/propuestas/nueva" className={BUTTON_PRIMARY}>
+          puede(me, "propuestas", "editar") && (
+            <Link href="/dashboard/propuestas/nueva" className={BUTTON_PRIMARY}>
             <Plus className="h-4 w-4" />
             Nueva propuesta
           </Link>
+          )
         }
       />
 

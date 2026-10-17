@@ -9,15 +9,17 @@ import { formatPayback, type DiagnosticoItem } from "@/lib/diagnostico";
 export function OportunidadDiagnosticos({
   oportunidadId,
   diagnosticos,
+  puedeCrear = true,
 }: {
   oportunidadId: number;
   diagnosticos: DiagnosticoItem[] | null;
+  puedeCrear?: boolean;
 }) {
   return (
     <section className={`${CARD} p-5`}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-ink-950">Diagnóstico</h2>
-        {diagnosticos && diagnosticos.length > 0 && (
+        {puedeCrear && diagnosticos && diagnosticos.length > 0 && (
           <Link href={`/dashboard/diagnosticos/nuevo?oportunidadId=${oportunidadId}`} className="text-xs font-semibold text-brand-700 hover:underline">
             Otro
           </Link>
@@ -27,11 +29,11 @@ export function OportunidadDiagnosticos({
         <p className="mt-2 text-sm text-ink-500">No se pudo cargar.</p>
       ) : diagnosticos.length === 0 ? (
         <>
-          <p className="mt-2 text-sm text-ink-500">Levanta los procesos del cliente para estimar el ahorro y el retorno.</p>
-          <Link href={`/dashboard/diagnosticos/nuevo?oportunidadId=${oportunidadId}`} className={`${BUTTON_SECONDARY} mt-3 h-9 w-full px-3`}>
+          <p className="mt-2 text-sm text-ink-500">{puedeCrear ? "Levanta los procesos del cliente para estimar el ahorro y el retorno." : "Aún no tiene diagnóstico."}</p>
+          {puedeCrear && <Link href={`/dashboard/diagnosticos/nuevo?oportunidadId=${oportunidadId}`} className={`${BUTTON_SECONDARY} mt-3 h-9 w-full px-3`}>
             <Plus className="h-4 w-4" />
             Iniciar diagnóstico
-          </Link>
+          </Link>}
         </>
       ) : (
         <ul className="mt-2 divide-y divide-line">

@@ -9,21 +9,20 @@ import { TotalesStrip } from "@/components/diagnostico/totales-strip";
 import { EtapaBadge } from "@/components/ui/comercial-badges";
 import { DiagnosticoEstadoBadge } from "@/components/ui/diagnostico-badges";
 import { PageHeader } from "@/components/ui/page-header";
+import { SoloLectura } from "@/components/permisos/solo-lectura";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
 import type { TeamUser } from "@/lib/comercial";
 import type { Diagnostico } from "@/lib/diagnostico";
 import { formatDate } from "@/lib/format-date";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 export default async function DiagnosticoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [diagnostico, users, user] = await Promise.all([
-    apiGet<Diagnostico>(`diagnosticos/${id}`),
-    apiGet<TeamUser[]>("users"),
-    getSessionUser(),
-  ]);
+  const [diagnostico, users, { me }] = await Promise.all([apiGet<Diagnostico>(`diagnosticos/${id}`), apiGet<TeamUser[]>("users"), getMe()]);
   if (!diagnostico) notFound();
+  const editar = puede(me, "diagnosticos", "editar");
 
   return (
     <div>
@@ -47,13 +46,13 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
               <FileText className="h-4 w-4" />
               Ver informe
             </Link>
-            {diagnostico.procesos.length > 0 && (
+            {diagnostico.procesos.length > 0 && puede(me, "propuestas", "editar") && (
               <Link href={`/dashboard/propuestas/nueva?diagnosticoId=${diagnostico.id}`} className={BUTTON_PRIMARY}>
                 <FilePen className="h-4 w-4" />
                 Crear propuesta
               </Link>
             )}
-            {isAdmin(user) && (
+            {me?.esAdmin && (
               <EliminarButton
                 path={`diagnosticos/${diagnostico.id}`}
                 confirmText={`¿Eliminar “${diagnostico.titulo}” con sus ${diagnostico.procesos.length} procesos? Esta acción no se puede deshacer.`}
@@ -70,7 +69,9 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       </div>
 
       <div className="mt-6">
-        <ProcesosTabla diagnosticoId={diagnostico.id} costoHora={diagnostico.costoHora} procesos={diagnostico.procesos} />
+        <SoloLectura activo={!editar} aviso="Solo lectura: tu acceso a Diagnósticos no permite cambios.">
+          <ProcesosTabla diagnosticoId={diagnostico.id} costoHora={diagnostico.costoHora} procesos={diagnostico.procesos} />
+        </SoloLectura>
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -102,7 +103,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
               )}
             </section>
           )}
-          <DiagnosticoAjustes diagnostico={diagnostico} users={users ?? []} />
+          {editar && <DiagnosticoAjustes diagnostico={diagnostico} users={users ?? []} />}
         </div>
       </div>
     </div>

@@ -20,8 +20,8 @@ import { panelFetch } from "@/lib/panel-api";
 // Kanban of the open pipeline: drag a card to another stage, or onto "Ganada"
 // / "Perdida" (shown while dragging) to close it. Moves apply at once and
 // roll back if the API refuses. Without a pointer, the stage can be changed
-// from the opportunity's own page.
-export function PipelineBoard({ items, today }: { items: OportunidadItem[]; today: string }) {
+// from the opportunity's own page. `soloLectura`: no dragging.
+export function PipelineBoard({ items, today, soloLectura = false }: { items: OportunidadItem[]; today: string; soloLectura?: boolean }) {
   const router = useRouter();
   // Stage moves made here, laid over the server's list until a refresh
   // brings the same data back (or removed again if the API refuses).
@@ -135,7 +135,7 @@ export function PipelineBoard({ items, today }: { items: OportunidadItem[]; toda
                   {column.map((card) => (
                     <li
                       key={card.id}
-                      draggable
+                      draggable={!soloLectura}
                       onDragStart={(e) => {
                         e.dataTransfer.effectAllowed = "move";
                         e.dataTransfer.setData("text/plain", String(card.id));
@@ -145,7 +145,7 @@ export function PipelineBoard({ items, today }: { items: OportunidadItem[]; toda
                         setDragId(null);
                         setOverEtapa(null);
                       }}
-                      className={`cursor-grab rounded-md bg-white p-3 shadow-card transition-shadow hover:shadow-card-hover active:cursor-grabbing ${
+                      className={`rounded-md bg-white p-3 shadow-card transition-shadow hover:shadow-card-hover ${soloLectura ? "" : "cursor-grab active:cursor-grabbing"} ${
                         dragId === card.id ? "opacity-50" : ""
                       }`}
                     >

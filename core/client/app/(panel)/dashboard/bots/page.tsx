@@ -10,6 +10,8 @@ import { SERVICIO_CORTO, formatSoles, type Paged } from "@/lib/comercial";
 import { formatNumero, formatPorcentaje } from "@/lib/diagnostico";
 import { formatDay } from "@/lib/format-date";
 import { nombreMes, type BotItem, type BotsResumen } from "@/lib/operacion";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 const FILTROS = [
   { value: "activo", label: "Activos" },
@@ -24,7 +26,7 @@ export default async function BotsPage({ searchParams }: { searchParams: Promise
   const estado = params.estado === undefined ? "activo" : FILTROS.some((f) => f.value === params.estado) ? params.estado : "activo";
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
   const query = new URLSearchParams({ page: String(page), pageSize: "25", ...(q && { q }), ...(estado !== "todos" && { estado }) });
-  const [data, resumen] = await Promise.all([apiGet<Paged<BotItem>>(`bots?${query}`), apiGet<BotsResumen>("bots/resumen")]);
+  const [data, resumen, { me }] = await Promise.all([apiGet<Paged<BotItem>>(`bots?${query}`), apiGet<BotsResumen>("bots/resumen"), getMe()]);
 
   const linkTo = (nextEstado: string) => `/dashboard/bots?${new URLSearchParams({ ...(q && { q }), estado: nextEstado })}`;
   const mes = resumen ? nombreMes(resumen.mes) : "";
@@ -49,10 +51,12 @@ export default async function BotsPage({ searchParams }: { searchParams: Promise
         title="Bots en producción"
         description="Lo que ya corre en los clientes: cuánto ahorra de verdad frente a lo estimado, y su salud."
         actions={
-          <Link href="/dashboard/bots/nuevo" className={BUTTON_PRIMARY}>
-            <Plus className="h-4 w-4" />
-            Registrar bot
-          </Link>
+          puede(me, "operacion", "editar") && (
+            <Link href="/dashboard/bots/nuevo" className={BUTTON_PRIMARY}>
+              <Plus className="h-4 w-4" />
+              Registrar bot
+            </Link>
+          )
         }
       />
 

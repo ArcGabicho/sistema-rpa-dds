@@ -12,6 +12,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/diagnosticos")]
 [Authorize]
+[Modulo(Modulo.Diagnosticos)]
 public class DiagnosticosController(AppDbContext db) : ControllerBase
 {
     [HttpGet]
@@ -187,7 +188,7 @@ public class DiagnosticosController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var diagnostico = await db.Diagnosticos.FindAsync([id], ct);

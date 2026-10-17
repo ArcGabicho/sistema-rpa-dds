@@ -29,13 +29,9 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const adminOnly = pathname.startsWith("/dashboard/usuarios") || pathname.startsWith("/dashboard/boveda/registro");
-  if (adminOnly && role !== "Admin") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
+  // Roles and module permissions are checked against the API by each
+  // section's layout (components/permisos/requiere.tsx), not from the token,
+  // so an admin's changes apply right away.
 
   if (pathname === "/ingresar" && authenticated) {
     const url = request.nextUrl.clone();

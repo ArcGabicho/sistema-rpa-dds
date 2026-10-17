@@ -6,6 +6,7 @@ namespace Server.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<PermisoUsuario> PermisosUsuario => Set<PermisoUsuario>();
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<ClientNote> ClientNotes => Set<ClientNote>();
     public DbSet<Secreto> Secretos => Set<Secreto>();
@@ -39,6 +40,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(u => u.FullName).HasMaxLength(200).IsRequired();
             entity.Property(u => u.PasswordHash).IsRequired();
             entity.Property(u => u.Role).HasMaxLength(20).IsRequired();
+        });
+
+        modelBuilder.Entity<PermisoUsuario>(entity =>
+        {
+            entity.HasIndex(p => new { p.UsuarioId, p.Modulo }).IsUnique();
+            entity.Property(p => p.Modulo).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.Nivel).HasMaxLength(20).IsRequired();
+            entity.HasOne(p => p.Usuario).WithMany(u => u.Permisos).HasForeignKey(p => p.UsuarioId).OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Client>(entity =>

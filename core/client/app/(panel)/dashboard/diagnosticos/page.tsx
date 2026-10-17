@@ -5,6 +5,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/panel-styles";
 import { apiGet } from "@/lib/api";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 import { formatSoles, type Paged } from "@/lib/comercial";
 import { DIAGNOSTICO_ESTADOS, formatNumero, formatPayback, type DiagnosticoItem } from "@/lib/diagnostico";
 import { formatDate } from "@/lib/format-date";
@@ -21,7 +23,7 @@ export default async function DiagnosticosPage({
   const estado = DIAGNOSTICO_ESTADOS.some((e) => e.value === params.estado) ? params.estado! : "";
   const page = Math.max(1, Math.floor(Number(params.page)) || 1);
   const query = new URLSearchParams({ page: String(page), pageSize: "25", ...(q && { q }), ...(estado && { estado }) });
-  const data = await apiGet<Paged<DiagnosticoItem>>(`diagnosticos?${query}`);
+  const [data, { me }] = await Promise.all([apiGet<Paged<DiagnosticoItem>>(`diagnosticos?${query}`), getMe()]);
 
   const linkTo = (nextEstado: string) => {
     const next = new URLSearchParams({ ...(q && { q }), ...(nextEstado && { estado: nextEstado }) });
@@ -35,10 +37,12 @@ export default async function DiagnosticosPage({
         title="Diagnósticos"
         description="Los procesos levantados con cada cliente, qué tan automatizables son y cuánto ahorrarían."
         actions={
-          <Link href="/dashboard/diagnosticos/nuevo" className={BUTTON_PRIMARY}>
+          puede(me, "diagnosticos", "editar") && (
+            <Link href="/dashboard/diagnosticos/nuevo" className={BUTTON_PRIMARY}>
             <Plus className="h-4 w-4" />
             Nuevo diagnóstico
           </Link>
+          )
         }
       />
 

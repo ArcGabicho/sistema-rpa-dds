@@ -245,7 +245,19 @@ export function OportunidadRenovacionButton({ contratoId, className = "" }: { co
   );
 }
 
-export function ContratosPanel({ contratos, esAdmin }: { contratos: Contrato[]; esAdmin: boolean }) {
+// `editar`: contracts can be changed (Operación); `oportunidades`: renewal
+// opportunities can be opened (Comercial).
+export function ContratosPanel({
+  contratos,
+  esAdmin,
+  editar = true,
+  oportunidades = true,
+}: {
+  contratos: Contrato[];
+  esAdmin: boolean;
+  editar?: boolean;
+  oportunidades?: boolean;
+}) {
   const [editando, setEditando] = useState<Contrato | null | "nuevo">(null);
   const [renovando, setRenovando] = useState<Contrato | null>(null);
 
@@ -258,10 +270,12 @@ export function ContratosPanel({ contratos, esAdmin }: { contratos: Contrato[]; 
           </h2>
           <p className="mt-0.5 text-xs text-ink-500">Avisan 60 días antes de vencer, para negociar la renovación a tiempo.</p>
         </div>
-        <button type="button" onClick={() => setEditando("nuevo")} className={`${BUTTON_SECONDARY} h-9 shrink-0 px-3`}>
-          <Plus className="h-4 w-4" />
-          Contrato
-        </button>
+        {editar && (
+          <button type="button" onClick={() => setEditando("nuevo")} className={`${BUTTON_SECONDARY} h-9 shrink-0 px-3`}>
+            <Plus className="h-4 w-4" />
+            Contrato
+          </button>
+        )}
       </div>
       {contratos.length === 0 ? (
         <p className="border-t border-line px-5 py-4 text-sm text-ink-500">Aún no hay contratos de soporte.</p>
@@ -301,16 +315,18 @@ export function ContratosPanel({ contratos, esAdmin }: { contratos: Contrato[]; 
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2 lg:justify-end">
-                  {avisar && !oportunidadAbierta && <OportunidadRenovacionButton contratoId={c.id} />}
-                  {c.estado === "vigente" && (
+                  {avisar && !oportunidadAbierta && oportunidades && <OportunidadRenovacionButton contratoId={c.id} />}
+                  {editar && c.estado === "vigente" && (
                     <button type="button" onClick={() => setRenovando(c)} className={`${avisar ? BUTTON_PRIMARY : BUTTON_SECONDARY} h-9 px-3`}>
                       <RefreshCw className="h-4 w-4" />
                       Renovar
                     </button>
                   )}
-                  <button type="button" onClick={() => setEditando(c)} aria-label={`Editar el contrato de ${c.empresaNombre}`} className={`${BUTTON_SECONDARY} h-9 px-3`}>
-                    <Pencil className="h-4 w-4" />
-                  </button>
+                  {editar && (
+                    <button type="button" onClick={() => setEditando(c)} aria-label={`Editar el contrato de ${c.empresaNombre}`} className={`${BUTTON_SECONDARY} h-9 px-3`}>
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </li>
             );

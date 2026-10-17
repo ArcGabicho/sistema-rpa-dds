@@ -12,18 +12,16 @@ import { VencimientoBadge } from "@/components/ui/vencimiento-badge";
 import { apiGet } from "@/lib/api";
 import { SECRETO_TIPO_LABELS, type BovedaResumen, type Secreto } from "@/lib/boveda";
 import { formatDate, formatDateTime, todayInLima } from "@/lib/format-date";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 
 export default async function SecretoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [secreto, resumen, user] = await Promise.all([
-    apiGet<Secreto>(`boveda/${id}`),
-    apiGet<BovedaResumen>("boveda/resumen"),
-    getSessionUser(),
-  ]);
+  const [secreto, resumen, { me }] = await Promise.all([apiGet<Secreto>(`boveda/${id}`), apiGet<BovedaResumen>("boveda/resumen"), getMe()]);
   if (!secreto) notFound();
 
-  const admin = isAdmin(user);
+  const admin = me?.esAdmin === true;
+  const editar = puede(me, "boveda", "editar");
   const restringidaParaMi = secreto.restringido && !admin;
   const bloqueado = restringidaParaMi
     ? "Credencial restringida: solo un administrador puede verla o cambiarla."
@@ -64,7 +62,7 @@ export default async function SecretoPage({ params }: { params: Promise<{ id: st
         description={secreto.empresaNombre ?? "Credencial de DDS"}
         actions={
           <>
-            {!restringidaParaMi && (
+            {!restringidaParaMi && editar && (
               <Link href={`/dashboard/boveda/${secreto.id}/editar`} className={BUTTON_SECONDARY}>
                 <Pencil className="h-4 w-4" />
                 Editar
@@ -114,7 +112,7 @@ export default async function SecretoPage({ params }: { params: Promise<{ id: st
             )}
           </section>
 
-          <RotarSecreto id={secreto.id} tipo={secreto.tipo} venceEl={secreto.venceEl} bloqueado={bloqueado !== null} />
+          {editar && <RotarSecreto id={secreto.id} tipo={secreto.tipo} venceEl={secreto.venceEl} bloqueado={bloqueado !== null} />}
         </div>
       </div>
     </div>

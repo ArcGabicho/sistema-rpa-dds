@@ -13,6 +13,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/procesos")]
 [Authorize]
+[Modulo(Modulo.Diagnosticos)]
 public class ProcesosController(AppDbContext db) : ControllerBase
 {
     [HttpPut("{id:int}")]

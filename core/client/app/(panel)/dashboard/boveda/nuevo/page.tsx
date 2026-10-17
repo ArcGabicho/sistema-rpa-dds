@@ -2,13 +2,13 @@ import { SecretoForm } from "@/components/boveda/secreto-form";
 import { PageHeader } from "@/components/ui/page-header";
 import { apiGet } from "@/lib/api";
 import type { Empresa } from "@/lib/comercial";
-import { getSessionUser, isAdmin } from "@/lib/session";
+import { getMe } from "@/lib/session";
 
 // ?empresaId= presets the company (the "Agregar" link on its page).
 export default async function NuevoSecretoPage({ searchParams }: { searchParams: Promise<{ empresaId?: string }> }) {
   const { empresaId } = await searchParams;
-  const [user, empresa] = await Promise.all([
-    getSessionUser(),
+  const [{ me }, empresa] = await Promise.all([
+    getMe(),
     empresaId && /^\d+$/.test(empresaId) ? apiGet<Empresa>(`empresas/${empresaId}`) : null,
   ]);
 
@@ -26,7 +26,7 @@ export default async function NuevoSecretoPage({ searchParams }: { searchParams:
       <div className="mt-8">
         <SecretoForm
           empresa={empresa ? { id: empresa.id, nombreComercial: empresa.nombreComercial, ruc: empresa.ruc } : undefined}
-          esAdmin={isAdmin(user)}
+          esAdmin={me?.esAdmin === true}
         />
       </div>
     </div>

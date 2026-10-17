@@ -15,6 +15,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/propuestas")]
 [Authorize]
+[Modulo(Modulo.Propuestas)]
 public class PropuestasController(AppDbContext db) : ControllerBase
 {
     // estado: one status, or "vencida" (sent, and past its validity date).
@@ -398,7 +399,7 @@ public class PropuestasController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var propuesta = await db.Propuestas.FindAsync([id], ct);

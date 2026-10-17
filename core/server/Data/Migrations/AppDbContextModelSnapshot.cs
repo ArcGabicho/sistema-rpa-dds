@@ -118,6 +118,9 @@ namespace server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -881,6 +884,35 @@ namespace server.Data.Migrations
                         .HasFilter("[SolicitudId] IS NOT NULL");
 
                     b.ToTable("Oportunidades");
+                });
+
+            modelBuilder.Entity("Server.Models.PermisoUsuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Modulo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Nivel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId", "Modulo")
+                        .IsUnique();
+
+                    b.ToTable("PermisosUsuario");
                 });
 
             modelBuilder.Entity("Server.Models.ProcesoEvaluado", b =>
@@ -1748,6 +1780,17 @@ namespace server.Data.Migrations
                     b.Navigation("Solicitud");
                 });
 
+            modelBuilder.Entity("Server.Models.PermisoUsuario", b =>
+                {
+                    b.HasOne("Server.Models.AdminUser", "Usuario")
+                        .WithMany("Permisos")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("Server.Models.ProcesoEvaluado", b =>
                 {
                     b.HasOne("Server.Models.Diagnostico", "Diagnostico")
@@ -1902,6 +1945,11 @@ namespace server.Data.Migrations
                     b.Navigation("Proyecto");
 
                     b.Navigation("Responsable");
+                });
+
+            modelBuilder.Entity("Server.Models.AdminUser", b =>
+                {
+                    b.Navigation("Permisos");
                 });
 
             modelBuilder.Entity("Server.Models.Bot", b =>

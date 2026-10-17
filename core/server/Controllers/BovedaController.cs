@@ -16,6 +16,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route("api/boveda")]
 [Authorize]
+[Modulo(Modulo.Boveda)]
 public class BovedaController(AppDbContext db, BovedaCifrado cifrado) : ControllerBase
 {
     // How far ahead an expiry counts as "por vencer".
@@ -182,6 +183,7 @@ public class BovedaController(AppDbContext db, BovedaCifrado cifrado) : Controll
     }
 
     [HttpPost("{id:int}/revelar")]
+    [Modulo(Modulo.Boveda, NivelAcceso.Ver)]
     [EnableRateLimiting(RateLimiting.Boveda)]
     public async Task<IActionResult> Revelar(int id, RevelarSecretoRequest request, CancellationToken ct)
     {
@@ -211,7 +213,7 @@ public class BovedaController(AppDbContext db, BovedaCifrado cifrado) : Controll
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         var secreto = await db.Secretos.FindAsync([id], ct);
@@ -230,7 +232,7 @@ public class BovedaController(AppDbContext db, BovedaCifrado cifrado) : Controll
 
     // The vault's whole audit trail, deleted secrets included.
     [HttpGet("accesos")]
-    [Authorize(Roles = AdminRole.Admin)]
+    [SoloAdmin]
     public async Task<ActionResult<PagedResponse<AccesoSecretoResponse>>> GetAccesos(
         [FromQuery] string? accion,
         [FromQuery] int? usuarioId,
@@ -313,7 +315,7 @@ public class BovedaController(AppDbContext db, BovedaCifrado cifrado) : Controll
         secreto.Restringido = request.Restringido;
     }
 
-    private bool EsAdmin() => User.IsInRole(AdminRole.Admin);
+    private bool EsAdmin() => HttpContext.Permisos().EsAdmin;
 
     private ObjectResult SoloAdmin() => StatusCode(StatusCodes.Status403Forbidden, new
     {

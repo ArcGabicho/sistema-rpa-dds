@@ -14,6 +14,7 @@ import { SERVICIOS, formatSoles, type TeamUser } from "@/lib/comercial";
 import { BOT_ESTADOS, PLATAFORMAS_SUGERIDAS, type BorradorBot, type Bot } from "@/lib/operacion";
 import { botSchema, type BotValues } from "@/lib/operacion-schema";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 function toBody(v: BotValues) {
   const n = (x: number) => (Number.isFinite(x) ? x : 0);
@@ -179,11 +180,7 @@ export function BotForm({
         <Field id="bot-responsable" label="Responsable de soporte">
           <select id="bot-responsable" className={input(false)} {...register("responsableId")}>
             <option value="">Sin asignar</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.fullName}
-              </option>
-            ))}
+            <UsuarioOptions users={users} actual={bot?.responsableId} />
           </select>
         </Field>
         {bot && (

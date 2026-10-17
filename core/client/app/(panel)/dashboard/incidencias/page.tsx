@@ -8,6 +8,8 @@ import { apiGet } from "@/lib/api";
 import type { Paged } from "@/lib/comercial";
 import { formatPorcentaje } from "@/lib/diagnostico";
 import { formatDateTime } from "@/lib/format-date";
+import { puede } from "@/lib/permisos";
+import { getMe } from "@/lib/session";
 import { CAUSA_LABELS, SEVERIDADES, SLA_OBJETIVOS, duracion, relojServidor, type IncidenciaItem, type IncidenciasResumen } from "@/lib/operacion";
 
 const FILTROS = [
@@ -35,7 +37,11 @@ export default async function IncidenciasPage({
     ...(botId && { botId }),
     ...(empresaId && { empresaId }),
   });
-  const [data, resumen] = await Promise.all([apiGet<Paged<IncidenciaItem>>(`incidencias?${query}`), apiGet<IncidenciasResumen>("incidencias/resumen")]);
+  const [data, resumen, { me }] = await Promise.all([
+    apiGet<Paged<IncidenciaItem>>(`incidencias?${query}`),
+    apiGet<IncidenciasResumen>("incidencias/resumen"),
+    getMe(),
+  ]);
 
   const ahora = relojServidor();
   const fechas = Object.fromEntries((data?.items ?? []).map((i) => [i.id, formatDateTime(i.createdAtUtc)]));
@@ -63,10 +69,12 @@ export default async function IncidenciasPage({
         title="Incidencias"
         description="El soporte de los bots en producción, con su SLA según la severidad."
         actions={
-          <Link href="/dashboard/incidencias/nueva" className={BUTTON_PRIMARY}>
-            <Plus className="h-4 w-4" />
-            Nueva incidencia
-          </Link>
+          puede(me, "operacion", "editar") && (
+            <Link href="/dashboard/incidencias/nueva" className={BUTTON_PRIMARY}>
+              <Plus className="h-4 w-4" />
+              Nueva incidencia
+            </Link>
+          )
         }
       />
 

@@ -9,6 +9,7 @@ import { BUTTON_PRIMARY, CARD, INPUT_BASE, inputState } from "@/components/ui/pa
 import type { TeamUser } from "@/lib/comercial";
 import { CANALES, CAUSAS, SEVERIDADES, type Incidencia } from "@/lib/operacion";
 import { panelFetch } from "@/lib/panel-api";
+import { UsuarioOptions } from "@/components/ui/usuario-options";
 
 // The incident's details, editable. Changing the severity recalculates the
 // SLA from the report time; the change goes on the history.
@@ -120,11 +121,7 @@ export function IncidenciaDetalles({
       <Field id="det-responsable" label="Responsable">
         <select id="det-responsable" value={form.responsableId} onChange={set("responsableId")} className={input}>
           <option value="">Sin asignar</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.fullName}
-            </option>
-          ))}
+          <UsuarioOptions users={users} actual={incidencia.responsableId} />
         </select>
       </Field>
       <Field id="det-reporta" label="Reportada por" optional>

@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
+import { UserRound, X } from "lucide-react";
 import { LogoutButton } from "@/components/sections/logout-button";
 import { DASHBOARD_NAV } from "@/lib/dashboard-nav";
 import { SITE } from "@/lib/site-config";
+import { puede, type Me } from "@/lib/permisos";
 import type { SessionUser } from "@/lib/session";
 
 function getInitials(name: string | undefined) {
@@ -20,17 +21,23 @@ function getInitials(name: string | undefined) {
 
 export function DashboardSidebar({
   user,
+  me,
   onNavigate,
   onClose,
 }: {
   user: SessionUser | null;
+  // Null when the API couldn't be reached: then the whole menu shows and
+  // each page reports its own error.
+  me: Me | null;
   onNavigate?: () => void;
   onClose?: () => void;
 }) {
   const pathname = usePathname();
   const visibleNav = DASHBOARD_NAV.map((group) => ({
     ...group,
-    items: group.items.filter((item) => !item.adminOnly || user?.role === "Admin"),
+    items: group.items.filter((item) =>
+      item.adminOnly ? me?.esAdmin === true : !item.modulo || !me || puede(me, item.modulo, "ver"),
+    ),
   })).filter((group) => group.items.length > 0);
 
   return (
@@ -100,15 +107,24 @@ export function DashboardSidebar({
               <p className="truncate text-sm font-semibold text-ink-950">
                 {user?.name || "Administrador"}
               </p>
-              {user?.role && (
+              {(me?.roleLabel ?? user?.role) && (
                 <span className="shrink-0 rounded-full bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700">
-                  {user.role}
+                  {me?.roleLabel ?? user?.role}
                 </span>
               )}
             </div>
             <p className="truncate text-xs text-ink-500">{user?.email}</p>
           </div>
         </div>
+        <Link
+          href="/dashboard/cuenta"
+          onClick={onNavigate}
+          aria-current={pathname === "/dashboard/cuenta" ? "page" : undefined}
+          className="-mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-ink-500 hover:text-ink-950 aria-[current=page]:text-brand-700"
+        >
+          <UserRound className="h-3.5 w-3.5" />
+          Mi cuenta y contraseña
+        </Link>
         <LogoutButton />
       </div>
     </aside>

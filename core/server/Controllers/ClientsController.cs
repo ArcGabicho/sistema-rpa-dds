@@ -12,6 +12,7 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("api/clients")]
+[Modulo(Modulo.Comercial)]
 public class ClientsController(AppDbContext db, ILogger<ClientsController> logger) : ControllerBase
 {
     [HttpPost]
